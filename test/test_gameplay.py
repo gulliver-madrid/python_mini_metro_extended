@@ -46,7 +46,7 @@ class TestMediator(unittest.TestCase):
         )
 
     def test_react_mouse_down_start_path(self) -> None:
-        self.mediator.start_path_on_station = MagicMock()
+        self.mediator.start_path_on_station = MagicMock() # type: ignore [method-assign]
         self.mediator.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,

@@ -14,7 +14,7 @@ class Circle(Shape):
         self.id = f"Circle-{uuid()}"
         self.radius = radius
 
-    def draw(self, surface: pygame.surface.Surface, position: Point):
+    def draw(self, surface: pygame.surface.Surface, position: Point) -> None:
         super().draw(surface, position)
         center = (position.left, position.top)
         radius = self.radius

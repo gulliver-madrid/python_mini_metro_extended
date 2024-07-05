@@ -18,7 +18,7 @@ class Line:
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Line) and self.id == other.id
 
-    def draw(self, surface: pygame.surface.Surface):
+    def draw(self, surface: pygame.surface.Surface) -> pygame.Rect:
         return pygame.draw.line(
             surface, self.color, self.start.to_tuple(), self.end.to_tuple(), self.width
         )

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 from copy import deepcopy
+from typing import Any
 
 from shortuuid import uuid
 
@@ -59,7 +60,7 @@ class Point:
 
         return Point(new_left, new_top)
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, memo: dict[int, Any]) -> 'Point':
         cls = self.__class__
         result = cls.__new__(cls)
         memo[id(self)] = result

@@ -2,8 +2,8 @@ import math
 from typing import List
 
 import pygame
-from shapely.geometry import Point as ShapelyPoint
-from shapely.geometry.polygon import Polygon as ShapelyPolygon
+from shapely.geometry import Point as ShapelyPoint # type: ignore [import-untyped]
+from shapely.geometry.polygon import Polygon as ShapelyPolygon # type: ignore [import-untyped]
 from shortuuid import uuid
 
 from src.config import Config
