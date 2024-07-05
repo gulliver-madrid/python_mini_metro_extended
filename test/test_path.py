@@ -15,7 +15,7 @@ from src.utils import get_random_color, get_random_position, get_random_station_
 
 
 class TestPath(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.width, self.height = 640, 480
         self.screen = create_autospec(pygame.surface.Surface)
         self.position = get_random_position(self.width, self.height)

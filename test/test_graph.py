@@ -1,5 +1,6 @@
 import os
 import unittest
+from collections.abc import Sequence
 from unittest.mock import create_autospec
 
 import pygame
@@ -18,7 +19,7 @@ from src.utils import get_random_color, get_random_position
 
 
 class TestGraph(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.width, self.height = screen_width, screen_height
         self.screen = create_autospec(pygame.surface.Surface)
         self.position = get_random_position(self.width, self.height)
@@ -27,7 +28,7 @@ class TestGraph(unittest.TestCase):
         for station in self.mediator.stations:
             station.draw(self.screen)
 
-    def connect_stations(self, station_idx):
+    def connect_stations(self, station_idx: Sequence[int]) -> None:
         self.mediator.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,

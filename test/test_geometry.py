@@ -15,7 +15,7 @@ from src.utils import get_random_color, get_random_position
 
 
 class TestGeometry(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.width, self.height = screen_width, screen_height
         self.screen = create_autospec(pygame.surface.Surface)
         self.position = get_random_position(self.width, self.height)
@@ -32,7 +32,7 @@ class TestGeometry(unittest.TestCase):
         self.assertSequenceEqual(circle.color, self.color)
         self.assertEqual(circle.radius, radius)
 
-    def init_circle(self):
+    def init_circle(self) -> Circle:
         return Circle(self.color, 1)
 
     def test_circle_draw(self) -> None:
@@ -62,7 +62,7 @@ class TestGeometry(unittest.TestCase):
         self.assertEqual(rect.width, width)
         self.assertEqual(rect.height, height)
 
-    def init_rect(self):
+    def init_rect(self) -> Rect:
         return Rect(self.color, 10, 20)
 
     def test_rect_draw(self) -> None:
@@ -110,7 +110,7 @@ class TestGeometry(unittest.TestCase):
         self.assertEqual(line.end, self.end)
         self.assertEqual(line.width, self.linewidth)
 
-    def init_line(self):
+    def init_line(self) -> Line:
         return Line(self.color, self.start, self.end, self.linewidth)
 
     def test_line_draw(self) -> None:
@@ -127,7 +127,7 @@ class TestGeometry(unittest.TestCase):
         self.assertSequenceEqual(triangle.color, self.color)
         self.assertEqual(triangle.size, size)
 
-    def init_triangle(self):
+    def init_triangle(self) -> Triangle:
         return Triangle(self.color, 10)
 
     def test_triangle_draw(self) -> None:

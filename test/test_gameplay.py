@@ -1,5 +1,6 @@
 import os
 import unittest
+from collections.abc import Sequence
 from unittest.mock import MagicMock, create_autospec
 
 import pygame
@@ -15,7 +16,7 @@ from src.utils import get_random_color, get_random_position
 
 
 class TestMediator(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.width, self.height = screen_width, screen_height
         self.screen = create_autospec(pygame.surface.Surface)
         self.position = get_random_position(self.width, self.height)
@@ -24,7 +25,7 @@ class TestMediator(unittest.TestCase):
         pygame.draw = MagicMock()
         self.mediator.render(self.screen)
 
-    def connect_stations(self, station_idx):
+    def connect_stations(self, station_idx:Sequence[int]) -> None:
         self.mediator.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
@@ -91,7 +92,7 @@ class TestMediator(unittest.TestCase):
 
     def test_mouse_dragged_between_station_and_non_station_points_does_not_create_path(
         self,
-    ):
+    ) -> None:
         self.mediator.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
@@ -121,7 +122,7 @@ class TestMediator(unittest.TestCase):
 
     def test_mouse_dragged_between_3_stations_without_coming_back_to_first_does_not_create_loop(
         self,
-    ):
+    ) -> None:
         self.connect_stations([0, 1, 2])
         self.assertEqual(len(self.mediator.paths), 1)
         self.assertFalse(self.mediator.paths[0].is_looped)
