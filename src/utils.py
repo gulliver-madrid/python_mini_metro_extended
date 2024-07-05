@@ -4,15 +4,15 @@ from typing import List, Tuple
 
 import numpy as np
 
-from config import passenger_size, station_color, station_shape_type_list, station_size
-from geometry.circle import Circle
-from geometry.cross import Cross
-from geometry.point import Point
-from geometry.rect import Rect
-from geometry.shape import Shape
-from geometry.triangle import Triangle
-from geometry.type import ShapeType
-from type import Color
+from src.config import passenger_size, station_color, station_shape_type_list, station_size
+from src.geometry.circle import Circle
+from src.geometry.cross import Cross
+from src.geometry.point import Point
+from src.geometry.rect import Rect
+from src.geometry.shape import Shape
+from src.geometry.triangle import Triangle
+from src.geometry.type import ShapeType
+from src.type import Color
 
 
 def get_random_position(width: int, height: int) -> Point:

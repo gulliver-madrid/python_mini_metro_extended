@@ -1,21 +1,17 @@
 import os
-import sys
 import unittest
-from unittest.mock import MagicMock, create_autospec
-
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../src")
-
 from copy import deepcopy
+from unittest.mock import MagicMock, create_autospec
 
 import pygame
 
-from config import screen_height, screen_width
-from geometry.circle import Circle
-from geometry.line import Line
-from geometry.point import Point
-from geometry.rect import Rect
-from geometry.triangle import Triangle
-from utils import get_random_color, get_random_position
+from src.config import screen_height, screen_width
+from src.geometry.circle import Circle
+from src.geometry.line import Line
+from src.geometry.point import Point
+from src.geometry.rect import Rect
+from src.geometry.triangle import Triangle
+from src.utils import get_random_color, get_random_position
 
 
 class TestGeometry(unittest.TestCase):

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 
-from event.type import KeyboardEventType, MouseEventType
+from src.event.type import KeyboardEventType, MouseEventType
 
 
 class Event(ABC):

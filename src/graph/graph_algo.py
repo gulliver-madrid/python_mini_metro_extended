@@ -1,8 +1,8 @@
 from typing import Dict, List
 
-from entity.path import Path
-from entity.station import Station
-from graph.node import Node
+from src.entity.path import Path
+from src.entity.station import Station
+from src.graph.node import Node
 
 
 def build_station_nodes_dict(stations: List[Station], paths: List[Path]):

@@ -1,9 +1,9 @@
 from typing import List
 
-from config import screen_height, screen_width
-from entity.metro import Metro
-from entity.station import Station
-from utils import get_random_position, get_random_station_shape
+from src.config import screen_height, screen_width
+from src.entity.metro import Metro
+from src.entity.station import Station
+from src.utils import get_random_position, get_random_station_shape
 
 
 def get_random_station() -> Station:

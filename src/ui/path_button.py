@@ -2,7 +2,7 @@ from typing import List
 
 import pygame
 
-from config import (
+from src.config import (
     button_color,
     button_size,
     path_button_buffer,
@@ -11,12 +11,12 @@ from config import (
     path_button_dist_to_bottom,
     path_button_start_left,
 )
-from entity.path import Path
-from geometry.circle import Circle
-from geometry.cross import Cross
-from geometry.point import Point
-from geometry.shape import Shape
-from ui.button import Button
+from src.entity.path import Path
+from src.geometry.circle import Circle
+from src.geometry.cross import Cross
+from src.geometry.point import Point
+from src.geometry.shape import Shape
+from src.ui.button import Button
 
 
 class PathButton(Button):

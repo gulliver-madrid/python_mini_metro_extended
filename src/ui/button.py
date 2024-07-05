@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 import pygame
 
-from geometry.point import Point
-from geometry.shape import Shape
+from src.geometry.point import Point
+from src.geometry.shape import Shape
 
 
 class Button(ABC):

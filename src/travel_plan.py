@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import List
 
-from entity.path import Path
-from entity.station import Station
-from graph.node import Node
+from src.entity.path import Path
+from src.entity.station import Station
+from src.graph.node import Node
 
 
 class TravelPlan:

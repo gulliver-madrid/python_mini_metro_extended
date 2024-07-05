@@ -5,11 +5,11 @@ from abc import ABC
 import pygame
 from shortuuid import uuid  # type: ignore
 
-from config import screen_height, screen_width
-from entity.station import Station
-from geometry.line import Line
-from geometry.point import Point
-from type import Color
+from src.config import screen_height, screen_width
+from src.entity.station import Station
+from src.geometry.line import Line
+from src.geometry.point import Point
+from src.type import Color
 
 
 class Segment(ABC):

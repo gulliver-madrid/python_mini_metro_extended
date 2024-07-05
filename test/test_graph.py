@@ -1,24 +1,23 @@
 import os
-import sys
 import unittest
 from unittest.mock import create_autospec
 
-from entity.get_entity import get_random_stations
+from src.entity.get_entity import get_random_stations
 
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../src")
+
 
 import pygame
 
-from config import screen_height, screen_width, station_color, station_size
-from entity.station import Station
-from event.mouse import MouseEvent
-from event.type import MouseEventType
-from geometry.circle import Circle
-from geometry.rect import Rect
-from graph.graph_algo import bfs, build_station_nodes_dict
-from graph.node import Node
-from mediator import Mediator
-from utils import get_random_color, get_random_position
+from src.config import screen_height, screen_width, station_color, station_size
+from src.entity.station import Station
+from src.event.mouse import MouseEvent
+from src.event.type import MouseEventType
+from src.geometry.circle import Circle
+from src.geometry.rect import Rect
+from src.graph.graph_algo import bfs, build_station_nodes_dict
+from src.graph.node import Node
+from src.mediator import Mediator
+from src.utils import get_random_color, get_random_position
 
 
 class TestGraph(unittest.TestCase):

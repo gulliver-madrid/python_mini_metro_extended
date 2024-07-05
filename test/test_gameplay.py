@@ -1,20 +1,18 @@
 import os
-import sys
 import unittest
 from unittest.mock import MagicMock, create_autospec
 
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../src")
 
 import pygame
 
-from config import screen_height, screen_width
-from entity.get_entity import get_random_stations
-from event.keyboard import KeyboardEvent
-from event.mouse import MouseEvent
-from event.type import KeyboardEventType, MouseEventType
-from geometry.point import Point
-from mediator import Mediator
-from utils import get_random_color, get_random_position
+from src.config import screen_height, screen_width
+from src.entity.get_entity import get_random_stations
+from src.event.keyboard import KeyboardEvent
+from src.event.mouse import MouseEvent
+from src.event.type import KeyboardEventType, MouseEventType
+from src.geometry.point import Point
+from src.mediator import Mediator
+from src.utils import get_random_color, get_random_position
 
 
 class TestMediator(unittest.TestCase):

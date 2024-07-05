@@ -3,10 +3,10 @@ from __future__ import annotations
 import pygame
 from shortuuid import uuid  # type: ignore
 
-from config import station_capacity, station_passengers_per_row, station_size
-from entity.holder import Holder
-from geometry.point import Point
-from geometry.shape import Shape
+from src.config import station_capacity, station_passengers_per_row, station_size
+from src.entity.holder import Holder
+from src.geometry.point import Point
+from src.geometry.shape import Shape
 
 
 class Station(Holder):

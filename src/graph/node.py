@@ -4,8 +4,8 @@ from typing import Set
 
 from shortuuid import uuid  # type: ignore
 
-from entity.path import Path
-from entity.station import Station
+from src.entity.path import Path
+from src.entity.station import Station
 
 
 class Node:

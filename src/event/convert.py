@@ -1,10 +1,10 @@
 import pygame
 
-from event.event import Event
-from event.keyboard import KeyboardEvent
-from event.mouse import MouseEvent
-from event.type import KeyboardEventType, MouseEventType
-from utils import tuple_to_point
+from src.event.event import Event
+from src.event.keyboard import KeyboardEvent
+from src.event.mouse import MouseEvent
+from src.event.type import KeyboardEventType, MouseEventType
+from src.utils import tuple_to_point
 
 
 def convert_pygame_event(event: pygame.event.Event):

@@ -1,6 +1,6 @@
-from event.event import Event
-from event.type import MouseEventType
-from geometry.point import Point
+from src.event.event import Event
+from src.event.type import MouseEventType
+from src.geometry.point import Point
 
 
 class MouseEvent(Event):

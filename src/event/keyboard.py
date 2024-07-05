@@ -1,5 +1,5 @@
-from event.event import Event
-from event.type import KeyboardEventType
+from src.event.event import Event
+from src.event.type import KeyboardEventType
 
 
 class KeyboardEvent(Event):

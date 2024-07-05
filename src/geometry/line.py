@@ -3,8 +3,8 @@ from __future__ import annotations
 import pygame
 from shortuuid import uuid  # type: ignore
 
-from geometry.point import Point
-from type import Color
+from src.geometry.point import Point
+from src.type import Color
 
 
 class Line:

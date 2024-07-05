@@ -1,10 +1,10 @@
 import pygame
 from shortuuid import uuid  # type: ignore
 
-from geometry.point import Point
-from geometry.shape import Shape
-from geometry.type import ShapeType
-from type import Color
+from src.geometry.point import Point
+from src.geometry.shape import Shape
+from src.geometry.type import ShapeType
+from src.type import Color
 
 
 class Circle(Shape):

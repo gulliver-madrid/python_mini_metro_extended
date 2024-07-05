@@ -1,21 +1,19 @@
 import os
-import sys
 import unittest
 from unittest.mock import MagicMock, create_autospec
 
-from entity.get_entity import get_random_stations
-from event.mouse import MouseEvent
-from event.type import MouseEventType
-from geometry.triangle import Triangle
-from geometry.type import ShapeType
+from src.entity.get_entity import get_random_stations
+from src.event.mouse import MouseEvent
+from src.event.type import MouseEventType
+from src.geometry.triangle import Triangle
+from src.geometry.type import ShapeType
 
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../src")
 
 from math import ceil
 
 import pygame
 
-from config import (
+from src.config import (
     framerate,
     passenger_spawning_interval_step,
     passenger_spawning_start_step,
@@ -24,12 +22,12 @@ from config import (
     station_color,
     station_size,
 )
-from entity.station import Station
-from geometry.circle import Circle
-from geometry.point import Point
-from geometry.rect import Rect
-from mediator import Mediator
-from utils import get_random_color, get_random_position
+from src.entity.station import Station
+from src.geometry.circle import Circle
+from src.geometry.point import Point
+from src.geometry.rect import Rect
+from src.mediator import Mediator
+from src.utils import get_random_color, get_random_position
 
 
 class TestMediator(unittest.TestCase):

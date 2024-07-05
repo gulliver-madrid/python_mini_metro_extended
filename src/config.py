@@ -1,4 +1,4 @@
-from geometry.type import ShapeType
+from src.geometry.type import ShapeType
 
 # game
 framerate = 60

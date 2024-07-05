@@ -1,6 +1,6 @@
 import numpy as np
 
-from geometry.point import Point
+from src.geometry.point import Point
 
 
 def distance(p1: Point, p2: Point) -> float:

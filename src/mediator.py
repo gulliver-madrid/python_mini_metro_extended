@@ -6,7 +6,7 @@ from typing import Dict, List
 
 import pygame
 
-from config import (
+from src.config import (
     num_metros,
     num_paths,
     num_stations,
@@ -17,24 +17,24 @@ from config import (
     score_display_coords,
     score_font_size,
 )
-from entity.get_entity import get_random_stations
-from entity.metro import Metro
-from entity.passenger import Passenger
-from entity.path import Path
-from entity.station import Station
-from event.event import Event
-from event.keyboard import KeyboardEvent
-from event.mouse import MouseEvent
-from event.type import KeyboardEventType, MouseEventType
-from geometry.point import Point
-from geometry.type import ShapeType
-from graph.graph_algo import bfs, build_station_nodes_dict
-from graph.node import Node
-from travel_plan import TravelPlan
-from type import Color
-from ui.button import Button
-from ui.path_button import PathButton, get_path_buttons
-from utils import get_shape_from_type, hue_to_rgb
+from src.entity.get_entity import get_random_stations
+from src.entity.metro import Metro
+from src.entity.passenger import Passenger
+from src.entity.path import Path
+from src.entity.station import Station
+from src.event.event import Event
+from src.event.keyboard import KeyboardEvent
+from src.event.mouse import MouseEvent
+from src.event.type import KeyboardEventType, MouseEventType
+from src.geometry.point import Point
+from src.geometry.type import ShapeType
+from src.graph.graph_algo import bfs, build_station_nodes_dict
+from src.graph.node import Node
+from src.travel_plan import TravelPlan
+from src.type import Color
+from src.ui.button import Button
+from src.ui.path_button import PathButton, get_path_buttons
+from src.utils import get_shape_from_type, hue_to_rgb
 
 TravelPlans = Dict[Passenger, TravelPlan]
 pp = pprint.PrettyPrinter(indent=4)

@@ -4,16 +4,16 @@ from typing import List
 import pygame
 from shortuuid import uuid  # type: ignore
 
-from config import path_width
-from entity.metro import Metro
-from entity.padding_segment import PaddingSegment
-from entity.path_segment import PathSegment
-from entity.segment import Segment
-from entity.station import Station
-from geometry.line import Line
-from geometry.point import Point
-from geometry.utils import direction, distance
-from type import Color
+from src.config import path_width
+from src.entity.metro import Metro
+from src.entity.padding_segment import PaddingSegment
+from src.entity.path_segment import PathSegment
+from src.entity.segment import Segment
+from src.entity.station import Station
+from src.geometry.line import Line
+from src.geometry.point import Point
+from src.geometry.utils import direction, distance
+from src.type import Color
 
 
 class Path:
