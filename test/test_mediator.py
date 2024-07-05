@@ -1,15 +1,7 @@
 import os
 import unittest
-from unittest.mock import MagicMock, create_autospec
-
-from src.entity.get_entity import get_random_stations
-from src.event.mouse import MouseEvent
-from src.event.type import MouseEventType
-from src.geometry.triangle import Triangle
-from src.geometry.type import ShapeType
-
-
 from math import ceil
+from unittest.mock import MagicMock, create_autospec
 
 import pygame
 
@@ -22,10 +14,15 @@ from src.config import (
     station_color,
     station_size,
 )
+from src.entity.get_entity import get_random_stations
 from src.entity.station import Station
+from src.event.mouse import MouseEvent
+from src.event.type import MouseEventType
 from src.geometry.circle import Circle
 from src.geometry.point import Point
 from src.geometry.rect import Rect
+from src.geometry.triangle import Triangle
+from src.geometry.type import ShapeType
 from src.mediator import Mediator
 from src.utils import get_random_color, get_random_position
 

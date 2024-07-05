@@ -3,8 +3,6 @@ import unittest
 from math import ceil
 from unittest.mock import MagicMock, create_autospec, patch
 
-
-
 import pygame
 
 from src.config import framerate, metro_speed_per_ms

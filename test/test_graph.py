@@ -2,13 +2,10 @@ import os
 import unittest
 from unittest.mock import create_autospec
 
-from src.entity.get_entity import get_random_stations
-
-
-
 import pygame
 
 from src.config import screen_height, screen_width, station_color, station_size
+from src.entity.get_entity import get_random_stations
 from src.entity.station import Station
 from src.event.mouse import MouseEvent
 from src.event.type import MouseEventType

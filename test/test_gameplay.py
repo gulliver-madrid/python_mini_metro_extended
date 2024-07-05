@@ -2,7 +2,6 @@ import os
 import unittest
 from unittest.mock import MagicMock, create_autospec
 
-
 import pygame
 
 from src.config import screen_height, screen_width

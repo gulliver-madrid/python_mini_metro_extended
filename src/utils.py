@@ -4,7 +4,12 @@ from typing import List, Tuple
 
 import numpy as np
 
-from src.config import passenger_size, station_color, station_shape_type_list, station_size
+from src.config import (
+    passenger_size,
+    station_color,
+    station_shape_type_list,
+    station_size,
+)
 from src.geometry.circle import Circle
 from src.geometry.cross import Cross
 from src.geometry.point import Point
