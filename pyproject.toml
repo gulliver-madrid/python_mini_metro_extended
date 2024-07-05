@@ -13,6 +13,9 @@ pygame = "==2.3.0"
 shapely = "==2.0.1"
 shortuuid = "==1.0.11"
 
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.10.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
