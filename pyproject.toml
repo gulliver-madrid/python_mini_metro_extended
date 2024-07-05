@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "python-mini-metro-extended"
+version = "0.1.0"
+description = "Fork of python_mini_metro."
+authors = ["gulliver-madrid <49131885+gulliver-madrid@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "==1.24.2"
+pygame = "==2.3.0"
+shapely = "==2.0.1"
+shortuuid = "==1.0.11"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
