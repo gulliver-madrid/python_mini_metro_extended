@@ -43,8 +43,8 @@ class Point:
     def __rmul__(self, other: int | float) -> Point:
         return self.__mul__(other)
 
-    def __eq__(self, other: Point) -> bool:
-        return self.left == other.left and self.top == other.top
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, Point) and self.left == other.left and self.top == other.top
 
     def rotate(self, degrees: float) -> Point:
         # Rotate around the origin.

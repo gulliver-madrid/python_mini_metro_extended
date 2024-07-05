@@ -22,8 +22,8 @@ class Segment(ABC):
         self.segment_end: Point
         self.line: Line
 
-    def __eq__(self, other: Segment) -> bool:
-        return self.id == other.id
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, Segment) and self.id == other.id
 
     def draw(self, surface: pygame.surface.Surface) -> None:
         self.line.draw(surface)

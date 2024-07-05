@@ -20,8 +20,8 @@ class Station(Holder):
         self.position = position
         self.passengers_per_row = station_passengers_per_row
 
-    def __eq__(self, other: Station) -> bool:
-        return self.id == other.id
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, Station) and self.id == other.id
 
     def __hash__(self) -> int:
         return hash(self.id)

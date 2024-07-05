@@ -16,8 +16,8 @@ class Shape(ABC):
         self.color = color
         self.id = f"Shape-{uuid()}"
 
-    def __eq__(self, other: Shape) -> bool:
-        return self.id == other.id
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, Shape) and self.id == other.id
 
     @abstractmethod
     def draw(self, surface: pygame.surface.Surface, position: Point) -> None:

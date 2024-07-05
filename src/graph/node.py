@@ -15,8 +15,8 @@ class Node:
         self.neighbors: Set[Node] = set()
         self.paths: Set[Path] = set()
 
-    def __eq__(self, other: Node) -> bool:
-        return self.station == other.station
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, Node) and self.station == other.station
 
     def __hash__(self) -> int:
         return hash(self.id)
