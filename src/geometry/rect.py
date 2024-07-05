@@ -1,5 +1,5 @@
 import pygame
-from shortuuid import uuid  # type: ignore
+from shortuuid import uuid
 
 from src.geometry.point import Point
 from src.geometry.polygon import Polygon

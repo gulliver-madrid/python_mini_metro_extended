@@ -19,13 +19,13 @@ class Button(ABC):
         return self.shape.contains(point)
 
     @abstractmethod
-    def on_hover(self):
+    def on_hover(self) -> None:
         pass
 
     @abstractmethod
-    def on_exit(self):
+    def on_exit(self) -> None:
         pass
 
     @abstractmethod
-    def on_click(self):
+    def on_click(self) -> None:
         pass

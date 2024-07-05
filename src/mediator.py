@@ -79,7 +79,7 @@ class Mediator:
         self.is_paused = False
         self.score = 0
 
-    def assign_paths_to_buttons(self):
+    def assign_paths_to_buttons(self) -> None:
         for path_button in self.path_buttons:
             path_button.remove_path()
 
@@ -103,7 +103,7 @@ class Mediator:
         text_surface = self.font.render(f"Score: {self.score}", True, (0, 0, 0))
         screen.blit(text_surface, score_display_coords)
 
-    def react_mouse_event(self, event: MouseEvent):
+    def react_mouse_event(self, event: MouseEvent) -> None:
         entity = self.get_containing_entity(event.position)
 
         if event.event_type == MouseEventType.MOUSE_DOWN:
@@ -139,26 +139,27 @@ class Mediator:
                     for button in self.buttons:
                         button.on_exit()
 
-    def react_keyboard_event(self, event: KeyboardEvent):
+    def react_keyboard_event(self, event: KeyboardEvent) -> None:
         if event.event_type == KeyboardEventType.KEY_UP:
             if event.key == pygame.K_SPACE:
                 self.is_paused = not self.is_paused
 
-    def react(self, event: Event | None):
+    def react(self, event: Event | None) -> None:
         if isinstance(event, MouseEvent):
             self.react_mouse_event(event)
         elif isinstance(event, KeyboardEvent):
             self.react_keyboard_event(event)
 
-    def get_containing_entity(self, position: Point):
+    def get_containing_entity(self, position: Point) -> Station |PathButton | None:
         for station in self.stations:
             if station.contains(position):
                 return station
         for button in self.buttons:
             if button.contains(position):
                 return button
+        return None
 
-    def remove_path(self, path: Path):
+    def remove_path(self, path: Path) -> None:
         self.path_to_button[path].remove_path()
         for metro in path.metros:
             for passenger in metro.passengers:
@@ -246,7 +247,7 @@ class Mediator:
         else:
             self.abort_path_creation()
 
-    def get_station_shape_types(self):
+    def get_station_shape_types(self) -> List[ShapeType]:
         station_shape_types: List[ShapeType] = []
         for station in self.stations:
             if station.shape.type not in station_shape_types:
@@ -259,7 +260,7 @@ class Mediator:
             or self.steps_since_last_spawn == self.passenger_spawning_interval_step
         )
 
-    def spawn_passengers(self):
+    def spawn_passengers(self) -> None:
         for station in self.stations:
             station_types = self.get_station_shape_types()
             other_station_shape_types = [
@@ -342,7 +343,7 @@ class Mediator:
                     if metro.has_room():
                         metro.current_station.move_passenger(passenger, metro)
 
-    def get_stations_for_shape_type(self, shape_type: ShapeType):
+    def get_stations_for_shape_type(self, shape_type: ShapeType) -> List[Station]:
         stations: List[Station] = []
         for station in self.stations:
             if station.shape.type == shape_type:
@@ -366,13 +367,13 @@ class Mediator:
 
     def find_next_path_for_passenger_at_station(
         self, passenger: Passenger, station: Station
-    ):
+    ) -> None:
         next_station = self.travel_plans[passenger].get_next_station()
         assert next_station is not None
         next_path = self.find_shared_path(station, next_station)
         self.travel_plans[passenger].next_path = next_path
 
-    def skip_stations_on_same_path(self, node_path: List[Node]):
+    def skip_stations_on_same_path(self, node_path: List[Node]) -> List[Node]:
         assert len(node_path) >= 2
         if len(node_path) == 2:
             return node_path

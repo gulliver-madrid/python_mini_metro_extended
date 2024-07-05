@@ -1,4 +1,4 @@
-from shortuuid import uuid  # type: ignore
+from shortuuid import uuid
 
 from src.config import Config, path_width
 from src.entity.segment import Segment

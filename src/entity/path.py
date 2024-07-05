@@ -2,7 +2,7 @@ import math
 from typing import List
 
 import pygame
-from shortuuid import uuid  # type: ignore
+from shortuuid import uuid
 
 from src.config import path_width
 from src.entity.metro import Metro

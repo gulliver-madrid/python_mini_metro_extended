@@ -24,7 +24,7 @@ class Holder(ABC):
     def __repr__(self) -> str:
         return self.id
 
-    def draw(self, surface: pygame.surface.Surface):
+    def draw(self, surface: pygame.surface.Surface) -> None:
         # draw self
         self.shape.draw(surface, self.position)
 
@@ -51,7 +51,7 @@ class Holder(ABC):
                 row += 1
                 col = 0
 
-    def contains(self, point: Point):
+    def contains(self, point: Point) -> bool:
         return self.shape.contains(point)
 
     def has_room(self) -> bool:

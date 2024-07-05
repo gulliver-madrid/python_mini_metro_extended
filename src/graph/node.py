@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Set
 
-from shortuuid import uuid  # type: ignore
+from shortuuid import uuid
 
 from src.entity.path import Path
 from src.entity.station import Station

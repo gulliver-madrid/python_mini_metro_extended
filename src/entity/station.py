@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pygame
-from shortuuid import uuid  # type: ignore
+from shortuuid import uuid
 
 from src.config import station_capacity, station_passengers_per_row, station_size
 from src.entity.holder import Holder
@@ -23,5 +23,5 @@ class Station(Holder):
     def __eq__(self, other: Station) -> bool:
         return self.id == other.id
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.id)

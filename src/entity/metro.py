@@ -1,5 +1,5 @@
 import pygame
-from shortuuid import uuid  # type: ignore
+from shortuuid import uuid
 
 from src.config import (
     metro_capacity,

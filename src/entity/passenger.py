@@ -1,5 +1,5 @@
 import pygame
-from shortuuid import uuid  # type: ignore
+from shortuuid import uuid
 
 from src.geometry.point import Point
 from src.geometry.shape import Shape
@@ -18,5 +18,5 @@ class Passenger:
     def __hash__(self) -> int:
         return hash(self.id)
 
-    def draw(self, surface: pygame.surface.Surface):
+    def draw(self, surface: pygame.surface.Surface) -> None:
         self.destination_shape.draw(surface, self.position)

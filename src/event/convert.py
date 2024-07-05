@@ -7,7 +7,7 @@ from src.event.type import KeyboardEventType, MouseEventType
 from src.utils import tuple_to_point
 
 
-def convert_pygame_event(event: pygame.event.Event):
+def convert_pygame_event(event: pygame.event.Event) -> Event | None:
     if event.type == pygame.MOUSEBUTTONDOWN:
         mouse_position = tuple_to_point(pygame.mouse.get_pos())
         return MouseEvent(MouseEventType.MOUSE_DOWN, mouse_position)
@@ -19,3 +19,4 @@ def convert_pygame_event(event: pygame.event.Event):
         return MouseEvent(MouseEventType.MOUSE_MOTION, mouse_position)
     elif event.type == pygame.KEYUP:
         return KeyboardEvent(KeyboardEventType.KEY_UP, event.key)
+    return None

@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from copy import deepcopy
 
-from shortuuid import uuid  # type: ignore
+from shortuuid import uuid
 
 
 class Point:
@@ -67,5 +67,5 @@ class Point:
             setattr(result, k, deepcopy(v, memo))
         return result
 
-    def to_tuple(self):
+    def to_tuple(self) -> tuple[int | float, int | float]:
         return (self.left, self.top)

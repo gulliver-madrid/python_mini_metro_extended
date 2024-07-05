@@ -4,7 +4,7 @@ from typing import List
 import pygame
 from shapely.geometry import Point as ShapelyPoint
 from shapely.geometry.polygon import Polygon as ShapelyPolygon
-from shortuuid import uuid  # type: ignore
+from shortuuid import uuid
 
 from src.config import Config
 from src.geometry.point import Point
@@ -36,9 +36,11 @@ class Polygon(Shape):
         shapely_point = ShapelyPoint(point.left, point.top)
         tuples = [(x + self.position).to_tuple() for x in self.points]
         polygon = ShapelyPolygon(tuples)
-        return polygon.contains(shapely_point)
+        result = polygon.contains(shapely_point)
+        assert isinstance(result, bool)
+        return result
 
-    def set_degrees(self, degrees: float):
+    def set_degrees(self, degrees: float) -> None:
         self.degrees = degrees
 
     def rotate(self, degree_diff: float) -> None:
