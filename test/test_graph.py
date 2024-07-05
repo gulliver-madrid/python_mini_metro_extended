@@ -47,7 +47,7 @@ class TestGraph(unittest.TestCase):
             )
         )
 
-    def test_build_station_nodes_dict(self):
+    def test_build_station_nodes_dict(self) -> None:
         self.mediator.stations = [
             Station(
                 Rect(
@@ -77,7 +77,7 @@ class TestGraph(unittest.TestCase):
         for station, node in station_nodes_dict.items():
             self.assertEqual(node.station, station)
 
-    def test_bfs_two_stations(self):
+    def test_bfs_two_stations(self) -> None:
         self.mediator.stations = get_random_stations(2)
         for station in self.mediator.stations:
             station.draw(self.screen)
@@ -97,7 +97,7 @@ class TestGraph(unittest.TestCase):
             [start_node, end_node],
         )
 
-    def test_bfs_five_stations(self):
+    def test_bfs_five_stations(self) -> None:
         self.mediator.stations = get_random_stations(5)
         for station in self.mediator.stations:
             station.draw(self.screen)

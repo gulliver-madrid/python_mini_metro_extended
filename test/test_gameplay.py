@@ -44,7 +44,7 @@ class TestMediator(unittest.TestCase):
             )
         )
 
-    def test_react_mouse_down_start_path(self):
+    def test_react_mouse_down_start_path(self) -> None:
         self.mediator.start_path_on_station = MagicMock()
         self.mediator.react(
             MouseEvent(
@@ -55,13 +55,13 @@ class TestMediator(unittest.TestCase):
 
         self.mediator.start_path_on_station.assert_called_once()
 
-    def test_mouse_down_and_up_at_the_same_point_does_not_create_path(self):
+    def test_mouse_down_and_up_at_the_same_point_does_not_create_path(self) -> None:
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_UP, Point(-1, -1)))
 
         self.assertEqual(len(self.mediator.paths), 0)
 
-    def test_mouse_dragged_between_stations_creates_path(self):
+    def test_mouse_dragged_between_stations_creates_path(self) -> None:
         self.mediator.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
@@ -82,7 +82,7 @@ class TestMediator(unittest.TestCase):
             [self.mediator.stations[0], self.mediator.stations[1]],
         )
 
-    def test_mouse_dragged_between_non_station_points_does_not_create_path(self):
+    def test_mouse_dragged_between_non_station_points_does_not_create_path(self) -> None:
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(0, 0)))
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_MOTION, Point(2, 2)))
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_UP, Point(0, 1)))
@@ -103,18 +103,18 @@ class TestMediator(unittest.TestCase):
 
         self.assertEqual(len(self.mediator.paths), 0)
 
-    def test_mouse_dragged_between_3_stations_creates_looped_path(self):
+    def test_mouse_dragged_between_3_stations_creates_looped_path(self) -> None:
         self.connect_stations([0, 1, 2, 0])
 
         self.assertEqual(len(self.mediator.paths), 1)
         self.assertTrue(self.mediator.paths[0].is_looped)
 
-    def test_mouse_dragged_between_4_stations_creates_looped_path(self):
+    def test_mouse_dragged_between_4_stations_creates_looped_path(self) -> None:
         self.connect_stations([0, 1, 2, 3, 0])
         self.assertEqual(len(self.mediator.paths), 1)
         self.assertTrue(self.mediator.paths[0].is_looped)
 
-    def test_path_between_2_stations_is_not_looped(self):
+    def test_path_between_2_stations_is_not_looped(self) -> None:
         self.connect_stations([0, 1])
         self.assertEqual(len(self.mediator.paths), 1)
         self.assertFalse(self.mediator.paths[0].is_looped)
@@ -126,7 +126,7 @@ class TestMediator(unittest.TestCase):
         self.assertEqual(len(self.mediator.paths), 1)
         self.assertFalse(self.mediator.paths[0].is_looped)
 
-    def test_space_key_pauses_and_unpauses_game(self):
+    def test_space_key_pauses_and_unpauses_game(self) -> None:
         self.mediator.react(KeyboardEvent(KeyboardEventType.KEY_UP, pygame.K_SPACE))
 
         self.assertTrue(self.mediator.is_paused)
@@ -135,7 +135,7 @@ class TestMediator(unittest.TestCase):
 
         self.assertFalse(self.mediator.is_paused)
 
-    def test_path_button_removes_path_on_click(self):
+    def test_path_button_removes_path_on_click(self) -> None:
         self.mediator.stations = get_random_stations(5)
         for station in self.mediator.stations:
             station.draw(self.screen)
@@ -146,7 +146,7 @@ class TestMediator(unittest.TestCase):
         self.assertEqual(len(self.mediator.paths), 0)
         self.assertEqual(len(self.mediator.path_to_button.items()), 0)
 
-    def test_path_buttons_get_assigned_upon_path_creation(self):
+    def test_path_buttons_get_assigned_upon_path_creation(self) -> None:
         self.mediator.stations = get_random_stations(5)
         for station in self.mediator.stations:
             station.draw(self.screen)
@@ -163,7 +163,7 @@ class TestMediator(unittest.TestCase):
         self.assertIn(self.mediator.paths[1], self.mediator.path_to_button)
         self.assertIn(self.mediator.paths[2], self.mediator.path_to_button)
 
-    def test_more_paths_can_be_created_after_removing_paths(self):
+    def test_more_paths_can_be_created_after_removing_paths(self) -> None:
         self.mediator.stations = get_random_stations(5)
         for station in self.mediator.stations:
             station.draw(self.screen)
@@ -177,7 +177,7 @@ class TestMediator(unittest.TestCase):
         self.connect_stations([1, 3])
         self.assertEqual(len(self.mediator.paths), 3)
 
-    def test_assigned_path_buttons_bubble_to_left(self):
+    def test_assigned_path_buttons_bubble_to_left(self) -> None:
         self.mediator.stations = get_random_stations(5)
         for station in self.mediator.stations:
             station.draw(self.screen)
@@ -197,7 +197,7 @@ class TestMediator(unittest.TestCase):
         )
         self.assertEqual(len(self.mediator.paths), 0)
 
-    def test_unassigned_path_buttons_do_nothing_on_click(self):
+    def test_unassigned_path_buttons_do_nothing_on_click(self) -> None:
         self.assertEqual(len(self.mediator.paths), 0)
         self.mediator.react(
             MouseEvent(MouseEventType.MOUSE_UP, self.mediator.path_buttons[0].position)

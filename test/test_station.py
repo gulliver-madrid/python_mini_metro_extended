@@ -10,7 +10,7 @@ class TestStation(unittest.TestCase):
         self.position = get_random_position(width=100, height=100)
         self.shape = get_random_station_shape()
 
-    def test_init(self):
+    def test_init(self) -> None:
         station = Station(self.shape, self.position)
 
         self.assertEqual(station.shape, self.shape)

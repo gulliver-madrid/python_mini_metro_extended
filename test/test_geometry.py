@@ -25,7 +25,7 @@ class TestGeometry(unittest.TestCase):
         self.end = get_random_position(self.width, self.height)
         self.linewidth = 1
 
-    def test_circle_init(self):
+    def test_circle_init(self) -> None:
         radius = 1
         circle = Circle(self.color, radius)
 
@@ -35,13 +35,13 @@ class TestGeometry(unittest.TestCase):
     def init_circle(self):
         return Circle(self.color, 1)
 
-    def test_circle_draw(self):
+    def test_circle_draw(self) -> None:
         circle = self.init_circle()
         pygame.draw.circle = MagicMock()
         circle.draw(self.screen, self.position)
         pygame.draw.circle.assert_called_once()
 
-    def test_circle_contains_point(self):
+    def test_circle_contains_point(self) -> None:
         circle = self.init_circle()
         pygame.draw.circle = MagicMock()
         circle.draw(self.screen, self.position)
@@ -53,7 +53,7 @@ class TestGeometry(unittest.TestCase):
             circle.contains(self.position + Point(circle.radius + 1, circle.radius + 1))
         )
 
-    def test_rect_init(self):
+    def test_rect_init(self) -> None:
         width = 2
         height = 3
         rect = Rect(self.color, width, height)
@@ -65,14 +65,14 @@ class TestGeometry(unittest.TestCase):
     def init_rect(self):
         return Rect(self.color, 10, 20)
 
-    def test_rect_draw(self):
+    def test_rect_draw(self) -> None:
         rect = self.init_rect()
         pygame.draw.polygon = MagicMock()
         rect.draw(self.screen, self.position)
 
         pygame.draw.polygon.assert_called_once()
 
-    def test_rect_contains_point(self):
+    def test_rect_contains_point(self) -> None:
         rect = self.init_rect()
         pygame.draw.polygon = MagicMock()
         rect.draw(self.screen, self.position)
@@ -80,7 +80,7 @@ class TestGeometry(unittest.TestCase):
         self.assertTrue(rect.contains(rect.position + Point(1, 1)))
         self.assertFalse(rect.contains(rect.position + Point(rect.width, rect.height)))
 
-    def test_rect_rotate(self):
+    def test_rect_rotate(self) -> None:
         rect = self.init_rect()
         pygame.draw.polygon = MagicMock()
         rect.draw(self.screen, self.position)
@@ -91,7 +91,7 @@ class TestGeometry(unittest.TestCase):
         rect.rotate(180)
         self.assertSequenceEqual(rect.points, rect_points)
 
-    def test_rect_set_degrees(self):
+    def test_rect_set_degrees(self) -> None:
         rect = self.init_rect()
         pygame.draw.polygon = MagicMock()
         rect.draw(self.screen, self.position)
@@ -102,7 +102,7 @@ class TestGeometry(unittest.TestCase):
         rect.set_degrees(360)
         self.assertSequenceEqual(rect.points, rect_points)
 
-    def test_line_init(self):
+    def test_line_init(self) -> None:
         line = Line(self.color, self.start, self.end, self.linewidth)
 
         self.assertSequenceEqual(line.color, self.color)
@@ -113,14 +113,14 @@ class TestGeometry(unittest.TestCase):
     def init_line(self):
         return Line(self.color, self.start, self.end, self.linewidth)
 
-    def test_line_draw(self):
+    def test_line_draw(self) -> None:
         line = self.init_line()
         pygame.draw.line = MagicMock()
         line.draw(self.screen)
 
         pygame.draw.line.assert_called_once()
 
-    def test_triangle_init(self):
+    def test_triangle_init(self) -> None:
         size = 10
         triangle = Triangle(self.color, size)
 
@@ -130,7 +130,7 @@ class TestGeometry(unittest.TestCase):
     def init_triangle(self):
         return Triangle(self.color, 10)
 
-    def test_triangle_draw(self):
+    def test_triangle_draw(self) -> None:
         triangle = self.init_triangle()
         pygame.draw.polygon = MagicMock()
         triangle.draw(self.screen, self.position)

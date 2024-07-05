@@ -56,31 +56,31 @@ class TestMediator(unittest.TestCase):
             )
         )
 
-    def test_react_mouse_down(self):
+    def test_react_mouse_down(self) -> None:
         for station in self.mediator.stations:
             station.draw(self.screen)
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))
 
         self.assertTrue(self.mediator.is_mouse_down)
 
-    def test_get_containing_entity(self):
+    def test_get_containing_entity(self) -> None:
         self.assertTrue(
             self.mediator.get_containing_entity(
                 self.mediator.stations[2].position + Point(1, 1)
             )
         )
 
-    def test_react_mouse_up(self):
+    def test_react_mouse_up(self) -> None:
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_UP, Point(-1, -1)))
 
         self.assertFalse(self.mediator.is_mouse_down)
 
-    def test_passengers_are_added_to_stations(self):
+    def test_passengers_are_added_to_stations(self) -> None:
         self.mediator.spawn_passengers()
 
         self.assertEqual(len(self.mediator.passengers), len(self.mediator.stations))
 
-    def test_is_passenger_spawn_time(self):
+    def test_is_passenger_spawn_time(self) -> None:
         self.mediator.spawn_passengers = MagicMock()
         # Run the game until first wave of passengers spawn
         for _ in range(passenger_spawning_start_step):
@@ -93,7 +93,7 @@ class TestMediator(unittest.TestCase):
 
         self.assertEqual(self.mediator.spawn_passengers.call_count, 2)
 
-    def test_passengers_spawned_at_a_station_have_a_different_destination(self):
+    def test_passengers_spawned_at_a_station_have_a_different_destination(self) -> None:
         # Run the game until first wave of passengers spawn
         for _ in range(passenger_spawning_start_step):
             self.mediator.increment_time(ceil(1000 / framerate))
@@ -104,7 +104,7 @@ class TestMediator(unittest.TestCase):
                     passenger.destination_shape.type, station.shape.type
                 )
 
-    def test_passengers_at_connected_stations_have_a_way_to_destination(self):
+    def test_passengers_at_connected_stations_have_a_way_to_destination(self) -> None:
         self.mediator.stations = [
             Station(
                 Rect(
@@ -139,7 +139,7 @@ class TestMediator(unittest.TestCase):
             self.assertIsNotNone(self.mediator.travel_plans[passenger].next_path)
             self.assertIsNotNone(self.mediator.travel_plans[passenger].next_station)
 
-    def test_passengers_at_isolated_stations_have_no_way_to_destination(self):
+    def test_passengers_at_isolated_stations_have_no_way_to_destination(self) -> None:
         # Run the game until first wave of passengers spawn, then 1 more frame
         for _ in range(passenger_spawning_start_step + 1):
             self.mediator.increment_time(ceil(1000 / framerate))
@@ -150,7 +150,7 @@ class TestMediator(unittest.TestCase):
             self.assertIsNone(self.mediator.travel_plans[passenger].next_path)
             self.assertIsNone(self.mediator.travel_plans[passenger].next_station)
 
-    def test_get_station_for_shape_type(self):
+    def test_get_station_for_shape_type(self) -> None:
         self.mediator.stations = [
             Station(
                 Rect(
@@ -206,7 +206,7 @@ class TestMediator(unittest.TestCase):
         self.assertCountEqual(circle_stations, self.mediator.stations[1:3])
         self.assertCountEqual(triangle_stations, self.mediator.stations[3:])
 
-    def test_skip_stations_on_same_path(self):
+    def test_skip_stations_on_same_path(self) -> None:
         self.mediator.stations = get_random_stations(5)
         for station in self.mediator.stations:
             station.draw(self.screen)
