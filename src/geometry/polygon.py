@@ -1,5 +1,5 @@
 import math
-from typing import List
+from typing import Sequence
 
 import pygame
 from shapely.geometry import Point as ShapelyPoint  # type: ignore [import-untyped]
@@ -15,7 +15,7 @@ from src.type import Color
 
 class Polygon(Shape):
     def __init__(
-        self, shape_type: ShapeType, color: Color, points: List[Point]
+        self, shape_type: ShapeType, color: Color, points: Sequence[Point]
     ) -> None:
         super().__init__(shape_type, color)
         self.id = f"Polygon-{uuid()}"

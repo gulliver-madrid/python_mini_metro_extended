@@ -3,7 +3,7 @@ from __future__ import annotations
 import pprint
 import random
 import sys
-from typing import Dict, List
+from typing import Dict, List, Sequence
 
 import pygame
 
@@ -74,7 +74,7 @@ class Mediator:
         self.num_stations: int = num_stations
 
         # UI
-        self.path_buttons: List[PathButton] = get_path_buttons(self.num_paths)
+        self.path_buttons: Sequence[PathButton] = get_path_buttons(self.num_paths)
         self.path_to_button: Dict[Path, PathButton] = {}
         self.buttons = [*self.path_buttons]
         self.font = pygame.font.SysFont("arial", score_font_size)

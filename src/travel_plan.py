@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import List
+from typing import Sequence
 
 from src.entity.path import Path
 from src.entity.station import Station
@@ -10,7 +10,7 @@ from src.graph.node import Node
 class TravelPlan:
     def __init__(
         self,
-        node_path: List[Node],
+        node_path: Sequence[Node],
     ) -> None:
         self.next_path: Path | None = None
         self.next_station: Station | None = None

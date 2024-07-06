@@ -1,6 +1,6 @@
 import colorsys
 import random
-from typing import List, Tuple
+from typing import Sequence, Tuple
 
 import numpy as np
 
@@ -41,7 +41,7 @@ def hue_to_rgb(hue: float) -> Color:
 
 
 def get_random_shape(
-    shape_type_list: List[ShapeType], color: Color, size: int
+    shape_type_list: Sequence[ShapeType], color: Color, size: int
 ) -> Shape:
     shape_type = random.choice(shape_type_list)
     return get_shape_from_type(shape_type, color, size)

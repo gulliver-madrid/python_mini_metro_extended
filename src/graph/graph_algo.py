@@ -1,4 +1,5 @@
 from typing import Dict, List
+from collections.abc import Sequence
 
 from src.entity.path import Path
 from src.entity.station import Station
@@ -6,7 +7,7 @@ from src.graph.node import Node
 
 
 def build_station_nodes_dict(
-    stations: List[Station], paths: List[Path]
+    stations: Sequence[Station], paths: Sequence[Path]
 ) -> Dict[Station, Node]:
     station_nodes: List[Node] = []
     connections: List[List[Node]] = []
