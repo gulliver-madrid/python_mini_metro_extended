@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pprint
 import random
+import sys
 from typing import Dict, List
 
 import pygame
@@ -158,6 +159,9 @@ class Mediator:
         if event.event_type == KeyboardEventType.KEY_UP:
             if event.key == pygame.K_SPACE:
                 self._status.is_paused = not self._status.is_paused
+            elif event.key == pygame.K_ESCAPE:
+                pygame.quit()
+                sys.exit()
 
     def react(self, event: Event | None) -> None:
         if isinstance(event, MouseEvent):
