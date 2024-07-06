@@ -1,7 +1,8 @@
 import os
 import unittest
 from collections.abc import Sequence
-from unittest.mock import MagicMock, create_autospec
+from typing import Any
+from unittest.mock import MagicMock, Mock, create_autospec, patch
 
 import pygame
 
@@ -45,16 +46,15 @@ class TestMediator(unittest.TestCase):
             )
         )
 
-    def test_react_mouse_down_start_path(self) -> None:
-        self.mediator.start_path_on_station = MagicMock()  # type: ignore [method-assign]
+    @patch.object(Mediator, "start_path_on_station", new_callable=Mock)
+    def test_react_mouse_down_start_path(self, mock_start_path_on_station: Any) -> None:
         self.mediator.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
                 self.mediator.stations[3].position + Point(1, 1),
             )
         )
-
-        self.mediator.start_path_on_station.assert_called_once()
+        self.mediator.start_path_on_station.assert_called_once()  # type: ignore
 
     def test_mouse_down_and_up_at_the_same_point_does_not_create_path(self) -> None:
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))

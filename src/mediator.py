@@ -57,15 +57,9 @@ class Mediator:
         "passengers",
         "path_colors",
         "path_to_color",
-        "time_ms",
-        "steps",
-        "steps_since_last_spawn",
-        "is_mouse_down",
-        "is_creating_path",
         "path_being_created",
         "travel_plans",
-        "is_paused",
-        "score",
+        "_status",
     )
 
     def __init__(self) -> None:
@@ -96,15 +90,9 @@ class Mediator:
         self.path_to_color: Dict[Path, Color] = {}
 
         # status
-        self.time_ms: int = 0
-        self.steps: int = 0
-        self.steps_since_last_spawn: int = self.passenger_spawning_interval_step + 1
-        self.is_mouse_down: bool = False
-        self.is_creating_path: bool = False
         self.path_being_created: Path | None = None
         self.travel_plans: TravelPlans = {}
-        self.is_paused: bool = False
-        self.score: int = 0
+        self._status = MediatorStatus(passenger_spawning_interval_step)
 
     def assign_paths_to_buttons(self) -> None:
         for path_button in self.path_buttons:
@@ -127,20 +115,20 @@ class Mediator:
             metro.draw(screen)
         for button in self.buttons:
             button.draw(screen)
-        text_surface = self.font.render(f"Score: {self.score}", True, (0, 0, 0))
+        text_surface = self.font.render(f"Score: {self._status.score}", True, (0, 0, 0))
         screen.blit(text_surface, score_display_coords)
 
     def react_mouse_event(self, event: MouseEvent) -> None:
         entity = self.get_containing_entity(event.position)
 
         if event.event_type == MouseEventType.MOUSE_DOWN:
-            self.is_mouse_down = True
+            self._status.is_mouse_down = True
             if entity:
                 if isinstance(entity, Station):
                     self.start_path_on_station(entity)
 
         elif event.event_type == MouseEventType.MOUSE_UP:
-            self.is_mouse_down = False
+            self._status.is_mouse_down = False
             if self.is_creating_path:
                 assert self.path_being_created is not None
                 if entity and isinstance(entity, Station):
@@ -153,7 +141,7 @@ class Mediator:
                         self.remove_path(entity.path)
 
         elif event.event_type == MouseEventType.MOUSE_MOTION:
-            if self.is_mouse_down:
+            if self._status.is_mouse_down:
                 if self.is_creating_path and self.path_being_created:
                     if entity and isinstance(entity, Station):
                         self.add_station_to_path(entity)
@@ -169,7 +157,7 @@ class Mediator:
     def react_keyboard_event(self, event: KeyboardEvent) -> None:
         if event.event_type == KeyboardEventType.KEY_UP:
             if event.key == pygame.K_SPACE:
-                self.is_paused = not self.is_paused
+                self._status.is_paused = not self._status.is_paused
 
     def react(self, event: Event | None) -> None:
         if isinstance(event, MouseEvent):
@@ -199,7 +187,7 @@ class Mediator:
 
     def start_path_on_station(self, station: Station) -> None:
         if len(self.paths) < self.num_paths:
-            self.is_creating_path = True
+            self._status.is_creating_path = True
             assigned_color = (0, 0, 0)
             for path_color, taken in self.path_colors.items():
                 if not taken:
@@ -231,7 +219,7 @@ class Mediator:
 
     def abort_path_creation(self) -> None:
         assert self.path_being_created is not None
-        self.is_creating_path = False
+        self._status.is_creating_path = False
         self.release_color_for_path(self.path_being_created)
         self.paths.remove(self.path_being_created)
         self.path_being_created = None
@@ -242,7 +230,7 @@ class Mediator:
 
     def finish_path_creation(self) -> None:
         assert self.path_being_created is not None
-        self.is_creating_path = False
+        self._status.is_creating_path = False
         self.path_being_created.is_being_created = False
         self.path_being_created.remove_temporary_point()
         if len(self.metros) < self.num_metros:
@@ -283,8 +271,9 @@ class Mediator:
 
     def is_passenger_spawn_time(self) -> bool:
         return (
-            self.steps == self.passenger_spawning_step
-            or self.steps_since_last_spawn == self.passenger_spawning_interval_step
+            self._status.steps == self.passenger_spawning_step
+            or self._status.steps_since_last_spawn
+            == self.passenger_spawning_interval_step
         )
 
     def spawn_passengers(self) -> None:
@@ -303,13 +292,13 @@ class Mediator:
                 self.passengers.append(passenger)
 
     def increment_time(self, dt_ms: int) -> None:
-        if self.is_paused:
+        if self._status.is_paused:
             return
 
         # record time
-        self.time_ms += dt_ms
-        self.steps += 1
-        self.steps_since_last_spawn += 1
+        self._status.time_ms += dt_ms
+        self._status.steps += 1
+        self._status.steps_since_last_spawn += 1
 
         # move metros
         for path in self.paths:
@@ -319,7 +308,7 @@ class Mediator:
         # spawn passengers
         if self.is_passenger_spawn_time():
             self.spawn_passengers()
-            self.steps_since_last_spawn = 0
+            self._status.steps_since_last_spawn = 0
 
         self.find_travel_plan_for_passengers()
         self.move_passengers()
@@ -356,7 +345,7 @@ class Mediator:
                     metro.remove_passenger(passenger)
                     self.passengers.remove(passenger)
                     del self.travel_plans[passenger]
-                    self.score += 1
+                    self._status.score += 1
 
                 for passenger in passengers_from_metro_to_station:
                     if metro.current_station.has_room():
@@ -455,3 +444,36 @@ class Mediator:
                             break
                     if should_set_null_path:
                         self.travel_plans[passenger] = TravelPlan([])
+
+    @property
+    def is_creating_path(self) -> bool:
+        return self._status.is_creating_path
+
+    @property
+    def is_mouse_down(self) -> bool:
+        return self._status.is_mouse_down
+
+    @property
+    def is_paused(self) -> bool:
+        return self._status.is_paused
+
+
+class MediatorStatus:
+    __slots__ = (
+        "time_ms",
+        "steps",
+        "steps_since_last_spawn",
+        "is_mouse_down",
+        "is_creating_path",
+        "is_paused",
+        "score",
+    )
+
+    def __init__(self, passenger_spawning_interval_step: int) -> None:
+        self.time_ms: int = 0
+        self.steps: int = 0
+        self.steps_since_last_spawn: int = passenger_spawning_interval_step + 1
+        self.is_mouse_down: bool = False
+        self.is_creating_path: bool = False
+        self.is_paused: bool = False
+        self.score: int = 0
