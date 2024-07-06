@@ -190,20 +190,22 @@ class Mediator:
         self.find_travel_plan_for_passengers()
 
     def start_path_on_station(self, station: Station) -> None:
-        if len(self.paths) < self.num_paths:
-            self._status.is_creating_path = True
-            assigned_color = (0, 0, 0)
-            for path_color, taken in self.path_colors.items():
-                if not taken:
-                    assigned_color = path_color
-                    self.path_colors[path_color] = True
-                    break
-            path = Path(assigned_color)
-            self.path_to_color[path] = assigned_color
-            path.add_station(station)
-            path.is_being_created = True
-            self.path_being_created = path
-            self.paths.append(path)
+        if len(self.paths) >= self.num_paths:
+            return
+        self._status.is_creating_path = True
+        assigned_color = (0, 0, 0)
+        for path_color, taken in self.path_colors.items():
+            if taken:
+                continue
+            assigned_color = path_color
+            self.path_colors[path_color] = True
+            break
+        path = Path(assigned_color)
+        self.path_to_color[path] = assigned_color
+        path.add_station(station)
+        path.is_being_created = True
+        self.path_being_created = path
+        self.paths.append(path)
 
     def add_station_to_path(self, station: Station) -> None:
         assert self.path_being_created is not None
@@ -319,49 +321,50 @@ class Mediator:
 
     def move_passengers(self) -> None:
         for metro in self.metros:
-            if metro.current_station:
-                passengers_to_remove = []
-                passengers_from_metro_to_station = []
-                passengers_from_station_to_metro = []
 
-                # queue
-                for passenger in metro.passengers:
-                    if (
-                        metro.current_station.shape.type
-                        == passenger.destination_shape.type
-                    ):
-                        passengers_to_remove.append(passenger)
-                    elif (
-                        self.travel_plans[passenger].get_next_station()
-                        == metro.current_station
-                    ):
-                        passengers_from_metro_to_station.append(passenger)
-                for passenger in metro.current_station.passengers:
-                    if (
-                        self.travel_plans[passenger].next_path
-                        and self.travel_plans[passenger].next_path.id == metro.path_id  # type: ignore
-                    ):
-                        passengers_from_station_to_metro.append(passenger)
+            if not metro.current_station:
+                continue
 
-                # process
-                for passenger in passengers_to_remove:
-                    passenger.is_at_destination = True
-                    metro.remove_passenger(passenger)
-                    self.passengers.remove(passenger)
-                    del self.travel_plans[passenger]
-                    self._status.score += 1
+            passengers_to_remove = []
+            passengers_from_metro_to_station = []
+            passengers_from_station_to_metro = []
 
-                for passenger in passengers_from_metro_to_station:
-                    if metro.current_station.has_room():
-                        metro.move_passenger(passenger, metro.current_station)
-                        self.travel_plans[passenger].increment_next_station()
-                        self.find_next_path_for_passenger_at_station(
-                            passenger, metro.current_station
-                        )
+            # queue
+            for passenger in metro.passengers:
+                if metro.current_station.shape.type == passenger.destination_shape.type:
+                    passengers_to_remove.append(passenger)
+                elif (
+                    self.travel_plans[passenger].get_next_station()
+                    == metro.current_station
+                ):
+                    passengers_from_metro_to_station.append(passenger)
+            for passenger in metro.current_station.passengers:
+                if (
+                    self.travel_plans[passenger].next_path
+                    and self.travel_plans[passenger].next_path.id == metro.path_id  # type: ignore
+                ):
+                    passengers_from_station_to_metro.append(passenger)
 
-                for passenger in passengers_from_station_to_metro:
-                    if metro.has_room():
-                        metro.current_station.move_passenger(passenger, metro)
+            # process
+            for passenger in passengers_to_remove:
+                passenger.is_at_destination = True
+                metro.remove_passenger(passenger)
+                self.passengers.remove(passenger)
+                del self.travel_plans[passenger]
+                self._status.score += 1
+
+            for passenger in passengers_from_metro_to_station:
+                if not metro.current_station.has_room():
+                    continue
+                metro.move_passenger(passenger, metro.current_station)
+                self.travel_plans[passenger].increment_next_station()
+                self.find_next_path_for_passenger_at_station(
+                    passenger, metro.current_station
+                )
+
+            for passenger in passengers_from_station_to_metro:
+                if metro.has_room():
+                    metro.current_station.move_passenger(passenger, metro)
 
     def get_stations_for_shape_type(self, shape_type: ShapeType) -> List[Station]:
         stations: List[Station] = []
@@ -397,57 +400,59 @@ class Mediator:
         assert len(node_path) >= 2
         if len(node_path) == 2:
             return node_path
-        else:
-            nodes_to_remove = []
-            i = 0
-            j = 1
-            path_set_list = [x.paths for x in node_path]
-            path_set_list.append(set())
-            while j <= len(path_set_list) - 1:
-                set_a = path_set_list[i]
-                set_b = path_set_list[j]
-                if set_a & set_b:
-                    j += 1
-                else:
-                    for k in range(i + 1, j - 1):
-                        nodes_to_remove.append(node_path[k])
-                    i = j - 1
-                    j += 1
-            for node in nodes_to_remove:
-                node_path.remove(node)
+        nodes_to_remove = []
+        i = 0
+        j = 1
+        path_set_list = [x.paths for x in node_path]
+        path_set_list.append(set())
+        while j <= len(path_set_list) - 1:
+            set_a = path_set_list[i]
+            set_b = path_set_list[j]
+            if set_a & set_b:
+                j += 1
+            else:
+                for k in range(i + 1, j - 1):
+                    nodes_to_remove.append(node_path[k])
+                i = j - 1
+                j += 1
+        for node in nodes_to_remove:
+            node_path.remove(node)
         return node_path
 
     def find_travel_plan_for_passengers(self) -> None:
         station_nodes_dict = build_station_nodes_dict(self.stations, self.paths)
         for station in self.stations:
             for passenger in station.passengers:
-                if not self.passenger_has_travel_plan(passenger):
-                    possible_dst_stations = self.get_stations_for_shape_type(
-                        passenger.destination_shape.type
-                    )
-                    should_set_null_path = True
-                    for possible_dst_station in possible_dst_stations:
-                        start = station_nodes_dict[station]
-                        end = station_nodes_dict[possible_dst_station]
-                        node_path = bfs(start, end)
-                        if len(node_path) == 1:
-                            # passenger arrived at destination
-                            station.remove_passenger(passenger)
-                            self.passengers.remove(passenger)
-                            passenger.is_at_destination = True
-                            del self.travel_plans[passenger]
-                            should_set_null_path = False
-                            break
-                        elif len(node_path) > 1:
-                            node_path = self.skip_stations_on_same_path(node_path)
-                            self.travel_plans[passenger] = TravelPlan(node_path[1:])
-                            self.find_next_path_for_passenger_at_station(
-                                passenger, station
-                            )
-                            should_set_null_path = False
-                            break
-                    if should_set_null_path:
-                        self.travel_plans[passenger] = TravelPlan([])
+
+                if self.passenger_has_travel_plan(passenger):
+                    continue
+
+                possible_dst_stations = self.get_stations_for_shape_type(
+                    passenger.destination_shape.type
+                )
+
+                should_set_null_path = True
+                for possible_dst_station in possible_dst_stations:
+                    start = station_nodes_dict[station]
+                    end = station_nodes_dict[possible_dst_station]
+                    node_path = bfs(start, end)
+                    if len(node_path) == 1:
+                        # passenger arrived at destination
+                        station.remove_passenger(passenger)
+                        self.passengers.remove(passenger)
+                        passenger.is_at_destination = True
+                        del self.travel_plans[passenger]
+                        should_set_null_path = False
+                        break
+                    elif len(node_path) > 1:
+                        node_path = self.skip_stations_on_same_path(node_path)
+                        self.travel_plans[passenger] = TravelPlan(node_path[1:])
+                        self.find_next_path_for_passenger_at_station(passenger, station)
+                        should_set_null_path = False
+                        break
+
+                if should_set_null_path:
+                    self.travel_plans[passenger] = TravelPlan([])
 
     @property
     def is_creating_path(self) -> bool:

@@ -23,8 +23,7 @@ class TravelPlan:
             next_station = next_node.station
             self.next_station = next_station
             return next_station
-        else:
-            return None
+        return None
 
     def increment_next_station(self) -> None:
         self.next_station_idx += 1

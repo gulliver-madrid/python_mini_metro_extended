@@ -31,11 +31,12 @@ def build_station_nodes_dict(
         for connection in connections:
             for idx in range(len(connection)):
                 node = connection[idx]
-                if node == root:
-                    if idx - 1 >= 0:
-                        root.neighbors.add(connection[idx - 1])
-                    if idx + 1 <= len(connection) - 1:
-                        root.neighbors.add(connection[idx + 1])
+                if node != root:
+                    continue
+                if idx - 1 >= 0:
+                    root.neighbors.add(connection[idx - 1])
+                if idx + 1 <= len(connection) - 1:
+                    root.neighbors.add(connection[idx + 1])
         station_nodes.remove(root)
         station_nodes_dict[root.station] = root
 
