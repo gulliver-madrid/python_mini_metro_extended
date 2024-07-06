@@ -41,18 +41,45 @@ pp = pprint.PrettyPrinter(indent=4)
 
 
 class Mediator:
+    __slots__ = (
+        "passenger_spawning_step",
+        "passenger_spawning_interval_step",
+        "num_paths",
+        "num_metros",
+        "num_stations",
+        "path_buttons",
+        "path_to_button",
+        "buttons",
+        "font",
+        "stations",
+        "metros",
+        "paths",
+        "passengers",
+        "path_colors",
+        "path_to_color",
+        "time_ms",
+        "steps",
+        "steps_since_last_spawn",
+        "is_mouse_down",
+        "is_creating_path",
+        "path_being_created",
+        "travel_plans",
+        "is_paused",
+        "score",
+    )
+
     def __init__(self) -> None:
         pygame.font.init()
 
         # configs
-        self.passenger_spawning_step = passenger_spawning_start_step
-        self.passenger_spawning_interval_step = passenger_spawning_interval_step
-        self.num_paths = num_paths
-        self.num_metros = num_metros
-        self.num_stations = num_stations
+        self.passenger_spawning_step: int = passenger_spawning_start_step
+        self.passenger_spawning_interval_step: int = passenger_spawning_interval_step
+        self.num_paths: int = num_paths
+        self.num_metros: int = num_metros
+        self.num_stations: int = num_stations
 
         # UI
-        self.path_buttons = get_path_buttons(self.num_paths)
+        self.path_buttons: List[PathButton] = get_path_buttons(self.num_paths)
         self.path_to_button: Dict[Path, PathButton] = {}
         self.buttons = [*self.path_buttons]
         self.font = pygame.font.SysFont("arial", score_font_size)
@@ -69,15 +96,15 @@ class Mediator:
         self.path_to_color: Dict[Path, Color] = {}
 
         # status
-        self.time_ms = 0
-        self.steps = 0
-        self.steps_since_last_spawn = self.passenger_spawning_interval_step + 1
-        self.is_mouse_down = False
-        self.is_creating_path = False
+        self.time_ms: int = 0
+        self.steps: int = 0
+        self.steps_since_last_spawn: int = self.passenger_spawning_interval_step + 1
+        self.is_mouse_down: bool = False
+        self.is_creating_path: bool = False
         self.path_being_created: Path | None = None
         self.travel_plans: TravelPlans = {}
-        self.is_paused = False
-        self.score = 0
+        self.is_paused: bool = False
+        self.score: int = 0
 
     def assign_paths_to_buttons(self) -> None:
         for path_button in self.path_buttons:
