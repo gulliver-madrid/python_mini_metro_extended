@@ -5,7 +5,9 @@ from src.entity.station import Station
 from src.graph.node import Node
 
 
-def build_station_nodes_dict(stations: List[Station], paths: List[Path]) -> Dict[Station, Node]:
+def build_station_nodes_dict(
+    stations: List[Station], paths: List[Path]
+) -> Dict[Station, Node]:
     station_nodes: List[Node] = []
     connections: List[List[Node]] = []
     station_nodes_dict: Dict[Station, Node] = {}

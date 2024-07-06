@@ -150,7 +150,7 @@ class Mediator:
         elif isinstance(event, KeyboardEvent):
             self.react_keyboard_event(event)
 
-    def get_containing_entity(self, position: Point) -> Station |PathButton | None:
+    def get_containing_entity(self, position: Point) -> Station | PathButton | None:
         for station in self.stations:
             if station.contains(position):
                 return station

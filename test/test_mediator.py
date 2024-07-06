@@ -37,7 +37,7 @@ class TestMediator(unittest.TestCase):
         self.mediator = Mediator()
         self.mediator.render(self.screen)
 
-    def connect_stations(self, station_idx :Sequence[int]) -> None:
+    def connect_stations(self, station_idx: Sequence[int]) -> None:
         self.mediator.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
@@ -82,7 +82,7 @@ class TestMediator(unittest.TestCase):
         self.assertEqual(len(self.mediator.passengers), len(self.mediator.stations))
 
     def test_is_passenger_spawn_time(self) -> None:
-        self.mediator.spawn_passengers = MagicMock() # type: ignore [method-assign]
+        self.mediator.spawn_passengers = MagicMock()  # type: ignore [method-assign]
         # Run the game until first wave of passengers spawn
         for _ in range(passenger_spawning_start_step):
             self.mediator.increment_time(ceil(1000 / framerate))

@@ -45,7 +45,11 @@ class Point:
         return self.__mul__(other)
 
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, Point) and self.left == other.left and self.top == other.top
+        return (
+            isinstance(other, Point)
+            and self.left == other.left
+            and self.top == other.top
+        )
 
     def rotate(self, degrees: float) -> Point:
         # Rotate around the origin.
@@ -60,7 +64,7 @@ class Point:
 
         return Point(new_left, new_top)
 
-    def __deepcopy__(self, memo: dict[int, Any]) -> 'Point':
+    def __deepcopy__(self, memo: dict[int, Any]) -> "Point":
         cls = self.__class__
         result = cls.__new__(cls)
         memo[id(self)] = result

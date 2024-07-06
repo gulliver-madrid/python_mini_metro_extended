@@ -25,7 +25,7 @@ class TestMediator(unittest.TestCase):
         pygame.draw = MagicMock()
         self.mediator.render(self.screen)
 
-    def connect_stations(self, station_idx:Sequence[int]) -> None:
+    def connect_stations(self, station_idx: Sequence[int]) -> None:
         self.mediator.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
@@ -46,7 +46,7 @@ class TestMediator(unittest.TestCase):
         )
 
     def test_react_mouse_down_start_path(self) -> None:
-        self.mediator.start_path_on_station = MagicMock() # type: ignore [method-assign]
+        self.mediator.start_path_on_station = MagicMock()  # type: ignore [method-assign]
         self.mediator.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
@@ -83,7 +83,9 @@ class TestMediator(unittest.TestCase):
             [self.mediator.stations[0], self.mediator.stations[1]],
         )
 
-    def test_mouse_dragged_between_non_station_points_does_not_create_path(self) -> None:
+    def test_mouse_dragged_between_non_station_points_does_not_create_path(
+        self,
+    ) -> None:
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(0, 0)))
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_MOTION, Point(2, 2)))
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_UP, Point(0, 1)))
