@@ -3,7 +3,7 @@ from __future__ import annotations
 import pprint
 import random
 import sys
-from typing import Dict, List, Sequence
+from typing import Dict, List, Mapping, Sequence
 
 import pygame
 
@@ -420,39 +420,49 @@ class Mediator:
         return node_path
 
     def find_travel_plan_for_passengers(self) -> None:
-        station_nodes_dict = build_station_nodes_dict(self.stations, self.paths)
+        station_nodes_mapping = build_station_nodes_dict(self.stations, self.paths)
         for station in self.stations:
             for passenger in station.passengers:
 
                 if self.passenger_has_travel_plan(passenger):
                     continue
 
-                possible_dst_stations = self.get_stations_for_shape_type(
-                    passenger.destination_shape.type
+                self._find_travel_plan_for_passenger(
+                    station_nodes_mapping, station, passenger
                 )
 
-                should_set_null_path = True
-                for possible_dst_station in possible_dst_stations:
-                    start = station_nodes_dict[station]
-                    end = station_nodes_dict[possible_dst_station]
-                    node_path = bfs(start, end)
-                    if len(node_path) == 1:
-                        # passenger arrived at destination
-                        station.remove_passenger(passenger)
-                        self.passengers.remove(passenger)
-                        passenger.is_at_destination = True
-                        del self.travel_plans[passenger]
-                        should_set_null_path = False
-                        break
-                    elif len(node_path) > 1:
-                        node_path = self.skip_stations_on_same_path(node_path)
-                        self.travel_plans[passenger] = TravelPlan(node_path[1:])
-                        self.find_next_path_for_passenger_at_station(passenger, station)
-                        should_set_null_path = False
-                        break
+    def _find_travel_plan_for_passenger(
+        self,
+        station_nodes_mapping: Mapping[Station, Node],
+        station: Station,
+        passenger: Passenger,
+    ) -> None:
+        possible_dst_stations = self.get_stations_for_shape_type(
+            passenger.destination_shape.type
+        )
 
-                if should_set_null_path:
-                    self.travel_plans[passenger] = TravelPlan([])
+        for possible_dst_station in possible_dst_stations:
+            start = station_nodes_mapping[station]
+            end = station_nodes_mapping[possible_dst_station]
+            node_path = bfs(start, end)
+            if len(node_path) == 0:
+                continue
+            if len(node_path) == 1:
+                # passenger arrived at destination
+                station.remove_passenger(passenger)
+                self.passengers.remove(passenger)
+                passenger.is_at_destination = True
+                del self.travel_plans[passenger]
+                break
+            else:
+                assert len(node_path) > 1
+                node_path = self.skip_stations_on_same_path(node_path)
+                self.travel_plans[passenger] = TravelPlan(node_path[1:])
+                self.find_next_path_for_passenger_at_station(passenger, station)
+                break
+
+        else:
+            self.travel_plans[passenger] = TravelPlan([])
 
     @property
     def is_creating_path(self) -> bool:
