@@ -358,7 +358,7 @@ class Mediator:
                     continue
                 metro.move_passenger(passenger, metro.current_station)
                 self.travel_plans[passenger].increment_next_station()
-                self.find_next_path_for_passenger_at_station(
+                self._find_next_path_for_passenger_at_station(
                     passenger, metro.current_station
                 )
 
@@ -388,7 +388,7 @@ class Mediator:
             and self.travel_plans[passenger].next_path is not None
         )
 
-    def find_next_path_for_passenger_at_station(
+    def _find_next_path_for_passenger_at_station(
         self, passenger: Passenger, station: Station
     ) -> None:
         next_station = self.travel_plans[passenger].get_next_station()
@@ -396,7 +396,7 @@ class Mediator:
         next_path = self.find_shared_path(station, next_station)
         self.travel_plans[passenger].next_path = next_path
 
-    def skip_stations_on_same_path(self, node_path: List[Node]) -> List[Node]:
+    def _skip_stations_on_same_path(self, node_path: List[Node]) -> List[Node]:
         assert len(node_path) >= 2
         if len(node_path) == 2:
             return node_path
@@ -423,10 +423,8 @@ class Mediator:
         station_nodes_mapping = build_station_nodes_dict(self.stations, self.paths)
         for station in self.stations:
             for passenger in station.passengers:
-
                 if self.passenger_has_travel_plan(passenger):
                     continue
-
                 self._find_travel_plan_for_passenger(
                     station_nodes_mapping, station, passenger
                 )
@@ -456,9 +454,9 @@ class Mediator:
                 break
             else:
                 assert len(node_path) > 1
-                node_path = self.skip_stations_on_same_path(node_path)
+                node_path = self._skip_stations_on_same_path(node_path)
                 self.travel_plans[passenger] = TravelPlan(node_path[1:])
-                self.find_next_path_for_passenger_at_station(passenger, station)
+                self._find_next_path_for_passenger_at_station(passenger, station)
                 break
 
         else:
