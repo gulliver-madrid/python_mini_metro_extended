@@ -240,36 +240,32 @@ class Mediator:
 
         if event.event_type == MouseEventType.MOUSE_DOWN:
             self._status.is_mouse_down = True
-            if entity:
-                if isinstance(entity, Station):
-                    self.start_path_on_station(entity)
+            if isinstance(entity, Station):
+                self.start_path_on_station(entity)
 
         elif event.event_type == MouseEventType.MOUSE_UP:
             self._status.is_mouse_down = False
             if self.is_creating_path:
                 assert self.path_being_created is not None
-                if entity and isinstance(entity, Station):
+                if isinstance(entity, Station):
                     self._end_path_on_station(entity)
                 else:
                     self._abort_path_creation()
-            else:
-                if entity and isinstance(entity, PathButton):
-                    if entity.path:
-                        self.remove_path(entity.path)
+            elif isinstance(entity, PathButton) and entity.path:
+                self.remove_path(entity.path)
 
         elif event.event_type == MouseEventType.MOUSE_MOTION:
             if self._status.is_mouse_down:
                 if self.is_creating_path and self.path_being_created:
-                    if entity and isinstance(entity, Station):
+                    if isinstance(entity, Station):
                         self._add_station_to_path(entity)
                     else:
                         self.path_being_created.set_temporary_point(event.position)
+            elif isinstance(entity, Button):
+                entity.on_hover()
             else:
-                if entity and isinstance(entity, Button):
-                    entity.on_hover()
-                else:
-                    for button in self.buttons:
-                        button.on_exit()
+                for button in self.buttons:
+                    button.on_exit()
 
     def _react_keyboard_event(self, event: KeyboardEvent) -> None:
         if event.event_type == KeyboardEventType.KEY_UP:
