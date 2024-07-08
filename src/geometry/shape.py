@@ -30,5 +30,5 @@ class Shape(ABC):
     def rotate(self, degree_diff: float) -> None:
         pass
 
-    def set_degrees(self, degree: float) -> None:
+    def set_degrees(self, degrees: float) -> None:
         pass
