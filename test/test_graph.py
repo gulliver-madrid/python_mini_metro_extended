@@ -1,7 +1,9 @@
+import random
 import unittest
 from collections.abc import Sequence
 from unittest.mock import create_autospec
 
+import numpy as np
 import pygame
 
 from src.config import screen_height, screen_width, station_color, station_size
@@ -17,11 +19,15 @@ from src.mediator import Mediator
 from src.utils import get_random_color, get_random_position
 
 from test.base_test import BaseTestCase
+from test.random_seed_config import RANDOM_SEED
 
 
 class TestGraph(BaseTestCase):
     def setUp(self) -> None:
         super().setUp()
+        random.seed(RANDOM_SEED)
+        np.random.seed(RANDOM_SEED)
+
         self.width, self.height = screen_width, screen_height
         self.screen = create_autospec(pygame.surface.Surface)
         self.position = get_random_position(self.width, self.height)
