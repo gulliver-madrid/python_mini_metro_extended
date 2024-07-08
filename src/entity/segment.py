@@ -5,7 +5,6 @@ from abc import ABC
 import pygame
 from shortuuid import uuid
 
-from src.config import screen_height, screen_width
 from src.entity.station import Station
 from src.geometry.line import Line
 from src.geometry.point import Point

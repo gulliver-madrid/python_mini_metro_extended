@@ -1,4 +1,3 @@
-import pygame
 from shortuuid import uuid
 
 from src.config import (

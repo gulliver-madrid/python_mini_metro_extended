@@ -19,7 +19,8 @@ class Point:
     def __add__(self, other: Point | int | float) -> Point:
         if isinstance(other, Point):
             return Point(self.left + other.left, self.top + other.top)
-        elif isinstance(other, int) or isinstance(other, float):
+        else:
+            assert isinstance(other, (int, float))
             return Point(self.left + other, self.top + other)
 
     def __radd__(self, other: Point | int | float) -> Point:
@@ -28,18 +29,20 @@ class Point:
     def __sub__(self, other: Point | int | float) -> Point:
         if isinstance(other, Point):
             return Point(self.left - other.left, self.top - other.top)
-        elif isinstance(other, int) or isinstance(other, float):
+        else:
+            assert isinstance(other, (int, float))
             return Point(self.left - other, self.top - other)
 
     def __rsub__(self, other: Point | int | float) -> Point:
         if isinstance(other, Point):
             return Point(other.left - self.left, other.top - self.top)
-        elif isinstance(other, int) or isinstance(other, float):
+        else:
+            assert isinstance(other, (int, float))
             return Point(other - self.left, other - self.top)
 
     def __mul__(self, other: int | float) -> Point:
-        if isinstance(other, int) or isinstance(other, float):
-            return Point(other * self.left, other * self.top)
+        assert isinstance(other, (int, float))
+        return Point(other * self.left, other * self.top)
 
     def __rmul__(self, other: int | float) -> Point:
         return self.__mul__(other)

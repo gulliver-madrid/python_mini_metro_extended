@@ -1,16 +1,12 @@
 from __future__ import annotations
 
-import math
-
-import pygame
 from shortuuid import uuid
 
 from src.config import path_order_shift, path_width
 from src.entity.segment import Segment
 from src.entity.station import Station
 from src.geometry.line import Line
-from src.geometry.point import Point
-from src.geometry.utils import direction, distance
+from src.geometry.utils import direction
 from src.type import Color
 
 
