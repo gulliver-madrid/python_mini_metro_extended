@@ -1,7 +1,6 @@
-import unittest
 from collections.abc import Sequence
 from typing import Any
-from unittest.mock import MagicMock, Mock, create_autospec, patch
+from unittest.mock import Mock, create_autospec, patch
 
 import pygame
 
@@ -14,16 +13,21 @@ from src.geometry.point import Point
 from src.mediator import Mediator
 from src.utils import get_random_color, get_random_position
 
+from test.base_test import BaseTestCase
 
-class TestGameplay(unittest.TestCase):
+
+class TestGameplay(BaseTestCase):
     def setUp(self) -> None:
+        super().setUp()
         self.width, self.height = screen_width, screen_height
         self.screen = create_autospec(pygame.surface.Surface)
         self.position = get_random_position(self.width, self.height)
         self.color = get_random_color()
         self.mediator = Mediator()
-        pygame.draw = MagicMock()
         self.mediator.render(self.screen)
+
+    def tearDown(self) -> None:
+        super().tearDown()
 
     def connect_stations(self, station_idx: Sequence[int]) -> None:
         self.mediator.react(

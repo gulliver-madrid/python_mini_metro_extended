@@ -1,6 +1,6 @@
 import unittest
 from math import ceil
-from unittest.mock import MagicMock, create_autospec
+from unittest.mock import create_autospec
 
 import pygame
 
@@ -12,13 +12,19 @@ from src.entity.station import Station
 from src.geometry.point import Point
 from src.utils import get_random_color, get_random_position, get_random_station_shape
 
+from test.base_test import BaseTestCase
 
-class TestPath(unittest.TestCase):
+
+class TestPath(BaseTestCase):
     def setUp(self) -> None:
+        super().setUp()
         self.width, self.height = 640, 480
         self.screen = create_autospec(pygame.surface.Surface)
         self.position = get_random_position(self.width, self.height)
         self.color = get_random_color()
+
+    def tearDown(self) -> None:
+        super().tearDown()
 
     def test_init(self) -> None:
         path = Path(get_random_color())
@@ -30,21 +36,19 @@ class TestPath(unittest.TestCase):
     def test_draw(self) -> None:
         path = Path(get_random_color())
         stations = get_random_stations(5)
-        pygame.draw.line = MagicMock()
         for station in stations:
             path.add_station(station)
         path.draw(self.screen, 0)
 
-        self.assertEqual(pygame.draw.line.call_count, 4 + 3)
+        self.assertEqual(self._draw.line.call_count, 4 + 3)
 
     def test_draw_temporary_point(self) -> None:
         path = Path(get_random_color())
-        pygame.draw.line = MagicMock()
         path.add_station(get_random_station())
         path.set_temporary_point(Point(1, 1))
         path.draw(self.screen, 0)
 
-        self.assertEqual(pygame.draw.line.call_count, 1)
+        self.assertEqual(self._draw.line.call_count, 1)
 
     def test_metro_starts_at_beginning_of_first_line(self) -> None:
         path = Path(get_random_color())
