@@ -4,30 +4,36 @@ from src.config import framerate, screen_color, screen_height, screen_width
 from src.event.convert import convert_pygame_event
 from src.mediator import Mediator
 
-# init
-pygame.init()
 
-# settings
-flags = pygame.SCALED
+def main() -> None:
+    # init
+    pygame.init()
 
-# game constants initialization
-screen = pygame.display.set_mode((screen_width, screen_height), flags, vsync=1)
-clock = pygame.time.Clock()
+    # settings
+    flags = pygame.SCALED
 
-mediator = Mediator()
+    # game constants initialization
+    screen = pygame.display.set_mode((screen_width, screen_height), flags, vsync=1)
+    clock = pygame.time.Clock()
 
-while True:
-    dt_ms = clock.tick(framerate)
-    mediator.increment_time(dt_ms)
-    screen.fill(screen_color)
-    mediator.render(screen)
+    mediator = Mediator()
 
-    # react to user interaction
-    for pygame_event in pygame.event.get():
-        if pygame_event.type == pygame.QUIT:
-            raise SystemExit
-        else:
-            event = convert_pygame_event(pygame_event)
-            mediator.react(event)
+    while True:
+        dt_ms = clock.tick(framerate)
+        mediator.increment_time(dt_ms)
+        screen.fill(screen_color)
+        mediator.render(screen)
 
-    pygame.display.flip()
+        # react to user interaction
+        for pygame_event in pygame.event.get():
+            if pygame_event.type == pygame.QUIT:
+                raise SystemExit
+            else:
+                event = convert_pygame_event(pygame_event)
+                mediator.react(event)
+
+        pygame.display.flip()
+
+
+if __name__ == "__main__":
+    main()
