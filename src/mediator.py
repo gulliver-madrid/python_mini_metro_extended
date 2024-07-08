@@ -333,9 +333,9 @@ class Mediator:
             if not metro.current_station:
                 continue
 
-            passengers_to_remove = []
-            passengers_from_metro_to_station = []
-            passengers_from_station_to_metro = []
+            passengers_to_remove: List[Passenger] = []
+            passengers_from_metro_to_station: List[Passenger] = []
+            passengers_from_station_to_metro: List[Passenger] = []
 
             # queue
             for passenger in metro.passengers:
@@ -444,7 +444,7 @@ class Mediator:
         assert len(node_path) >= 2
         if len(node_path) == 2:
             return node_path
-        nodes_to_remove = []
+        nodes_to_remove: List[Node] = []
         i = 0
         j = 1
         path_set_list = [x.paths for x in node_path]
