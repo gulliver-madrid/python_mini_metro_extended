@@ -120,10 +120,7 @@ class Mediator:
         if self._status.is_paused:
             return
 
-        # record time
-        self._status.time_ms += dt_ms
-        self._status.steps += 1
-        self._status.steps_since_last_spawn += 1
+        self._status.increment_time(dt_ms)
 
         # move metros
         for path in self.paths:
@@ -473,7 +470,7 @@ class Mediator:
 
 class MediatorStatus:
     __slots__ = (
-        "time_ms",
+        "_time_ms",
         "steps",
         "steps_since_last_spawn",
         "is_mouse_down",
@@ -483,10 +480,17 @@ class MediatorStatus:
     )
 
     def __init__(self, passenger_spawning_interval_step: int) -> None:
-        self.time_ms: int = 0
+        self._time_ms: int = 0
         self.steps: int = 0
         self.steps_since_last_spawn: int = passenger_spawning_interval_step + 1
         self.is_mouse_down: bool = False
         self.is_creating_path: bool = False
         self.is_paused: bool = False
         self.score: int = 0
+
+    def increment_time(self, dt_ms: int) -> None:
+        assert not self.is_paused
+
+        self._time_ms += dt_ms
+        self.steps += 1
+        self.steps_since_last_spawn += 1
