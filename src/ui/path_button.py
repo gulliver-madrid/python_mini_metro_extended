@@ -54,7 +54,7 @@ class PathButton(Button):
 
 
 def get_path_buttons(num: int) -> List[PathButton]:
-    path_buttons = []
+    path_buttons: List[PathButton] = []
     for i in range(num):
         position = (
             Point(path_button_start_left, path_button_dist_to_bottom)

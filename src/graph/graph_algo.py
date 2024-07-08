@@ -1,5 +1,5 @@
-from typing import Dict, List
 from collections.abc import Sequence
+from typing import Dict, List
 
 from src.entity.path import Path
 from src.entity.station import Station
@@ -20,7 +20,7 @@ def build_station_nodes_dict(
     for path in paths:
         if path.is_being_created:
             continue
-        connection = []
+        connection: List[Node] = []
         for station in path.stations:
             station_nodes_dict[station].paths.add(path)
             connection.append(station_nodes_dict[station])

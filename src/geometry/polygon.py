@@ -1,9 +1,10 @@
-import math
-from typing import Sequence
+from typing import Any, List, Sequence
 
 import pygame
 from shapely.geometry import Point as ShapelyPoint  # type: ignore [import-untyped]
-from shapely.geometry.polygon import Polygon as ShapelyPolygon  # type: ignore [import-untyped]
+from shapely.geometry.polygon import (  # type: ignore [import-untyped]
+    Polygon as ShapelyPolygon,
+)
 from shortuuid import uuid
 
 from src.config import Config
@@ -24,7 +25,7 @@ class Polygon(Shape):
 
     def draw(self, surface: pygame.surface.Surface, position: Point) -> None:
         super().draw(surface, position)
-        tuples = []
+        tuples: List[tuple[float, float]] = []
         for point in self.points:
             rotated_point = point.rotate(self.degrees)
             tuples.append((rotated_point + self.position).to_tuple())
@@ -33,9 +34,9 @@ class Polygon(Shape):
         )
 
     def contains(self, point: Point) -> bool:
-        shapely_point = ShapelyPoint(point.left, point.top)
+        shapely_point: Any = ShapelyPoint(point.left, point.top)
         tuples = [(x + self.position).to_tuple() for x in self.points]
-        polygon = ShapelyPolygon(tuples)
+        polygon: Any = ShapelyPolygon(tuples)
         result = polygon.contains(shapely_point)
         assert isinstance(result, bool)
         return result
