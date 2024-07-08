@@ -1,4 +1,3 @@
-import os
 import unittest
 from copy import deepcopy
 from unittest.mock import MagicMock, create_autospec

@@ -1,4 +1,3 @@
-import os
 import unittest
 from collections.abc import Sequence
 from unittest.mock import create_autospec

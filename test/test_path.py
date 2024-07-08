@@ -1,7 +1,6 @@
-import os
 import unittest
 from math import ceil
-from unittest.mock import MagicMock, create_autospec, patch
+from unittest.mock import MagicMock, create_autospec
 
 import pygame
 

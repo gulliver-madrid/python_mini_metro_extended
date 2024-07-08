@@ -1,4 +1,3 @@
-import os
 import unittest
 
 from src.entity.station import Station

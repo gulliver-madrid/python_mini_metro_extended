@@ -1,4 +1,3 @@
-import os
 import unittest
 from collections.abc import Sequence
 from typing import Any
