@@ -46,7 +46,7 @@ class TestMediator(unittest.TestCase):
             )
         )
 
-    @patch.object(Mediator, "start_path_on_station", new_callable=Mock)
+    @patch.object(Mediator, "_start_path_on_station", new_callable=Mock)
     def test_react_mouse_down_start_path(self, mock_start_path_on_station: Any) -> None:
         self.mediator.react(
             MouseEvent(
@@ -54,7 +54,7 @@ class TestMediator(unittest.TestCase):
                 self.mediator.stations[3].position + Point(1, 1),
             )
         )
-        self.mediator.start_path_on_station.assert_called_once()  # type: ignore
+        self.mediator._start_path_on_station.assert_called_once()  # type: ignore
 
     def test_mouse_down_and_up_at_the_same_point_does_not_create_path(self) -> None:
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))
@@ -132,11 +132,15 @@ class TestMediator(unittest.TestCase):
     def test_space_key_pauses_and_unpauses_game(self) -> None:
         self.mediator.react(KeyboardEvent(KeyboardEventType.KEY_UP, pygame.K_SPACE))
 
-        self.assertTrue(self.mediator.is_paused)
+        self.assertTrue(
+            self.mediator._status.is_paused  # pyright: ignore [reportPrivateUsage]
+        )
 
         self.mediator.react(KeyboardEvent(KeyboardEventType.KEY_UP, pygame.K_SPACE))
 
-        self.assertFalse(self.mediator.is_paused)
+        self.assertFalse(
+            self.mediator._status.is_paused  # pyright: ignore [reportPrivateUsage]
+        )
 
     def test_path_button_removes_path_on_click(self) -> None:
         self.mediator.stations = get_random_stations(5)

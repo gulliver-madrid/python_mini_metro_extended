@@ -63,11 +63,11 @@ class TestMediator(unittest.TestCase):
             station.draw(self.screen)
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))
 
-        self.assertTrue(self.mediator.is_mouse_down)
+        self.assertTrue(self.mediator._is_mouse_down)
 
     def test_get_containing_entity(self) -> None:
         self.assertTrue(
-            self.mediator.get_containing_entity(
+            self.mediator._get_containing_entity(  # pyright: ignore [reportPrivateUsage]
                 self.mediator.stations[2].position + Point(1, 1)
             )
         )
@@ -75,25 +75,25 @@ class TestMediator(unittest.TestCase):
     def test_react_mouse_up(self) -> None:
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_UP, Point(-1, -1)))
 
-        self.assertFalse(self.mediator.is_mouse_down)
+        self.assertFalse(self.mediator._is_mouse_down)
 
     def test_passengers_are_added_to_stations(self) -> None:
-        self.mediator.spawn_passengers()
+        self.mediator._spawn_passengers()
 
         self.assertEqual(len(self.mediator.passengers), len(self.mediator.stations))
 
-    @patch.object(Mediator, "spawn_passengers", new_callable=Mock)
+    @patch.object(Mediator, "_spawn_passengers", new_callable=Mock)
     def test_is_passenger_spawn_time(self, mock_spawn_passengers: Any) -> None:
         # Run the game until first wave of passengers spawn
         for _ in range(passenger_spawning_start_step):
             self.mediator.increment_time(ceil(1000 / framerate))
 
-        self.mediator.spawn_passengers.assert_called_once()  # type: ignore [attr-defined]
+        self.mediator._spawn_passengers.assert_called_once()  # type: ignore [attr-defined]
 
         for _ in range(passenger_spawning_interval_step):
             self.mediator.increment_time(ceil(1000 / framerate))
 
-        self.assertEqual(self.mediator.spawn_passengers.call_count, 2)  # type: ignore [attr-defined]
+        self.assertEqual(self.mediator._spawn_passengers.call_count, 2)  # type: ignore [attr-defined]
 
     def test_passengers_spawned_at_a_station_have_a_different_destination(self) -> None:
         # Run the game until first wave of passengers spawn
@@ -198,9 +198,9 @@ class TestMediator(unittest.TestCase):
                 get_random_position(self.width, self.height),
             ),
         ]
-        rect_stations = self.mediator.get_stations_for_shape_type(ShapeType.RECT)
-        circle_stations = self.mediator.get_stations_for_shape_type(ShapeType.CIRCLE)
-        triangle_stations = self.mediator.get_stations_for_shape_type(
+        rect_stations = self.mediator._get_stations_for_shape_type(ShapeType.RECT)
+        circle_stations = self.mediator._get_stations_for_shape_type(ShapeType.CIRCLE)
+        triangle_stations = self.mediator._get_stations_for_shape_type(
             ShapeType.TRIANGLE
         )
 
@@ -213,8 +213,8 @@ class TestMediator(unittest.TestCase):
         for station in self.mediator.stations:
             station.draw(self.screen)
         self.connect_stations([i for i in range(5)])
-        self.mediator.spawn_passengers()
-        self.mediator.find_travel_plan_for_passengers()
+        self.mediator._spawn_passengers()
+        self.mediator._find_travel_plan_for_passengers()
         for station in self.mediator.stations:
             for passenger in station.passengers:
                 self.assertEqual(

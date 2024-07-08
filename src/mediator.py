@@ -116,7 +116,39 @@ class Mediator:
         elif isinstance(event, KeyboardEvent):
             self._react_keyboard_event(event)
 
-    def get_containing_entity(self, position: Point) -> Station | PathButton | None:
+    def increment_time(self, dt_ms: int) -> None:
+        if self._status.is_paused:
+            return
+
+        # record time
+        self._status.time_ms += dt_ms
+        self._status.steps += 1
+        self._status.steps_since_last_spawn += 1
+
+        # move metros
+        for path in self.paths:
+            for metro in path.metros:
+                path.move_metro(metro, dt_ms)
+
+        # spawn passengers
+        if self._is_passenger_spawn_time():
+            self._spawn_passengers()
+            self._status.steps_since_last_spawn = 0
+
+        self._find_travel_plan_for_passengers()
+        self._move_passengers()
+
+    # private methods
+
+    @property
+    def _is_creating_path(self) -> bool:
+        return self._status.is_creating_path
+
+    @property
+    def _is_mouse_down(self) -> bool:
+        return self._status.is_mouse_down
+
+    def _get_containing_entity(self, position: Point) -> Station | PathButton | None:
         for station in self.stations:
             if station.contains(position):
                 return station
@@ -125,7 +157,7 @@ class Mediator:
                 return button
         return None
 
-    def remove_path(self, path: Path) -> None:
+    def _remove_path(self, path: Path) -> None:
         self.path_to_button[path].remove_path()
         for metro in path.metros:
             for passenger in metro.passengers:
@@ -134,9 +166,9 @@ class Mediator:
         self._release_color_for_path(path)
         self.paths.remove(path)
         self._assign_paths_to_buttons()
-        self.find_travel_plan_for_passengers()
+        self._find_travel_plan_for_passengers()
 
-    def start_path_on_station(self, station: Station) -> None:
+    def _start_path_on_station(self, station: Station) -> None:
         if len(self.paths) >= self.num_paths:
             return
         self._status.is_creating_path = True
@@ -154,7 +186,7 @@ class Mediator:
         self.path_being_created = path
         self.paths.append(path)
 
-    def spawn_passengers(self) -> None:
+    def _spawn_passengers(self) -> None:
         for station in self.stations:
             station_types = self._get_station_shape_types()
             other_station_shape_types = [
@@ -169,61 +201,6 @@ class Mediator:
                 station.add_passenger(passenger)
                 self.passengers.append(passenger)
 
-    def increment_time(self, dt_ms: int) -> None:
-        if self._status.is_paused:
-            return
-
-        # record time
-        self._status.time_ms += dt_ms
-        self._status.steps += 1
-        self._status.steps_since_last_spawn += 1
-
-        # move metros
-        for path in self.paths:
-            for metro in path.metros:
-                path.move_metro(metro, dt_ms)
-
-        # spawn passengers
-        if self._is_passenger_spawn_time():
-            self.spawn_passengers()
-            self._status.steps_since_last_spawn = 0
-
-        self.find_travel_plan_for_passengers()
-        self._move_passengers()
-
-    def get_stations_for_shape_type(self, shape_type: ShapeType) -> List[Station]:
-        stations: List[Station] = []
-        for station in self.stations:
-            if station.shape.type == shape_type:
-                stations.append(station)
-        random.shuffle(stations)
-
-        return stations
-
-    def find_travel_plan_for_passengers(self) -> None:
-        station_nodes_mapping = build_station_nodes_dict(self.stations, self.paths)
-        for station in self.stations:
-            for passenger in station.passengers:
-                if self._passenger_has_travel_plan(passenger):
-                    continue
-                self._find_travel_plan_for_passenger(
-                    station_nodes_mapping, station, passenger
-                )
-
-    @property
-    def is_creating_path(self) -> bool:
-        return self._status.is_creating_path
-
-    @property
-    def is_mouse_down(self) -> bool:
-        return self._status.is_mouse_down
-
-    @property
-    def is_paused(self) -> bool:
-        return self._status.is_paused
-
-    # private methods
-
     def _assign_paths_to_buttons(self) -> None:
         for path_button in self.path_buttons:
             path_button.remove_path()
@@ -236,27 +213,27 @@ class Mediator:
             self.path_to_button[path] = button
 
     def _react_mouse_event(self, event: MouseEvent) -> None:
-        entity = self.get_containing_entity(event.position)
+        entity = self._get_containing_entity(event.position)
 
         if event.event_type == MouseEventType.MOUSE_DOWN:
             self._status.is_mouse_down = True
             if isinstance(entity, Station):
-                self.start_path_on_station(entity)
+                self._start_path_on_station(entity)
 
         elif event.event_type == MouseEventType.MOUSE_UP:
             self._status.is_mouse_down = False
-            if self.is_creating_path:
+            if self._is_creating_path:
                 assert self.path_being_created is not None
                 if isinstance(entity, Station):
                     self._end_path_on_station(entity)
                 else:
                     self._abort_path_creation()
             elif isinstance(entity, PathButton) and entity.path:
-                self.remove_path(entity.path)
+                self._remove_path(entity.path)
 
         elif event.event_type == MouseEventType.MOUSE_MOTION:
             if self._status.is_mouse_down:
-                if self.is_creating_path and self.path_being_created:
+                if self._is_creating_path and self.path_being_created:
                     if isinstance(entity, Station):
                         self._add_station_to_path(entity)
                     else:
@@ -409,7 +386,7 @@ class Mediator:
         station: Station,
         passenger: Passenger,
     ) -> None:
-        possible_dst_stations = self.get_stations_for_shape_type(
+        possible_dst_stations = self._get_stations_for_shape_type(
             passenger.destination_shape.type
         )
 
@@ -435,6 +412,25 @@ class Mediator:
 
         else:
             self.travel_plans[passenger] = TravelPlan([])
+
+    def _get_stations_for_shape_type(self, shape_type: ShapeType) -> List[Station]:
+        stations: List[Station] = []
+        for station in self.stations:
+            if station.shape.type == shape_type:
+                stations.append(station)
+        random.shuffle(stations)
+
+        return stations
+
+    def _find_travel_plan_for_passengers(self) -> None:
+        station_nodes_mapping = build_station_nodes_dict(self.stations, self.paths)
+        for station in self.stations:
+            for passenger in station.passengers:
+                if self._passenger_has_travel_plan(passenger):
+                    continue
+                self._find_travel_plan_for_passenger(
+                    station_nodes_mapping, station, passenger
+                )
 
     def _find_next_path_for_passenger_at_station(
         self, passenger: Passenger, station: Station
