@@ -62,7 +62,9 @@ class TestMediator(unittest.TestCase):
             station.draw(self.screen)
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))
 
-        self.assertTrue(self.mediator._is_mouse_down)
+        self.assertTrue(
+            self.mediator._is_mouse_down  # pyright: ignore [reportPrivateUsage]
+        )
 
     def test_get_containing_entity(self) -> None:
         self.assertTrue(
@@ -74,10 +76,12 @@ class TestMediator(unittest.TestCase):
     def test_react_mouse_up(self) -> None:
         self.mediator.react(MouseEvent(MouseEventType.MOUSE_UP, Point(-1, -1)))
 
-        self.assertFalse(self.mediator._is_mouse_down)
+        self.assertFalse(
+            self.mediator._is_mouse_down  # pyright: ignore [reportPrivateUsage]
+        )
 
     def test_passengers_are_added_to_stations(self) -> None:
-        self.mediator._spawn_passengers()
+        self.mediator._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
 
         self.assertEqual(len(self.mediator.passengers), len(self.mediator.stations))
 
@@ -197,9 +201,13 @@ class TestMediator(unittest.TestCase):
                 get_random_position(self.width, self.height),
             ),
         ]
-        rect_stations = self.mediator._get_stations_for_shape_type(ShapeType.RECT)
-        circle_stations = self.mediator._get_stations_for_shape_type(ShapeType.CIRCLE)
-        triangle_stations = self.mediator._get_stations_for_shape_type(
+        rect_stations = self.mediator._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
+            ShapeType.RECT
+        )
+        circle_stations = self.mediator._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
+            ShapeType.CIRCLE
+        )
+        triangle_stations = self.mediator._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
             ShapeType.TRIANGLE
         )
 
@@ -212,8 +220,8 @@ class TestMediator(unittest.TestCase):
         for station in self.mediator.stations:
             station.draw(self.screen)
         self.connect_stations([i for i in range(5)])
-        self.mediator._spawn_passengers()
-        self.mediator._find_travel_plan_for_passengers()
+        self.mediator._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
+        self.mediator._find_travel_plan_for_passengers()  # pyright: ignore [reportPrivateUsage]
         for station in self.mediator.stations:
             for passenger in station.passengers:
                 self.assertEqual(
