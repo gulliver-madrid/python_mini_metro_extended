@@ -408,12 +408,10 @@ class Mediator:
             self.travel_plans[passenger] = TravelPlan([])
 
     def _get_stations_for_shape_type(self, shape_type: ShapeType) -> List[Station]:
-        stations: List[Station] = []
-        for station in self.stations:
-            if station.shape.type == shape_type:
-                stations.append(station)
+        stations = [
+            station for station in self.stations if station.shape.type == shape_type
+        ]
         random.shuffle(stations)
-
         return stations
 
     def _find_travel_plan_for_passengers(self) -> None:
