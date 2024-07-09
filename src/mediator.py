@@ -31,6 +31,7 @@ from src.geometry.point import Point
 from src.geometry.type import ShapeType
 from src.graph.graph_algo import bfs, build_station_nodes_dict
 from src.graph.node import Node
+from src.graph.skip_intermediate import skip_stations_on_same_path
 from src.travel_plan import TravelPlan
 from src.type import Color
 from src.ui.button import Button
@@ -399,7 +400,7 @@ class Mediator:
                 break
             else:
                 assert len(node_path) > 1
-                node_path = self._skip_stations_on_same_path(node_path)
+                node_path = skip_stations_on_same_path(node_path)
                 self.travel_plans[passenger] = TravelPlan(node_path[1:])
                 self._find_next_path_for_passenger_at_station(passenger, station)
                 break
@@ -431,29 +432,6 @@ class Mediator:
         assert next_station is not None
         next_path = self._find_shared_path(station, next_station)
         self.travel_plans[passenger].next_path = next_path
-
-    def _skip_stations_on_same_path(self, node_path: List[Node]) -> List[Node]:
-        assert len(node_path) >= 2
-        if len(node_path) == 2:
-            return node_path
-        nodes_to_remove: List[Node] = []
-        i = 0
-        j = 1
-        path_set_list = [x.paths for x in node_path]
-        path_set_list.append(set())
-        while j <= len(path_set_list) - 1:
-            set_a = path_set_list[i]
-            set_b = path_set_list[j]
-            if set_a & set_b:
-                j += 1
-            else:
-                for k in range(i + 1, j - 1):
-                    nodes_to_remove.append(node_path[k])
-                i = j - 1
-                j += 1
-        for node in nodes_to_remove:
-            node_path.remove(node)
-        return node_path
 
     def _find_shared_path(self, station_a: Station, station_b: Station) -> Path | None:
         """Returns the first path both stations belong to, or None if there is no shared path"""
