@@ -187,6 +187,8 @@ class Mediator:
     def _spawn_passengers(self) -> None:
         station_types = self._get_station_shape_types()
         for station in self.stations:
+            if not station.has_room():
+                continue
             other_station_shape_types = [
                 x for x in station_types if x != station.shape.type
             ]
@@ -195,9 +197,8 @@ class Mediator:
                 destination_shape_type, passenger_color, passenger_size
             )
             passenger = Passenger(destination_shape)
-            if station.has_room():
-                station.add_passenger(passenger)
-                self.passengers.append(passenger)
+            station.add_passenger(passenger)
+            self.passengers.append(passenger)
 
     def _assign_paths_to_buttons(self) -> None:
         for path_button in self.path_buttons:
