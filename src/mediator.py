@@ -44,7 +44,7 @@ pp = pprint.PrettyPrinter(indent=4)
 class Mediator:
     __slots__ = (
         "_passenger_spawning_step",
-        "passenger_spawning_interval_step",
+        "_passenger_spawning_interval_step",
         "num_paths",
         "num_metros",
         "num_stations",
@@ -68,7 +68,7 @@ class Mediator:
 
         # configs
         self._passenger_spawning_step: int = passenger_spawning_start_step
-        self.passenger_spawning_interval_step: int = passenger_spawning_interval_step
+        self._passenger_spawning_interval_step: int = passenger_spawning_interval_step
         self.num_paths: int = num_paths
         self.num_metros: int = num_metros
         self.num_stations: int = num_stations
@@ -319,7 +319,8 @@ class Mediator:
 
     def _is_passenger_spawn_time(self) -> bool:
         return (self._status.steps == self._passenger_spawning_step) or (
-            self._status.steps_since_last_spawn == self.passenger_spawning_interval_step
+            self._status.steps_since_last_spawn
+            == self._passenger_spawning_interval_step
         )
 
     def _move_passengers(self) -> None:
