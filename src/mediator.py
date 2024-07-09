@@ -458,9 +458,9 @@ class Mediator:
         return node_path
 
     def _find_shared_path(self, station_a: Station, station_b: Station) -> Path | None:
+        """Returns the first path both stations belong to, or None if there is no shared path"""
         for path in self.paths:
-            stations = path.stations
-            if (station_a in stations) and (station_b in stations):
+            if all(station in path.stations for station in (station_a, station_b)):
                 return path
         return None
 
