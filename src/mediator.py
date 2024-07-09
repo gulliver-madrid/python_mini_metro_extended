@@ -43,7 +43,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 class Mediator:
     __slots__ = (
-        "passenger_spawning_step",
+        "_passenger_spawning_step",
         "passenger_spawning_interval_step",
         "num_paths",
         "num_metros",
@@ -67,7 +67,7 @@ class Mediator:
         pygame.font.init()
 
         # configs
-        self.passenger_spawning_step: int = passenger_spawning_start_step
+        self._passenger_spawning_step: int = passenger_spawning_start_step
         self.passenger_spawning_interval_step: int = passenger_spawning_interval_step
         self.num_paths: int = num_paths
         self.num_metros: int = num_metros
@@ -318,10 +318,8 @@ class Mediator:
         return station_shape_types
 
     def _is_passenger_spawn_time(self) -> bool:
-        return (
-            self._status.steps == self.passenger_spawning_step
-            or self._status.steps_since_last_spawn
-            == self.passenger_spawning_interval_step
+        return (self._status.steps == self._passenger_spawning_step) or (
+            self._status.steps_since_last_spawn == self.passenger_spawning_interval_step
         )
 
     def _move_passengers(self) -> None:
