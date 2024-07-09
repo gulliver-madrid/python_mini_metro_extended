@@ -185,8 +185,8 @@ class Mediator:
         self.paths.append(path)
 
     def _spawn_passengers(self) -> None:
+        station_types = self._get_station_shape_types()
         for station in self.stations:
-            station_types = self._get_station_shape_types()
             other_station_shape_types = [
                 x for x in station_types if x != station.shape.type
             ]
