@@ -343,10 +343,8 @@ class Mediator:
                 ):
                     passengers_from_metro_to_station.append(passenger)
             for passenger in metro.current_station.passengers:
-                if (
-                    self.travel_plans[passenger].next_path
-                    and self.travel_plans[passenger].next_path.id == metro.path_id  # type: ignore
-                ):
+                next_path = self.travel_plans[passenger].next_path
+                if next_path and next_path.id == metro.path_id:
                     passengers_from_station_to_metro.append(passenger)
 
             # process
