@@ -3,9 +3,12 @@ import unittest
 from src.entity.station import Station
 from src.utils import get_random_position, get_random_station_shape
 
+from test.base_test import FixedRandomSeedTestCase
 
-class TestStation(unittest.TestCase):
+
+class TestStation(FixedRandomSeedTestCase):
     def setUp(self) -> None:
+        super().setUp()
         self.position = get_random_position(width=100, height=100)
         self.shape = get_random_station_shape()
 
