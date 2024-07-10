@@ -186,11 +186,15 @@ class Mediator:
 
     def _spawn_passengers(self) -> None:
         station_types = self._get_station_shape_types()
+        other_station_shape_types_dict = {
+            shape_type: [x for x in station_types if x != shape_type]
+            for shape_type in set(station_types)
+        }
         for station in self.stations:
             if not station.has_room():
                 continue
-            other_station_shape_types = [
-                x for x in station_types if x != station.shape.type
+            other_station_shape_types = other_station_shape_types_dict[
+                station.shape.type
             ]
             destination_shape_type = random.choice(other_station_shape_types)
             destination_shape = get_shape_from_type(
