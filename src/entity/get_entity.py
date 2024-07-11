@@ -1,8 +1,9 @@
 from typing import List
 
-from src.config import screen_height, screen_width
+from src.config import screen_height, screen_width, station_size
 from src.entity.metro import Metro
 from src.entity.station import Station
+from src.geometry.utils import distance
 from src.utils import get_random_position, get_random_station_shape
 
 
@@ -13,9 +14,15 @@ def get_random_station() -> Station:
 
 
 def get_random_stations(num: int) -> List[Station]:
+    min_distance = station_size * 2
     stations: List[Station] = []
-    for _ in range(num):
-        stations.append(get_random_station())
+    while len(stations) < num:
+        new_station = get_random_station()
+        if all(
+            distance(station.position, new_station.position) >= min_distance
+            for station in stations
+        ):
+            stations.append(new_station)
     return stations
 
 
