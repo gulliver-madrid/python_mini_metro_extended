@@ -2,7 +2,7 @@ import pygame
 
 from src.config import framerate, screen_color, screen_height, screen_width
 from src.event.convert import convert_pygame_event
-from src.mediator import Mediator
+from src.mediator import Mediator, UI_Reactor
 
 
 def main() -> None:
@@ -17,6 +17,7 @@ def main() -> None:
     clock = pygame.time.Clock()
 
     mediator = Mediator()
+    reactor = UI_Reactor(mediator)
 
     while True:
         dt_ms = clock.tick(framerate)
@@ -30,7 +31,7 @@ def main() -> None:
                 raise SystemExit
             else:
                 event = convert_pygame_event(pygame_event)
-                mediator.react(event)
+                reactor.react(event)
 
         pygame.display.flip()
 

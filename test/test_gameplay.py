@@ -10,7 +10,7 @@ from src.event.keyboard import KeyboardEvent
 from src.event.mouse import MouseEvent
 from src.event.type import KeyboardEventType, MouseEventType
 from src.geometry.point import Point
-from src.mediator import Mediator
+from src.mediator import Mediator, UI_Reactor
 from src.utils import get_random_color, get_random_position
 
 from test.base_test import BaseTestCase
@@ -24,56 +24,57 @@ class TestGameplay(BaseTestCase):
         self.position = get_random_position(self.width, self.height)
         self.color = get_random_color()
         self.mediator = Mediator()
+        self.reactor = UI_Reactor(self.mediator)
         self.mediator.render(self.screen)
 
     def tearDown(self) -> None:
         super().tearDown()
 
     def connect_stations(self, station_idx: Sequence[int]) -> None:
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
                 self.mediator.stations[station_idx[0]].position,
             )
         )
         for idx in station_idx[1:]:
-            self.mediator.react(
+            self.reactor.react(
                 MouseEvent(
                     MouseEventType.MOUSE_MOTION, self.mediator.stations[idx].position
                 )
             )
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP,
                 self.mediator.stations[station_idx[-1]].position,
             )
         )
 
-    @patch.object(Mediator, "_start_path_on_station", new_callable=Mock)
+    @patch.object(Mediator, "start_path_on_station", new_callable=Mock)
     def test_react_mouse_down_start_path(self, mock_start_path_on_station: Any) -> None:
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
                 self.mediator.stations[3].position + Point(1, 1),
             )
         )
-        self.mediator._start_path_on_station.assert_called_once()  # type: ignore
+        self.mediator.start_path_on_station.assert_called_once()  # type: ignore
 
     def test_mouse_down_and_up_at_the_same_point_does_not_create_path(self) -> None:
-        self.mediator.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))
-        self.mediator.react(MouseEvent(MouseEventType.MOUSE_UP, Point(-1, -1)))
+        self.reactor.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))
+        self.reactor.react(MouseEvent(MouseEventType.MOUSE_UP, Point(-1, -1)))
 
         self.assertEqual(len(self.mediator.paths), 0)
 
     def test_mouse_dragged_between_stations_creates_path(self) -> None:
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
                 self.mediator.stations[0].position + Point(1, 1),
             )
         )
-        self.mediator.react(MouseEvent(MouseEventType.MOUSE_MOTION, Point(2, 2)))
-        self.mediator.react(
+        self.reactor.react(MouseEvent(MouseEventType.MOUSE_MOTION, Point(2, 2)))
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP,
                 self.mediator.stations[1].position + Point(1, 1),
@@ -89,23 +90,23 @@ class TestGameplay(BaseTestCase):
     def test_mouse_dragged_between_non_station_points_does_not_create_path(
         self,
     ) -> None:
-        self.mediator.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(0, 0)))
-        self.mediator.react(MouseEvent(MouseEventType.MOUSE_MOTION, Point(2, 2)))
-        self.mediator.react(MouseEvent(MouseEventType.MOUSE_UP, Point(0, 1)))
+        self.reactor.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(0, 0)))
+        self.reactor.react(MouseEvent(MouseEventType.MOUSE_MOTION, Point(2, 2)))
+        self.reactor.react(MouseEvent(MouseEventType.MOUSE_UP, Point(0, 1)))
 
         self.assertEqual(len(self.mediator.paths), 0)
 
     def test_mouse_dragged_between_station_and_non_station_points_does_not_create_path(
         self,
     ) -> None:
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
                 self.mediator.stations[0].position + Point(1, 1),
             )
         )
-        self.mediator.react(MouseEvent(MouseEventType.MOUSE_MOTION, Point(2, 2)))
-        self.mediator.react(MouseEvent(MouseEventType.MOUSE_UP, Point(0, 1)))
+        self.reactor.react(MouseEvent(MouseEventType.MOUSE_MOTION, Point(2, 2)))
+        self.reactor.react(MouseEvent(MouseEventType.MOUSE_UP, Point(0, 1)))
 
         self.assertEqual(len(self.mediator.paths), 0)
 
@@ -133,13 +134,13 @@ class TestGameplay(BaseTestCase):
         self.assertFalse(self.mediator.paths[0].is_looped)
 
     def test_space_key_pauses_and_unpauses_game(self) -> None:
-        self.mediator.react(KeyboardEvent(KeyboardEventType.KEY_UP, pygame.K_SPACE))
+        self.reactor.react(KeyboardEvent(KeyboardEventType.KEY_UP, pygame.K_SPACE))
 
         self.assertTrue(
             self.mediator._status.is_paused  # pyright: ignore [reportPrivateUsage]
         )
 
-        self.mediator.react(KeyboardEvent(KeyboardEventType.KEY_UP, pygame.K_SPACE))
+        self.reactor.react(KeyboardEvent(KeyboardEventType.KEY_UP, pygame.K_SPACE))
 
         self.assertFalse(
             self.mediator._status.is_paused  # pyright: ignore [reportPrivateUsage]
@@ -150,7 +151,7 @@ class TestGameplay(BaseTestCase):
         for station in self.mediator.stations:
             station.draw(self.screen)
         self.connect_stations([0, 1])
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP, self.mediator.ui.path_buttons[0].position
             )
@@ -182,7 +183,7 @@ class TestGameplay(BaseTestCase):
         self.connect_stations([0, 1])
         self.connect_stations([2, 3])
         self.connect_stations([1, 4])
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP, self.mediator.ui.path_buttons[0].position
             )
@@ -198,19 +199,19 @@ class TestGameplay(BaseTestCase):
         self.connect_stations([0, 1])
         self.connect_stations([2, 3])
         self.connect_stations([1, 4])
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP, self.mediator.ui.path_buttons[0].position
             )
         )
         self.assertEqual(len(self.mediator.paths), 2)
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP, self.mediator.ui.path_buttons[0].position
             )
         )
         self.assertEqual(len(self.mediator.paths), 1)
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP, self.mediator.ui.path_buttons[0].position
             )
@@ -219,13 +220,13 @@ class TestGameplay(BaseTestCase):
 
     def test_unassigned_path_buttons_do_nothing_on_click(self) -> None:
         self.assertEqual(len(self.mediator.paths), 0)
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP, self.mediator.ui.path_buttons[0].position
             )
         )
         self.assertEqual(len(self.mediator.paths), 0)
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP, self.mediator.ui.path_buttons[0].position
             )

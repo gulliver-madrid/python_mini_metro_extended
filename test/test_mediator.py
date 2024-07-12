@@ -24,7 +24,7 @@ from src.geometry.point import Point
 from src.geometry.rect import Rect
 from src.geometry.triangle import Triangle
 from src.geometry.type import ShapeType
-from src.mediator import Mediator
+from src.mediator import Mediator, UI_Reactor
 from src.utils import get_random_color, get_random_position
 
 from test.base_test import BaseTestCase
@@ -38,25 +38,26 @@ class TestMediator(BaseTestCase):
         self.position = get_random_position(self.width, self.height)
         self.color = get_random_color()
         self.mediator = Mediator()
+        self.reactor = UI_Reactor(self.mediator)
         self.mediator.render(self.screen)
 
     def tearDown(self) -> None:
         super().tearDown()
 
     def connect_stations(self, station_idx: Sequence[int]) -> None:
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
                 self.mediator.stations[station_idx[0]].position,
             )
         )
         for idx in station_idx[1:]:
-            self.mediator.react(
+            self.reactor.react(
                 MouseEvent(
                     MouseEventType.MOUSE_MOTION, self.mediator.stations[idx].position
                 )
             )
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP,
                 self.mediator.stations[station_idx[-1]].position,
@@ -66,25 +67,21 @@ class TestMediator(BaseTestCase):
     def test_react_mouse_down(self) -> None:
         for station in self.mediator.stations:
             station.draw(self.screen)
-        self.mediator.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))
+        self.reactor.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))
 
-        self.assertTrue(
-            self.mediator._is_mouse_down  # pyright: ignore [reportPrivateUsage]
-        )
+        self.assertTrue(self.reactor.is_mouse_down)
 
     def test_get_containing_entity(self) -> None:
         self.assertTrue(
-            self.mediator._get_containing_entity(  # pyright: ignore [reportPrivateUsage]
+            self.mediator.get_containing_entity(
                 self.mediator.stations[2].position + Point(1, 1)
             )
         )
 
     def test_react_mouse_up(self) -> None:
-        self.mediator.react(MouseEvent(MouseEventType.MOUSE_UP, Point(-1, -1)))
+        self.reactor.react(MouseEvent(MouseEventType.MOUSE_UP, Point(-1, -1)))
 
-        self.assertFalse(
-            self.mediator._is_mouse_down  # pyright: ignore [reportPrivateUsage]
-        )
+        self.assertFalse(self.reactor.is_mouse_down)
 
     def test_passengers_are_added_to_stations(self) -> None:
         self.mediator._spawn_passengers()  # pyright: ignore [reportPrivateUsage]

@@ -41,6 +41,78 @@ TravelPlans = Dict[Passenger, TravelPlan]
 pp = pprint.PrettyPrinter(indent=4)
 
 
+class UI_Reactor:
+    __slots__ = (
+        "mediator",
+        "is_mouse_down",
+    )
+
+    def __init__(self, mediator: Mediator) -> None:
+        self.mediator = mediator
+        self.is_mouse_down: bool = False
+
+    def react(self, event: Event | None) -> None:
+        if isinstance(event, MouseEvent):
+            self._on_mouse_event(event)
+        elif isinstance(event, KeyboardEvent):
+            self._on_keyboard_event(event)
+
+    def _on_mouse_event(self, event: MouseEvent) -> None:
+        entity = self.mediator.get_containing_entity(event.position)
+
+        if event.event_type == MouseEventType.MOUSE_DOWN:
+            self.is_mouse_down = True
+            self._on_mouse_down(entity)
+
+        elif event.event_type == MouseEventType.MOUSE_UP:
+            self.is_mouse_down = False
+            self._on_mouse_up(entity)
+
+        elif event.event_type == MouseEventType.MOUSE_MOTION:
+            self._on_mouse_motion(entity, event.position)
+
+    def _on_keyboard_event(self, event: KeyboardEvent) -> None:
+        if event.event_type == KeyboardEventType.KEY_UP:
+            if event.key == pygame.K_SPACE:
+                self.mediator.toggle_pause()
+            elif event.key == pygame.K_ESCAPE:
+                self.mediator.exit()
+
+    def _on_mouse_motion(
+        self, entity: Station | PathButton | None, position: Point
+    ) -> None:
+        if self.is_mouse_down:
+            self._on_mouse_motion_with_mouse_down(entity, position)
+        elif isinstance(entity, Button):
+            entity.on_hover()
+        else:
+            self.mediator.ui.exit_buttons()
+
+    def _on_mouse_down(self, entity: Station | PathButton | None) -> None:
+
+        if isinstance(entity, Station):
+            self.mediator.start_path_on_station(entity)
+
+    def _on_mouse_up(self, entity: Station | PathButton | None) -> None:
+        if self.mediator.is_creating_path:
+            assert self.mediator.path_being_created is not None
+            if isinstance(entity, Station):
+                self.mediator.end_path_on_station(entity)
+            else:
+                self.mediator.abort_path_creation()
+        elif isinstance(entity, PathButton) and entity.path:
+            self.mediator.remove_path(entity.path)
+
+    def _on_mouse_motion_with_mouse_down(
+        self, entity: Station | PathButton | None, position: Point
+    ) -> None:
+        if self.mediator.is_creating_path and self.mediator.path_being_created:
+            if isinstance(entity, Station):
+                self.mediator.add_station_to_path(entity)
+            else:
+                self.mediator.path_being_created.set_temporary_point(position)
+
+
 class Mediator:
     __slots__ = (
         "_passenger_spawning_step",
@@ -101,12 +173,6 @@ class Mediator:
             metro.draw(screen)
         self.ui.render(screen, self._status.score)
 
-    def react(self, event: Event | None) -> None:
-        if isinstance(event, MouseEvent):
-            self._react_mouse_event(event)
-        elif isinstance(event, KeyboardEvent):
-            self._react_keyboard_event(event)
-
     def increment_time(self, dt_ms: int) -> None:
         if self._status.is_paused:
             return
@@ -126,23 +192,62 @@ class Mediator:
         self._find_travel_plan_for_passengers()
         self._move_passengers()
 
-    # private methods
+    def end_path_on_station(self, station: Station) -> None:
+        assert self.path_being_created is not None
+        # current station de-dupe
+        if (
+            len(self.path_being_created.stations) > 1
+            and self.path_being_created.stations[-1] == station
+        ):
+            self._finish_path_creation()
+        # loop
+        elif (
+            len(self.path_being_created.stations) > 1
+            and self.path_being_created.stations[0] == station
+        ):
+            self.path_being_created.set_loop()
+            self._finish_path_creation()
+        # non-loop
+        elif self.path_being_created.stations[0] != station:
+            self.path_being_created.add_station(station)
+            self._finish_path_creation()
+        else:
+            self.abort_path_creation()
+
+    def add_station_to_path(self, station: Station) -> None:
+        assert self.path_being_created is not None
+        if self.path_being_created.stations[-1] == station:
+            return
+        # loop
+        if (
+            len(self.path_being_created.stations) > 1
+            and self.path_being_created.stations[0] == station
+        ):
+            self.path_being_created.set_loop()
+        # non-loop
+        elif self.path_being_created.stations[0] != station:
+            if self.path_being_created.is_looped:
+                self.path_being_created.remove_loop()
+            self.path_being_created.add_station(station)
+
+    def toggle_pause(self) -> None:
+        self._status.is_paused = not self._status.is_paused
+
+    def exit(self) -> None:
+        pygame.quit()
+        sys.exit()
 
     @property
-    def _is_creating_path(self) -> bool:
+    def is_creating_path(self) -> bool:
         return self._status.is_creating_path
 
-    @property
-    def _is_mouse_down(self) -> bool:
-        return self._status.is_mouse_down
-
-    def _get_containing_entity(self, position: Point) -> Station | PathButton | None:
+    def get_containing_entity(self, position: Point) -> Station | PathButton | None:
         for station in self.stations:
             if station.contains(position):
                 return station
         return self.ui.get_containing_button(position) or None
 
-    def _remove_path(self, path: Path) -> None:
+    def remove_path(self, path: Path) -> None:
         self.ui.path_to_button[path].remove_path()
         for metro in path.metros:
             for passenger in metro.passengers:
@@ -153,7 +258,7 @@ class Mediator:
         self._assign_paths_to_buttons()
         self._find_travel_plan_for_passengers()
 
-    def _start_path_on_station(self, station: Station) -> None:
+    def start_path_on_station(self, station: Station) -> None:
         if len(self.paths) >= self.num_paths:
             return
         self._status.is_creating_path = True
@@ -170,6 +275,17 @@ class Mediator:
         path.is_being_created = True
         self.path_being_created = path
         self.paths.append(path)
+
+    def abort_path_creation(self) -> None:
+        assert self.path_being_created is not None
+        self._status.is_creating_path = False
+        self._release_color_for_path(self.path_being_created)
+        self.paths.remove(self.path_being_created)
+        self.path_being_created = None
+
+    #######################
+    ### private methods ###
+    #######################
 
     def _spawn_passengers(self) -> None:
         station_types = self._get_station_shape_types()
@@ -192,52 +308,6 @@ class Mediator:
     def _assign_paths_to_buttons(self) -> None:
         self.ui.assign_paths_to_buttons(self.paths)
 
-    def _react_mouse_event(self, event: MouseEvent) -> None:
-        entity = self._get_containing_entity(event.position)
-
-        if event.event_type == MouseEventType.MOUSE_DOWN:
-            self._status.is_mouse_down = True
-            if isinstance(entity, Station):
-                self._start_path_on_station(entity)
-
-        elif event.event_type == MouseEventType.MOUSE_UP:
-            self._status.is_mouse_down = False
-            if self._is_creating_path:
-                assert self.path_being_created is not None
-                if isinstance(entity, Station):
-                    self._end_path_on_station(entity)
-                else:
-                    self._abort_path_creation()
-            elif isinstance(entity, PathButton) and entity.path:
-                self._remove_path(entity.path)
-
-        elif event.event_type == MouseEventType.MOUSE_MOTION:
-            if self._status.is_mouse_down:
-                if self._is_creating_path and self.path_being_created:
-                    if isinstance(entity, Station):
-                        self._add_station_to_path(entity)
-                    else:
-                        self.path_being_created.set_temporary_point(event.position)
-            elif isinstance(entity, Button):
-                entity.on_hover()
-            else:
-                self.ui.exit_buttons()
-
-    def _react_keyboard_event(self, event: KeyboardEvent) -> None:
-        if event.event_type == KeyboardEventType.KEY_UP:
-            if event.key == pygame.K_SPACE:
-                self._status.is_paused = not self._status.is_paused
-            elif event.key == pygame.K_ESCAPE:
-                pygame.quit()
-                sys.exit()
-
-    def _abort_path_creation(self) -> None:
-        assert self.path_being_created is not None
-        self._status.is_creating_path = False
-        self._release_color_for_path(self.path_being_created)
-        self.paths.remove(self.path_being_created)
-        self.path_being_created = None
-
     def _release_color_for_path(self, path: Path) -> None:
         self.path_colors[path.color] = False
         del self.path_to_color[path]
@@ -253,44 +323,6 @@ class Mediator:
             self.metros.append(metro)
         self.path_being_created = None
         self._assign_paths_to_buttons()
-
-    def _end_path_on_station(self, station: Station) -> None:
-        assert self.path_being_created is not None
-        # current station de-dupe
-        if (
-            len(self.path_being_created.stations) > 1
-            and self.path_being_created.stations[-1] == station
-        ):
-            self._finish_path_creation()
-        # loop
-        elif (
-            len(self.path_being_created.stations) > 1
-            and self.path_being_created.stations[0] == station
-        ):
-            self.path_being_created.set_loop()
-            self._finish_path_creation()
-        # non-loop
-        elif self.path_being_created.stations[0] != station:
-            self.path_being_created.add_station(station)
-            self._finish_path_creation()
-        else:
-            self._abort_path_creation()
-
-    def _add_station_to_path(self, station: Station) -> None:
-        assert self.path_being_created is not None
-        if self.path_being_created.stations[-1] == station:
-            return
-        # loop
-        if (
-            len(self.path_being_created.stations) > 1
-            and self.path_being_created.stations[0] == station
-        ):
-            self.path_being_created.set_loop()
-        # non-loop
-        elif self.path_being_created.stations[0] != station:
-            if self.path_being_created.is_looped:
-                self.path_being_created.remove_loop()
-            self.path_being_created.add_station(station)
 
     def _get_station_shape_types(self) -> List[ShapeType]:
         station_shape_types: List[ShapeType] = []
@@ -427,7 +459,6 @@ class MediatorStatus:
         "_time_ms",
         "steps",
         "steps_since_last_spawn",
-        "is_mouse_down",
         "is_creating_path",
         "is_paused",
         "score",
@@ -437,7 +468,6 @@ class MediatorStatus:
         self._time_ms: int = 0
         self.steps: int = 0
         self.steps_since_last_spawn: int = passenger_spawning_interval_step + 1
-        self.is_mouse_down: bool = False
         self.is_creating_path: bool = False
         self.is_paused: bool = False
         self.score: int = 0

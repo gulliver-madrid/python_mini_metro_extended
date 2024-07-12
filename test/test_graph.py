@@ -13,7 +13,7 @@ from src.geometry.circle import Circle
 from src.geometry.rect import Rect
 from src.graph.graph_algo import bfs, build_station_nodes_dict
 from src.graph.node import Node
-from src.mediator import Mediator
+from src.mediator import Mediator, UI_Reactor
 from src.utils import get_random_color, get_random_position
 
 from test.base_test import BaseTestCase
@@ -27,6 +27,7 @@ class TestGraph(BaseTestCase):
         self.position = get_random_position(self.width, self.height)
         self.color = get_random_color()
         self.mediator = Mediator()
+        self.reactor = UI_Reactor(self.mediator)
         for station in self.mediator.stations:
             station.draw(self.screen)
 
@@ -34,19 +35,19 @@ class TestGraph(BaseTestCase):
         super().tearDown()
 
     def connect_stations(self, station_idx: Sequence[int]) -> None:
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
                 self.mediator.stations[station_idx[0]].position,
             )
         )
         for idx in station_idx[1:]:
-            self.mediator.react(
+            self.reactor.react(
                 MouseEvent(
                     MouseEventType.MOUSE_MOTION, self.mediator.stations[idx].position
                 )
             )
-        self.mediator.react(
+        self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP,
                 self.mediator.stations[station_idx[-1]].position,
