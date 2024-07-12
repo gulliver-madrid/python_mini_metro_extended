@@ -42,6 +42,51 @@ TravelPlans = Dict[Passenger, TravelPlan]
 pp = pprint.PrettyPrinter(indent=4)
 
 
+class UI:
+    __slots__ = (
+        "path_buttons",
+        "path_to_button",
+        "buttons",
+        "font",
+    )
+
+    def __init__(self, num_paths: int) -> None:
+        pygame.font.init()
+
+        # UI
+        self.path_buttons: Sequence[PathButton] = get_path_buttons(num_paths)
+        self.path_to_button: Dict[Path, PathButton] = {}
+        self.buttons = [*self.path_buttons]
+        self.font = pygame.font.SysFont("arial", score_font_size)
+
+    def assign_paths_to_buttons(self, paths: Sequence[Path]) -> None:
+        for path_button in self.path_buttons:
+            path_button.remove_path()
+
+        self.path_to_button = {}
+        for i in range(min(len(paths), len(self.path_buttons))):
+            path = paths[i]
+            button = self.path_buttons[i]
+            button.assign_path(path)
+            self.path_to_button[path] = button
+
+    def exit_buttons(self) -> None:
+        for button in self.buttons:
+            button.on_exit()
+
+    def get_containing_button(self, position: Point) -> PathButton | None:
+        for button in self.buttons:
+            if button.contains(position):
+                return button
+        return None
+
+    def render(self, screen: pygame.surface.Surface, score: int) -> None:
+        for button in self.buttons:
+            button.draw(screen)
+        text_surface = self.font.render(f"Score: {score}", True, (0, 0, 0))
+        screen.blit(text_surface, score_display_coords)
+
+
 class Mediator:
     __slots__ = (
         "_passenger_spawning_step",
@@ -49,10 +94,7 @@ class Mediator:
         "num_paths",
         "num_metros",
         "num_stations",
-        "path_buttons",
-        "path_to_button",
-        "buttons",
-        "font",
+        "ui",
         "stations",
         "metros",
         "paths",
@@ -75,10 +117,7 @@ class Mediator:
         self.num_stations: int = num_stations
 
         # UI
-        self.path_buttons: Sequence[PathButton] = get_path_buttons(self.num_paths)
-        self.path_to_button: Dict[Path, PathButton] = {}
-        self.buttons = [*self.path_buttons]
-        self.font = pygame.font.SysFont("arial", score_font_size)
+        self.ui = UI(self.num_paths)
 
         # entities
         self.stations = get_random_stations(self.num_stations)
@@ -106,10 +145,7 @@ class Mediator:
             station.draw(screen)
         for metro in self.metros:
             metro.draw(screen)
-        for button in self.buttons:
-            button.draw(screen)
-        text_surface = self.font.render(f"Score: {self._status.score}", True, (0, 0, 0))
-        screen.blit(text_surface, score_display_coords)
+        self.ui.render(screen, self._status.score)
 
     def react(self, event: Event | None) -> None:
         if isinstance(event, MouseEvent):
@@ -150,13 +186,10 @@ class Mediator:
         for station in self.stations:
             if station.contains(position):
                 return station
-        for button in self.buttons:
-            if button.contains(position):
-                return button
-        return None
+        return self.ui.get_containing_button(position) or None
 
     def _remove_path(self, path: Path) -> None:
-        self.path_to_button[path].remove_path()
+        self.ui.path_to_button[path].remove_path()
         for metro in path.metros:
             for passenger in metro.passengers:
                 self.passengers.remove(passenger)
@@ -203,15 +236,7 @@ class Mediator:
             self.passengers.append(passenger)
 
     def _assign_paths_to_buttons(self) -> None:
-        for path_button in self.path_buttons:
-            path_button.remove_path()
-
-        self.path_to_button = {}
-        for i in range(min(len(self.paths), len(self.path_buttons))):
-            path = self.paths[i]
-            button = self.path_buttons[i]
-            button.assign_path(path)
-            self.path_to_button[path] = button
+        self.ui.assign_paths_to_buttons(self.paths)
 
     def _react_mouse_event(self, event: MouseEvent) -> None:
         entity = self._get_containing_entity(event.position)
@@ -242,8 +267,7 @@ class Mediator:
             elif isinstance(entity, Button):
                 entity.on_hover()
             else:
-                for button in self.buttons:
-                    button.on_exit()
+                self.ui.exit_buttons()
 
     def _react_keyboard_event(self, event: KeyboardEvent) -> None:
         if event.event_type == KeyboardEventType.KEY_UP:
