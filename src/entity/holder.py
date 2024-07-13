@@ -6,9 +6,10 @@ from typing import List
 import pygame
 
 from src.config import passenger_display_buffer, passenger_size
-from src.entity.passenger import Passenger
 from src.geometry.point import Point
 from src.geometry.shape import Shape
+
+from .passenger import Passenger
 
 
 class Holder(ABC):

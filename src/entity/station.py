@@ -3,9 +3,10 @@ from __future__ import annotations
 from shortuuid import uuid
 
 from src.config import station_capacity, station_passengers_per_row, station_size
-from src.entity.holder import Holder
 from src.geometry.point import Point
 from src.geometry.shape import Shape
+
+from .holder import Holder
 
 
 class Station(Holder):

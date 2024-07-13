@@ -2,10 +2,11 @@ from collections.abc import Sequence
 from typing import Iterator, List
 
 from src.config import screen_height, screen_width, station_size
-from src.entity.metro import Metro
-from src.entity.station import Station
 from src.geometry.utils import distance
 from src.utils import get_random_position, get_random_station_shape
+
+from .metro import Metro
+from .station import Station
 
 
 def get_random_station() -> Station:

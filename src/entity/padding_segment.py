@@ -1,10 +1,11 @@
 from shortuuid import uuid
 
 from src.config import Config, path_width
-from src.entity.segment import Segment
 from src.geometry.line import Line
 from src.geometry.point import Point
 from src.type import Color
+
+from .segment import Segment
 
 
 class PaddingSegment(Segment):

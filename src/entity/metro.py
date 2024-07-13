@@ -7,10 +7,11 @@ from src.config import (
     metro_size,
     metro_speed_per_ms,
 )
-from src.entity.holder import Holder
-from src.entity.segment import Segment
-from src.entity.station import Station
 from src.geometry.rect import Rect
+
+from .holder import Holder
+from .segment import Segment
+from .station import Station
 
 
 class Metro(Holder):
