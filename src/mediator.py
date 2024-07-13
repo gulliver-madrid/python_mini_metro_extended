@@ -215,23 +215,11 @@ class Mediator:
 
     def _spawn_passengers(self) -> None:
         station_types = self._get_station_shape_types()
-        shape_types_to_others: Final[Mapping[ShapeType, Sequence[ShapeType]]] = {
-            shape_type: [x for x in station_types if x != shape_type]
-            for shape_type in set(station_types)
-        }
-
-        def create_passenger(station: Station) -> Passenger:
-            other_shape_types = shape_types_to_others[station.shape.type]
-            destination_shape_type = random.choice(other_shape_types)
-            destination_shape = get_shape_from_type(
-                destination_shape_type, passenger_color, passenger_size
-            )
-            return Passenger(destination_shape)
-
+        passenger_creator = PassengerCreator(station_types)
         for station in self.stations:
             if not station.has_room():
                 continue
-            passenger = create_passenger(station)
+            passenger = passenger_creator.create_passenger(station)
             station.add_passenger(passenger)
             self.passengers.append(passenger)
 
@@ -382,6 +370,24 @@ class Mediator:
             if all(station in path.stations for station in (station_a, station_b)):
                 return path
         return None
+
+
+class PassengerCreator:
+    shape_types_to_others: Final[Mapping[ShapeType, Sequence[ShapeType]]]
+
+    def __init__(self, station_types: Sequence[ShapeType]):
+        self.shape_types_to_others = {
+            shape_type: [x for x in station_types if x != shape_type]
+            for shape_type in set(station_types)
+        }
+
+    def create_passenger(self, station: Station) -> Passenger:
+        other_shape_types = self.shape_types_to_others[station.shape.type]
+        destination_shape_type = random.choice(other_shape_types)
+        destination_shape = get_shape_from_type(
+            destination_shape_type, passenger_color, passenger_size
+        )
+        return Passenger(destination_shape)
 
 
 class MediatorStatus:
