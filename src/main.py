@@ -2,7 +2,8 @@ import pygame
 
 from src.config import framerate, screen_color, screen_height, screen_width
 from src.event.convert import convert_pygame_event
-from src.mediator import Mediator, UI_Reactor
+from src.mediator import Mediator
+from src.reactor import UI_Reactor
 
 
 def main() -> None:

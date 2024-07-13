@@ -13,7 +13,8 @@ from src.geometry.circle import Circle
 from src.geometry.rect import Rect
 from src.graph.graph_algo import bfs, build_station_nodes_dict
 from src.graph.node import Node
-from src.mediator import Mediator, UI_Reactor
+from src.mediator import Mediator
+from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 
 from test.base_test import BaseTestCase
