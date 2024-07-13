@@ -3,7 +3,8 @@ from __future__ import annotations
 import pprint
 import random
 import sys
-from typing import Dict, List, Mapping
+from collections.abc import Sequence
+from typing import Dict, Final, List, Mapping
 
 import pygame
 
@@ -214,19 +215,23 @@ class Mediator:
 
     def _spawn_passengers(self) -> None:
         station_types = self._get_station_shape_types()
-        shape_types_to_others = {
+        shape_types_to_others: Final[Mapping[ShapeType, Sequence[ShapeType]]] = {
             shape_type: [x for x in station_types if x != shape_type]
             for shape_type in set(station_types)
         }
-        for station in self.stations:
-            if not station.has_room():
-                continue
+
+        def create_passenger(station: Station) -> Passenger:
             other_shape_types = shape_types_to_others[station.shape.type]
             destination_shape_type = random.choice(other_shape_types)
             destination_shape = get_shape_from_type(
                 destination_shape_type, passenger_color, passenger_size
             )
-            passenger = Passenger(destination_shape)
+            return Passenger(destination_shape)
+
+        for station in self.stations:
+            if not station.has_room():
+                continue
+            passenger = create_passenger(station)
             station.add_passenger(passenger)
             self.passengers.append(passenger)
 
