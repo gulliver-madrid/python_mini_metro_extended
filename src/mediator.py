@@ -287,13 +287,8 @@ class Mediator:
                 self._status.score += 1
 
             for passenger in passengers_from_metro_to_station:
-                if not current_station.has_room():
-                    continue
-                metro.move_passenger(passenger, current_station)
-                self.travel_plans[passenger].increment_next_station()
-                self._find_next_path_for_passenger_at_station(
-                    passenger, current_station
-                )
+                if current_station.has_room():
+                    self._move_passenger_to_current_station(passenger, metro)
 
             for passenger in passengers_from_station_to_metro:
                 if metro.has_room():
@@ -307,6 +302,15 @@ class Mediator:
 
     def _is_next_planned_station(self, station: Station, passenger: Passenger) -> bool:
         return self.travel_plans[passenger].get_next_station() == station
+
+    def _move_passenger_to_current_station(
+        self, passenger: Passenger, metro: Metro
+    ) -> None:
+        current_station = metro.current_station
+        assert current_station
+        metro.move_passenger(passenger, current_station)
+        self.travel_plans[passenger].increment_next_station()
+        self._find_next_path_for_passenger_at_station(passenger, current_station)
 
     def _metro_is_in_next_passenger_path(
         self, passenger: Passenger, metro: Metro
