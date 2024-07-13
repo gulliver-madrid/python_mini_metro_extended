@@ -161,17 +161,15 @@ class Mediator:
         self.travel_plans: TravelPlans = {}
         self._status = MediatorStatus(passenger_spawning_interval_step)
 
-    # public methods
+    ######################
+    ### public methods ###
+    ######################
 
-    def render(self, screen: pygame.surface.Surface) -> None:
-        for idx, path in enumerate(self.paths):
-            path_order = idx - round(self.num_paths / 2)
-            path.draw(screen, path_order)
+    def get_containing_entity(self, position: Point) -> Station | PathButton | None:
         for station in self.stations:
-            station.draw(screen)
-        for metro in self.metros:
-            metro.draw(screen)
-        self.ui.render(screen, self._status.score)
+            if station.contains(position):
+                return station
+        return self.ui.get_containing_button(position) or None
 
     def increment_time(self, dt_ms: int) -> None:
         if self._status.is_paused:
@@ -191,6 +189,47 @@ class Mediator:
 
         self._find_travel_plan_for_passengers()
         self._move_passengers()
+
+    def start_path_on_station(self, station: Station) -> None:
+        if len(self.paths) >= self.num_paths:
+            return
+        self._status.is_creating_path = True
+        assigned_color = (0, 0, 0)
+        for path_color, taken in self.path_colors.items():
+            if taken:
+                continue
+            assigned_color = path_color
+            self.path_colors[path_color] = True
+            break
+        path = Path(assigned_color)
+        self.path_to_color[path] = assigned_color
+        path.add_station(station)
+        path.is_being_created = True
+        self.path_being_created = path
+        self.paths.append(path)
+
+    def add_station_to_path(self, station: Station) -> None:
+        assert self.path_being_created is not None
+        if self.path_being_created.stations[-1] == station:
+            return
+        # loop
+        if (
+            len(self.path_being_created.stations) > 1
+            and self.path_being_created.stations[0] == station
+        ):
+            self.path_being_created.set_loop()
+        # non-loop
+        elif self.path_being_created.stations[0] != station:
+            if self.path_being_created.is_looped:
+                self.path_being_created.remove_loop()
+            self.path_being_created.add_station(station)
+
+    def abort_path_creation(self) -> None:
+        assert self.path_being_created is not None
+        self._status.is_creating_path = False
+        self._release_color_for_path(self.path_being_created)
+        self.paths.remove(self.path_being_created)
+        self.path_being_created = None
 
     def end_path_on_station(self, station: Station) -> None:
         assert self.path_being_created is not None
@@ -214,39 +253,6 @@ class Mediator:
         else:
             self.abort_path_creation()
 
-    def add_station_to_path(self, station: Station) -> None:
-        assert self.path_being_created is not None
-        if self.path_being_created.stations[-1] == station:
-            return
-        # loop
-        if (
-            len(self.path_being_created.stations) > 1
-            and self.path_being_created.stations[0] == station
-        ):
-            self.path_being_created.set_loop()
-        # non-loop
-        elif self.path_being_created.stations[0] != station:
-            if self.path_being_created.is_looped:
-                self.path_being_created.remove_loop()
-            self.path_being_created.add_station(station)
-
-    def toggle_pause(self) -> None:
-        self._status.is_paused = not self._status.is_paused
-
-    def exit(self) -> None:
-        pygame.quit()
-        sys.exit()
-
-    @property
-    def is_creating_path(self) -> bool:
-        return self._status.is_creating_path
-
-    def get_containing_entity(self, position: Point) -> Station | PathButton | None:
-        for station in self.stations:
-            if station.contains(position):
-                return station
-        return self.ui.get_containing_button(position) or None
-
     def remove_path(self, path: Path) -> None:
         self.ui.path_to_button[path].remove_path()
         for metro in path.metros:
@@ -258,30 +264,26 @@ class Mediator:
         self._assign_paths_to_buttons()
         self._find_travel_plan_for_passengers()
 
-    def start_path_on_station(self, station: Station) -> None:
-        if len(self.paths) >= self.num_paths:
-            return
-        self._status.is_creating_path = True
-        assigned_color = (0, 0, 0)
-        for path_color, taken in self.path_colors.items():
-            if taken:
-                continue
-            assigned_color = path_color
-            self.path_colors[path_color] = True
-            break
-        path = Path(assigned_color)
-        self.path_to_color[path] = assigned_color
-        path.add_station(station)
-        path.is_being_created = True
-        self.path_being_created = path
-        self.paths.append(path)
+    def render(self, screen: pygame.surface.Surface) -> None:
+        for idx, path in enumerate(self.paths):
+            path_order = idx - round(self.num_paths / 2)
+            path.draw(screen, path_order)
+        for station in self.stations:
+            station.draw(screen)
+        for metro in self.metros:
+            metro.draw(screen)
+        self.ui.render(screen, self._status.score)
 
-    def abort_path_creation(self) -> None:
-        assert self.path_being_created is not None
-        self._status.is_creating_path = False
-        self._release_color_for_path(self.path_being_created)
-        self.paths.remove(self.path_being_created)
-        self.path_being_created = None
+    def toggle_pause(self) -> None:
+        self._status.is_paused = not self._status.is_paused
+
+    def exit(self) -> None:
+        pygame.quit()
+        sys.exit()
+
+    @property
+    def is_creating_path(self) -> bool:
+        return self._status.is_creating_path
 
     #######################
     ### private methods ###
