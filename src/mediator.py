@@ -261,22 +261,21 @@ class Mediator:
             if not metro.current_station:
                 continue
 
+            current_station = metro.current_station
+
             passengers_to_remove: List[Passenger] = []
             passengers_from_metro_to_station: List[Passenger] = []
             passengers_from_station_to_metro: List[Passenger] = []
 
             # queue
             for passenger in metro.passengers:
-                if metro.current_station.shape.type == passenger.destination_shape.type:
+                if have_same_shape_type(current_station, passenger):
                     passengers_to_remove.append(passenger)
-                elif (
-                    self.travel_plans[passenger].get_next_station()
-                    == metro.current_station
-                ):
+                elif self._is_next_planned_station(current_station, passenger):
                     passengers_from_metro_to_station.append(passenger)
-            for passenger in metro.current_station.passengers:
-                next_path = self.travel_plans[passenger].next_path
-                if next_path and next_path.id == metro.path_id:
+
+            for passenger in current_station.passengers:
+                if self._metro_is_in_next_passenger_path(passenger, metro):
                     passengers_from_station_to_metro.append(passenger)
 
             # process
@@ -288,23 +287,32 @@ class Mediator:
                 self._status.score += 1
 
             for passenger in passengers_from_metro_to_station:
-                if not metro.current_station.has_room():
+                if not current_station.has_room():
                     continue
-                metro.move_passenger(passenger, metro.current_station)
+                metro.move_passenger(passenger, current_station)
                 self.travel_plans[passenger].increment_next_station()
                 self._find_next_path_for_passenger_at_station(
-                    passenger, metro.current_station
+                    passenger, current_station
                 )
 
             for passenger in passengers_from_station_to_metro:
                 if metro.has_room():
-                    metro.current_station.move_passenger(passenger, metro)
+                    current_station.move_passenger(passenger, metro)
 
     def _passenger_has_travel_plan(self, passenger: Passenger) -> bool:
         return (
             passenger in self.travel_plans
             and self.travel_plans[passenger].next_path is not None
         )
+
+    def _is_next_planned_station(self, station: Station, passenger: Passenger) -> bool:
+        return self.travel_plans[passenger].get_next_station() == station
+
+    def _metro_is_in_next_passenger_path(
+        self, passenger: Passenger, metro: Metro
+    ) -> bool:
+        next_path = self.travel_plans[passenger].next_path
+        return (next_path is not None) and (next_path.id == metro.path_id)
 
     def _find_travel_plan_for_passenger(
         self,
@@ -370,6 +378,10 @@ class Mediator:
             if all(station in path.stations for station in (station_a, station_b)):
                 return path
         return None
+
+
+def have_same_shape_type(station: Station, passenger: Passenger) -> bool:
+    return station.shape.type == passenger.destination_shape.type
 
 
 class PassengerCreator:
