@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from abc import ABC
 from typing import List
 
 import pygame
@@ -9,14 +8,16 @@ from src.config import passenger_display_buffer, passenger_size
 from src.geometry.point import Point
 from src.geometry.shape import Shape
 
+from .entity import Entity
+from .ids import EntityId
 from .passenger import Passenger
 
 
-class Holder(ABC):
-    def __init__(self, shape: Shape, capacity: int, id: str) -> None:
+class Holder(Entity):
+    def __init__(self, shape: Shape, capacity: int, id: EntityId) -> None:
+        super().__init__(id)
         self.shape = shape
         self.capacity = capacity
-        self.id = id
         self.position: Point
         self.passengers: List[Passenger] = []
         self.passengers_per_row: int

@@ -1,17 +1,15 @@
-from shortuuid import uuid
-
 from src.config import Config, path_width
 from src.geometry.line import Line
 from src.geometry.point import Point
 from src.type import Color
 
+from .ids import EntityId, create_new_padding_segment_id
 from .segment import Segment
 
 
 class PaddingSegment(Segment):
     def __init__(self, color: Color, start_point: Point, end_point: Point) -> None:
-        super().__init__(color)
-        self.id = f"PathSegment-{uuid()}"
+        super().__init__(color, create_new_padding_segment_id())
         self.segment_start = start_point
         self.segment_end = end_point
         self.line = Line(
@@ -20,3 +18,7 @@ class PaddingSegment(Segment):
             end=self.segment_end,
             width=path_width,
         )
+
+    @property
+    def id(self) -> EntityId:
+        return super().id

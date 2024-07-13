@@ -2,7 +2,6 @@ import math
 from typing import List
 
 import pygame
-from shortuuid import uuid
 
 from src.config import path_width
 from src.geometry.line import Line
@@ -10,6 +9,8 @@ from src.geometry.point import Point
 from src.geometry.utils import direction, distance
 from src.type import Color
 
+from .entity import Entity
+from .ids import EntityId, create_new_path_id
 from .metro import Metro
 from .padding_segment import PaddingSegment
 from .path_segment import PathSegment
@@ -17,9 +18,9 @@ from .segment import Segment
 from .station import Station
 
 
-class Path:
+class Path(Entity):
     def __init__(self, color: Color) -> None:
-        self.id = f"Path-{uuid()}"
+        super().__init__(create_new_path_id())
         self.color = color
         self.stations: List[Station] = []
         self.metros: List[Metro] = []
@@ -33,6 +34,10 @@ class Path:
 
     def __repr__(self) -> str:
         return self.id
+
+    @property
+    def id(self) -> EntityId:
+        return super().id
 
     def add_station(self, station: Station) -> None:
         self.stations.append(station)

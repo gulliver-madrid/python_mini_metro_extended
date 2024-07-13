@@ -1,13 +1,15 @@
 import pygame
-from shortuuid import uuid
 
 from src.geometry.point import Point
 from src.geometry.shape import Shape
 
+from .entity import Entity
+from .ids import EntityId, create_new_passenger_id
 
-class Passenger:
+
+class Passenger(Entity):
     def __init__(self, destination_shape: Shape) -> None:
-        self.id = f"Passenger-{uuid()}"
+        super().__init__(create_new_passenger_id())
         self.position = Point(0, 0)
         self.destination_shape = destination_shape
         self.is_at_destination = False
@@ -17,6 +19,10 @@ class Passenger:
 
     def __hash__(self) -> int:
         return hash(self.id)
+
+    @property
+    def id(self) -> EntityId:
+        return super().id
 
     def draw(self, surface: pygame.surface.Surface) -> None:
         self.destination_shape.draw(surface, self.position)

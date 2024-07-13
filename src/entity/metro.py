@@ -1,5 +1,3 @@
-from shortuuid import uuid
-
 from src.config import (
     metro_capacity,
     metro_color,
@@ -10,6 +8,7 @@ from src.config import (
 from src.geometry.rect import Rect
 
 from .holder import Holder
+from .ids import EntityId, create_new_metro_id
 from .segment import Segment
 from .station import Station
 
@@ -21,12 +20,16 @@ class Metro(Holder):
         super().__init__(
             shape=metro_shape,
             capacity=metro_capacity,
-            id=f"Metro-{uuid()}",
+            id=create_new_metro_id(),
         )
         self.current_station: Station | None = None
         self.current_segment: Segment | None = None
         self.current_segment_idx = 0
-        self.path_id = ""
+        self.path_id: EntityId | None = None
         self.speed = metro_speed_per_ms
         self.is_forward = True
         self.passengers_per_row = metro_passengers_per_row
+
+    @property
+    def id(self) -> EntityId:
+        return super().id
