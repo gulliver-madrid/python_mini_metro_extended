@@ -37,6 +37,31 @@ TravelPlans = Dict[Passenger, TravelPlan]
 pp = pprint.PrettyPrinter(indent=4)
 
 
+class PathBeingCreated:
+    __slots__ = ("path",)
+
+    def __init__(self, content: Path):
+        self.path = content
+
+    def add_station_to_path(self, station: Station) -> None:
+        if self.path.stations[-1] == station:
+            return
+        # loop
+        if len(self.path.stations) > 1 and self.path.stations[0] == station:
+            self.path.set_loop()
+        # non-loop
+        elif self.path.stations[0] != station:
+            if self.path.is_looped:
+                self.path.remove_loop()
+            self.path.add_station(station)
+
+    def can_end_with(self, station: Station) -> bool:
+        return len(self.path.stations) > 1 and self.path.stations[-1] == station
+
+    def can_make_loop(self, station: Station) -> bool:
+        return len(self.path.stations) > 1 and self.path.stations[0] == station
+
+
 class Mediator:
     __slots__ = (
         "_passenger_spawning_step",
@@ -81,7 +106,7 @@ class Mediator:
         self.path_to_color: Dict[Path, Color] = {}
 
         # status
-        self.path_being_created: Path | None = None
+        self.path_being_created: PathBeingCreated | None = None
         self.travel_plans: TravelPlans = {}
         self._status = MediatorStatus(passenger_spawning_interval_step)
 
@@ -129,50 +154,32 @@ class Mediator:
         self.path_to_color[path] = assigned_color
         path.add_station(station)
         path.is_being_created = True
-        self.path_being_created = path
+        self.path_being_created = PathBeingCreated(path)
         self.paths.append(path)
 
     def add_station_to_path(self, station: Station) -> None:
         assert self.path_being_created is not None
-        if self.path_being_created.stations[-1] == station:
-            return
-        # loop
-        if (
-            len(self.path_being_created.stations) > 1
-            and self.path_being_created.stations[0] == station
-        ):
-            self.path_being_created.set_loop()
-        # non-loop
-        elif self.path_being_created.stations[0] != station:
-            if self.path_being_created.is_looped:
-                self.path_being_created.remove_loop()
-            self.path_being_created.add_station(station)
+        self.path_being_created.add_station_to_path(station)
 
     def abort_path_creation(self) -> None:
         assert self.path_being_created is not None
         self._status.is_creating_path = False
-        self._release_color_for_path(self.path_being_created)
-        self.paths.remove(self.path_being_created)
+        self._release_color_for_path(self.path_being_created.path)
+        self.paths.remove(self.path_being_created.path)
         self.path_being_created = None
 
     def end_path_on_station(self, station: Station) -> None:
         assert self.path_being_created is not None
         # current station de-dupe
-        if (
-            len(self.path_being_created.stations) > 1
-            and self.path_being_created.stations[-1] == station
-        ):
+        if self.path_being_created.can_end_with(station):
             self._finish_path_creation()
         # loop
-        elif (
-            len(self.path_being_created.stations) > 1
-            and self.path_being_created.stations[0] == station
-        ):
-            self.path_being_created.set_loop()
+        elif self.path_being_created.can_make_loop(station):
+            self.path_being_created.path.set_loop()
             self._finish_path_creation()
         # non-loop
-        elif self.path_being_created.stations[0] != station:
-            self.path_being_created.add_station(station)
+        elif self.path_being_created.path.stations[0] != station:
+            self.path_being_created.path.add_station(station)
             self._finish_path_creation()
         else:
             self.abort_path_creation()
@@ -233,11 +240,11 @@ class Mediator:
     def _finish_path_creation(self) -> None:
         assert self.path_being_created is not None
         self._status.is_creating_path = False
-        self.path_being_created.is_being_created = False
-        self.path_being_created.remove_temporary_point()
+        self.path_being_created.path.is_being_created = False
+        self.path_being_created.path.remove_temporary_point()
         if len(self.metros) < self.num_metros:
             metro = Metro()
-            self.path_being_created.add_metro(metro)
+            self.path_being_created.path.add_metro(metro)
             self.metros.append(metro)
         self.path_being_created = None
         self._assign_paths_to_buttons()
