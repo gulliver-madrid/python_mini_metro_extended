@@ -47,7 +47,7 @@ class PathBeingCreated:
         if self.path.stations[-1] == station:
             return
         # loop
-        if len(self.path.stations) > 1 and self.path.stations[0] == station:
+        if self.can_make_loop(station):
             self.path.set_loop()
         # non-loop
         elif self.path.stations[0] != station:
@@ -56,10 +56,12 @@ class PathBeingCreated:
             self.path.add_station(station)
 
     def can_end_with(self, station: Station) -> bool:
-        return len(self.path.stations) > 1 and self.path.stations[-1] == station
+        stations = self.path.stations
+        return len(stations) > 1 and stations[-1] == station
 
     def can_make_loop(self, station: Station) -> bool:
-        return len(self.path.stations) > 1 and self.path.stations[0] == station
+        stations = self.path.stations
+        return len(stations) > 1 and stations[0] == station
 
 
 class Mediator:
