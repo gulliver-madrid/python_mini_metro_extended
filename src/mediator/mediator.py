@@ -7,13 +7,7 @@ from typing import Dict, List, Mapping
 
 import pygame
 
-from src.config import (
-    num_metros,
-    num_paths,
-    num_stations,
-    passenger_spawning_interval_step,
-    passenger_spawning_start_step,
-)
+from src.config import PassengerSpawningConfig, num_metros, num_paths, num_stations
 from src.entity.get_entity import get_random_stations
 from src.entity.metro import Metro
 from src.entity.passenger import Passenger
@@ -64,7 +58,7 @@ class Mediator:
 
         # configs
         self._passenger_spawning = PassengerSpawning(
-            passenger_spawning_start_step, passenger_spawning_interval_step
+            PassengerSpawningConfig.start_step, PassengerSpawningConfig.interval_step
         )
         self.num_paths: int = num_paths
         self.num_metros: int = num_metros
@@ -87,7 +81,7 @@ class Mediator:
         # status
         self.path_being_created: PathBeingCreated | None = None
         self.travel_plans: TravelPlans = {}
-        self._status = MediatorStatus(passenger_spawning_interval_step)
+        self._status = MediatorStatus(PassengerSpawningConfig.interval_step)
 
     ######################
     ### public methods ###

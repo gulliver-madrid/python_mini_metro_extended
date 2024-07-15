@@ -7,9 +7,8 @@ from unittest.mock import Mock, create_autospec, patch
 import pygame
 
 from src.config import (
+    PassengerSpawningConfig,
     framerate,
-    passenger_spawning_interval_step,
-    passenger_spawning_start_step,
     screen_height,
     screen_width,
     station_color,
@@ -92,19 +91,19 @@ class TestMediator(BaseTestCase):
     @patch.object(Mediator, "_spawn_passengers", new_callable=Mock)
     def test_is_passenger_spawn_time(self, mock_spawn_passengers: Any) -> None:
         # Run the game until first wave of passengers spawn
-        for _ in range(passenger_spawning_start_step):
+        for _ in range(PassengerSpawningConfig.start_step):
             self.mediator.increment_time(ceil(1000 / framerate))
 
         self.mediator._spawn_passengers.assert_called_once()  # type: ignore [attr-defined]
 
-        for _ in range(passenger_spawning_interval_step):
+        for _ in range(PassengerSpawningConfig.interval_step):
             self.mediator.increment_time(ceil(1000 / framerate))
 
         self.assertEqual(self.mediator._spawn_passengers.call_count, 2)  # type: ignore [attr-defined]
 
     def test_passengers_spawned_at_a_station_have_a_different_destination(self) -> None:
         # Run the game until first wave of passengers spawn
-        for _ in range(passenger_spawning_start_step):
+        for _ in range(PassengerSpawningConfig.start_step):
             self.mediator.increment_time(ceil(1000 / framerate))
 
         for station in self.mediator.stations:
@@ -136,7 +135,7 @@ class TestMediator(BaseTestCase):
             station.draw(self.screen)
 
         # Run the game until first wave of passengers spawn
-        for _ in range(passenger_spawning_start_step):
+        for _ in range(PassengerSpawningConfig.start_step):
             self.mediator.increment_time(ceil(1000 / framerate))
 
         self.connect_stations([0, 1])
@@ -150,7 +149,7 @@ class TestMediator(BaseTestCase):
 
     def test_passengers_at_isolated_stations_have_no_way_to_destination(self) -> None:
         # Run the game until first wave of passengers spawn, then 1 more frame
-        for _ in range(passenger_spawning_start_step + 1):
+        for _ in range(PassengerSpawningConfig.start_step + 1):
             self.mediator.increment_time(ceil(1000 / framerate))
 
         for passenger in self.mediator.passengers:

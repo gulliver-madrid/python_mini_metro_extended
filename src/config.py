@@ -1,3 +1,5 @@
+from typing import Final
+
 from src.geometry.type import ShapeType
 
 # game
@@ -24,9 +26,13 @@ station_passengers_per_row = 4
 # passenger
 passenger_size = 5
 passenger_color = (128, 128, 128)
-passenger_spawning_start_step = 1
-passenger_spawning_interval_step = 10 * framerate
 passenger_display_buffer = 3 * passenger_size
+
+
+class PassengerSpawningConfig:
+    start_step: Final = 1
+    interval_step: Final = 10 * framerate
+
 
 # metro
 num_metros = 4
