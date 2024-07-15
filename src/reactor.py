@@ -6,7 +6,7 @@ from src.event.keyboard import KeyboardEvent
 from src.event.mouse import MouseEvent
 from src.event.type import KeyboardEventType, MouseEventType
 from src.geometry.point import Point
-from src.mediator import Mediator
+from src.mediator.mediator import Mediator
 from src.ui.button import Button
 from src.ui.path_button import PathButton
 

@@ -10,7 +10,7 @@ from src.event.keyboard import KeyboardEvent
 from src.event.mouse import MouseEvent
 from src.event.type import KeyboardEventType, MouseEventType
 from src.geometry.point import Point
-from src.mediator import Mediator
+from src.mediator.mediator import Mediator
 from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 

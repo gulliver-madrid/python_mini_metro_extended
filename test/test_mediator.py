@@ -24,7 +24,7 @@ from src.geometry.point import Point
 from src.geometry.rect import Rect
 from src.geometry.triangle import Triangle
 from src.geometry.type import ShapeType
-from src.mediator import Mediator
+from src.mediator.mediator import Mediator
 from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 
