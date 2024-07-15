@@ -77,6 +77,11 @@ class PassengerSpawning:
         self.step: Final[int] = start_step
         self.interval_step: Final[int] = interval_step
 
+    def is_passenger_spawn_time(self, status: MediatorStatus) -> bool:
+        return (status.steps == self.step) or (
+            status.steps_since_last_spawn == self.interval_step
+        )
+
 
 class Mediator:
     __slots__ = (
@@ -273,10 +278,7 @@ class Mediator:
         return station_shape_types
 
     def _is_passenger_spawn_time(self) -> bool:
-        return (self._status.steps == self._passenger_spawning.step) or (
-            self._status.steps_since_last_spawn
-            == self._passenger_spawning.interval_step
-        )
+        return self._passenger_spawning.is_passenger_spawn_time(self._status)
 
     def _move_passengers(self) -> None:
         for metro in self.metros:
