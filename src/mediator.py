@@ -70,10 +70,17 @@ class PathBeingCreated:
         return self.path.stations[-1] == station
 
 
+class PassengerSpawning:
+    __slots__ = ("step", "interval_step")
+
+    def __init__(self, start_step: int, interval_step: int):
+        self.step: Final[int] = start_step
+        self.interval_step: Final[int] = interval_step
+
+
 class Mediator:
     __slots__ = (
-        "_passenger_spawning_step",
-        "_passenger_spawning_interval_step",
+        "_passenger_spawning",
         "num_paths",
         "num_metros",
         "num_stations",
@@ -93,8 +100,9 @@ class Mediator:
         pygame.font.init()
 
         # configs
-        self._passenger_spawning_step: int = passenger_spawning_start_step
-        self._passenger_spawning_interval_step: int = passenger_spawning_interval_step
+        self._passenger_spawning = PassengerSpawning(
+            passenger_spawning_start_step, passenger_spawning_interval_step
+        )
         self.num_paths: int = num_paths
         self.num_metros: int = num_metros
         self.num_stations: int = num_stations
@@ -265,9 +273,9 @@ class Mediator:
         return station_shape_types
 
     def _is_passenger_spawn_time(self) -> bool:
-        return (self._status.steps == self._passenger_spawning_step) or (
+        return (self._status.steps == self._passenger_spawning.step) or (
             self._status.steps_since_last_spawn
-            == self._passenger_spawning_interval_step
+            == self._passenger_spawning.interval_step
         )
 
     def _move_passengers(self) -> None:
