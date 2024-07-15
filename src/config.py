@@ -4,8 +4,8 @@ from src.geometry.type import ShapeType
 framerate = 60
 
 # screen
-screen_width = 1920
-screen_height = 1080
+screen_width = 1600
+screen_height = 840
 screen_color = (255, 255, 255)
 
 # station
