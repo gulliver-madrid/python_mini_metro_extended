@@ -26,6 +26,7 @@ from src.mediator.impl import (
     TravelPlans,
 )
 from src.mediator.passenger_mover import PassengerMover
+from src.mediator.path_finder import find_next_path_for_passenger_at_station
 from src.travel_plan import TravelPlan
 from src.type import Color
 from src.ui.path_button import PathButton
@@ -86,7 +87,7 @@ class Mediator:
 
         # passenger mover
         self._passenger_mover = PassengerMover(
-            self.passengers, self.travel_plans, self, self._status
+            self.paths, self.passengers, self.travel_plans, self._status
         )
 
     ######################
@@ -177,10 +178,9 @@ class Mediator:
     def find_next_path_for_passenger_at_station(
         self, passenger: Passenger, station: Station
     ) -> None:
-        next_station = self.travel_plans[passenger].get_next_station()
-        assert next_station is not None
-        next_path = self._find_shared_path(station, next_station)
-        self.travel_plans[passenger].next_path = next_path
+        find_next_path_for_passenger_at_station(
+            self.paths, self.travel_plans[passenger], station
+        )
 
     def render(self, screen: pygame.surface.Surface) -> None:
         for idx, path in enumerate(self.paths):
@@ -309,10 +309,3 @@ class Mediator:
                 self._find_travel_plan_for_passenger(
                     station_nodes_mapping, station, passenger
                 )
-
-    def _find_shared_path(self, station_a: Station, station_b: Station) -> Path | None:
-        """Returns the first path both stations belong to, or None if there is no shared path"""
-        for path in self.paths:
-            if all(station in path.stations for station in (station_a, station_b)):
-                return path
-        return None

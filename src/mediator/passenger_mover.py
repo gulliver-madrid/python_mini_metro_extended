@@ -1,32 +1,28 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import List, Protocol
+from typing import List
 
 from src.entity.metro import Metro
 from src.entity.passenger import Passenger
+from src.entity.path import Path
 from src.entity.station import Station
 from src.mediator.impl import MediatorStatus, TravelPlans, have_same_shape_type
-
-
-class NextPathFinder(Protocol):
-    def find_next_path_for_passenger_at_station(
-        self, passenger: Passenger, station: Station
-    ) -> None: ...
+from src.mediator.path_finder import find_next_path_for_passenger_at_station
 
 
 class PassengerMover:
     def __init__(
         self,
+        paths: List[Path],
         passengers: List[Passenger],
         travel_plans: TravelPlans,
-        next_path_finder: NextPathFinder,
         status: MediatorStatus,
     ):
+        self._paths = paths
         self._passengers = passengers
         self._travel_plans = travel_plans
         self._status = status
-        self._mediator = next_path_finder
 
     def move_passengers(self, metro: Metro) -> None:
         current_station = metro.current_station
@@ -96,7 +92,8 @@ class PassengerMover:
         current_station = metro.current_station
         assert current_station
         metro.move_passenger(passenger, current_station)
-        self._travel_plans[passenger].increment_next_station()
-        self._mediator.find_next_path_for_passenger_at_station(
-            passenger, current_station
+        travel_plan = self._travel_plans[passenger]
+        travel_plan.increment_next_station()
+        find_next_path_for_passenger_at_station(
+            self._paths, travel_plan, current_station
         )
