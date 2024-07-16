@@ -327,34 +327,34 @@ class PassengerMover:
         current_station = metro.current_station
         assert current_station
 
-        passengers_to_remove: List[Passenger] = []
-        passengers_from_metro_to_station: List[Passenger] = []
-        passengers_from_station_to_metro: List[Passenger] = []
+        to_remove: List[Passenger] = []
+        from_metro_to_station: List[Passenger] = []
+        from_station_to_metro: List[Passenger] = []
 
         # queue
         for passenger in metro.passengers:
             if have_same_shape_type(current_station, passenger):
-                passengers_to_remove.append(passenger)
+                to_remove.append(passenger)
             elif self._is_next_planned_station(current_station, passenger):
-                passengers_from_metro_to_station.append(passenger)
+                from_metro_to_station.append(passenger)
 
         for passenger in current_station.passengers:
             if self._metro_is_in_next_passenger_path(passenger, metro):
-                passengers_from_station_to_metro.append(passenger)
+                from_station_to_metro.append(passenger)
 
         # process
-        for passenger in passengers_to_remove:
+        for passenger in to_remove:
             passenger.is_at_destination = True
             metro.remove_passenger(passenger)
             self.passengers.remove(passenger)
             del self.travel_plans[passenger]
             self.status.score += 1
 
-        for passenger in passengers_from_metro_to_station:
+        for passenger in from_metro_to_station:
             if current_station.has_room():
                 self._move_passenger_to_current_station(passenger, metro)
 
-        for passenger in passengers_from_station_to_metro:
+        for passenger in from_station_to_metro:
             if metro.has_room():
                 current_station.move_passenger(passenger, metro)
 
