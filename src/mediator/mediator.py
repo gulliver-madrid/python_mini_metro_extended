@@ -270,12 +270,7 @@ class Mediator:
             if len(node_path) == 0:
                 continue
             if len(node_path) == 1:
-                # passenger arrived at destination
-                station.remove_passenger(passenger)
-                self.passengers.remove(passenger)
-                passenger.is_at_destination = True
-                del self.travel_plans[passenger]
-                break
+                raise RuntimeError("Trying to eliminate from station")
             else:
                 assert len(node_path) > 1
                 node_path = skip_stations_on_same_path(node_path)
