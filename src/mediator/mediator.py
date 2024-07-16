@@ -318,10 +318,10 @@ class Mediator:
 
 class PassengerMover:
     def __init__(self, mediator: Mediator, status: MediatorStatus):
-        self.passengers = mediator.passengers
-        self.travel_plans = mediator.travel_plans
-        self.status = status
-        self.mediator = mediator
+        self._passengers = mediator.passengers
+        self._travel_plans = mediator.travel_plans
+        self._status = status
+        self._mediator = mediator
 
     def move_passengers(self, metro: Metro) -> None:
         current_station = metro.current_station
@@ -346,9 +346,9 @@ class PassengerMover:
         for passenger in to_remove:
             passenger.is_at_destination = True
             metro.remove_passenger(passenger)
-            self.passengers.remove(passenger)
-            del self.travel_plans[passenger]
-            self.status.score += 1
+            self._passengers.remove(passenger)
+            del self._travel_plans[passenger]
+            self._status.score += 1
 
         for passenger in from_metro_to_station:
             if current_station.has_room():
@@ -359,12 +359,12 @@ class PassengerMover:
                 current_station.move_passenger(passenger, metro)
 
     def _is_next_planned_station(self, station: Station, passenger: Passenger) -> bool:
-        return self.travel_plans[passenger].get_next_station() == station
+        return self._travel_plans[passenger].get_next_station() == station
 
     def _metro_is_in_next_passenger_path(
         self, passenger: Passenger, metro: Metro
     ) -> bool:
-        next_path = self.travel_plans[passenger].next_path
+        next_path = self._travel_plans[passenger].next_path
         return (next_path is not None) and (next_path.id == metro.path_id)
 
     def _move_passenger_to_current_station(
@@ -373,7 +373,7 @@ class PassengerMover:
         current_station = metro.current_station
         assert current_station
         metro.move_passenger(passenger, current_station)
-        self.travel_plans[passenger].increment_next_station()
-        self.mediator.find_next_path_for_passenger_at_station(
+        self._travel_plans[passenger].increment_next_station()
+        self._mediator.find_next_path_for_passenger_at_station(
             passenger, current_station
         )
