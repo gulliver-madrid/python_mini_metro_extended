@@ -175,13 +175,6 @@ class Mediator:
         self._assign_paths_to_buttons()
         self._find_travel_plan_for_passengers()
 
-    def find_next_path_for_passenger_at_station(
-        self, passenger: Passenger, station: Station
-    ) -> None:
-        find_next_path_for_passenger_at_station(
-            self.paths, self.travel_plans[passenger], station
-        )
-
     def render(self, screen: pygame.surface.Surface) -> None:
         for idx, path in enumerate(self.paths):
             path_order = idx - round(self.num_paths / 2)
@@ -287,18 +280,11 @@ class Mediator:
                 assert len(node_path) > 1
                 node_path = skip_stations_on_same_path(node_path)
                 self.travel_plans[passenger] = TravelPlan(node_path[1:])
-                self.find_next_path_for_passenger_at_station(passenger, station)
+                self._find_next_path_for_passenger_at_station(passenger, station)
                 break
 
         else:
             self.travel_plans[passenger] = TravelPlan([])
-
-    def _get_stations_for_shape_type(self, shape_type: ShapeType) -> List[Station]:
-        stations = [
-            station for station in self.stations if station.shape.type == shape_type
-        ]
-        random.shuffle(stations)
-        return stations
 
     def _find_travel_plan_for_passengers(self) -> None:
         station_nodes_mapping = build_station_nodes_dict(self.stations, self.paths)
@@ -309,3 +295,17 @@ class Mediator:
                 self._find_travel_plan_for_passenger(
                     station_nodes_mapping, station, passenger
                 )
+
+    def _get_stations_for_shape_type(self, shape_type: ShapeType) -> List[Station]:
+        stations = [
+            station for station in self.stations if station.shape.type == shape_type
+        ]
+        random.shuffle(stations)
+        return stations
+
+    def _find_next_path_for_passenger_at_station(
+        self, passenger: Passenger, station: Station
+    ) -> None:
+        find_next_path_for_passenger_at_station(
+            self.paths, self.travel_plans[passenger], station
+        )
