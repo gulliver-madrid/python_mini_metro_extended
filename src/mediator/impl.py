@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import random
 from collections.abc import Sequence
-from typing import Dict, Final, Mapping
+from typing import TYPE_CHECKING, Dict, Final, Mapping
 
 from src.config import passenger_color, passenger_size
 from src.entity.passenger import Passenger
@@ -66,6 +66,8 @@ def have_same_shape_type(station: Station, passenger: Passenger) -> bool:
 
 
 class PassengerCreator:
+    if TYPE_CHECKING:
+        __slots__ = ("shape_types_to_others",)
     shape_types_to_others: Final[Mapping[ShapeType, Sequence[ShapeType]]]
 
     def __init__(self, station_types: Sequence[ShapeType]):
