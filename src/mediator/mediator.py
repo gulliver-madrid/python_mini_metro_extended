@@ -3,7 +3,7 @@ from __future__ import annotations
 import pprint
 import random
 import sys
-from typing import Dict, List, Mapping
+from typing import Dict, Final, List, Mapping
 
 import pygame
 
@@ -51,6 +51,7 @@ class Mediator:
         "path_being_created",
         "travel_plans",
         "_status",
+        "_passenger_mover",
     )
 
     def __init__(self) -> None:
@@ -71,7 +72,7 @@ class Mediator:
         self.stations = get_random_stations(self.num_stations)
         self.metros: List[Metro] = []
         self.paths: List[Path] = []
-        self.passengers: List[Passenger] = []
+        self.passengers: Final[List[Passenger]] = []
         self.path_colors: Dict[Color, bool] = {}
         for i in range(num_paths):
             color = hue_to_rgb(i / (num_paths + 1))
@@ -80,8 +81,11 @@ class Mediator:
 
         # status
         self.path_being_created: PathBeingCreated | None = None
-        self.travel_plans: TravelPlans = {}
-        self._status = MediatorStatus(PassengerSpawningConfig.interval_step)
+        self.travel_plans: Final[TravelPlans] = {}
+        self._status: Final = MediatorStatus(PassengerSpawningConfig.interval_step)
+
+        # passenger mover
+        self._passenger_mover = PassengerMover(self, self._status)
 
     ######################
     ### public methods ###
@@ -238,8 +242,7 @@ class Mediator:
             if not metro.current_station:
                 continue
 
-            mover = PassengerMover(self, self._status)
-            mover.move_passengers(metro)
+            self._passenger_mover.move_passengers(metro)
 
     def _passenger_has_travel_plan(self, passenger: Passenger) -> bool:
         return (
