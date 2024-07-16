@@ -2,14 +2,17 @@ from __future__ import annotations
 
 import random
 from collections.abc import Sequence
-from typing import Final, Mapping
+from typing import Dict, Final, Mapping
 
 from src.config import passenger_color, passenger_size
 from src.entity.passenger import Passenger
 from src.entity.path import Path
 from src.entity.station import Station
 from src.geometry.type import ShapeType
+from src.travel_plan import TravelPlan
 from src.utils import get_shape_from_type
+
+TravelPlans = Dict[Passenger, TravelPlan]
 
 
 class PathBeingCreated:
