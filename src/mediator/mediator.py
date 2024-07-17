@@ -60,7 +60,6 @@ class PathManager:
         self,
         paths: List[Path],
         num_paths: int,
-        path_colors: Dict[Color, bool],
         path_to_color: Dict[Path, Color],
         passengers: List[Passenger],
         stations: List[Station],
@@ -72,9 +71,12 @@ class PathManager:
     ):
         self.paths: Final = paths
         self.num_paths: Final[int] = num_paths
-        self.path_colors: Dict[Color, bool] = path_colors
         self.path_to_color: Dict[Path, Color] = path_to_color
         self.passengers: Final[List[Passenger]] = passengers
+        self.path_colors: Dict[Color, bool] = {}
+        for i in range(num_paths):
+            color = hue_to_rgb(i / (num_paths + 1))
+            self.path_colors[color] = False  # not taken
         self.stations: Final = stations
         self.travel_plans: Final = travel_plans
         self.metros: List[Metro] = metros
@@ -228,7 +230,6 @@ class Mediator:
         "metros",
         "paths",
         "passengers",
-        "path_colors",
         "path_to_color",
         "travel_plans",
         "_status",
@@ -253,12 +254,8 @@ class Mediator:
         # entities
         self.stations: Final = get_random_stations(self.num_stations)
         self.metros: Final[List[Metro]] = []
-        self.paths: List[Path] = []
+        self.paths: Final[List[Path]] = []
         self.passengers: Final[List[Passenger]] = []
-        self.path_colors: Dict[Color, bool] = {}
-        for i in range(num_paths):
-            color = hue_to_rgb(i / (num_paths + 1))
-            self.path_colors[color] = False  # not taken
         self.path_to_color: Dict[Path, Color] = {}
 
         # status
@@ -273,7 +270,6 @@ class Mediator:
         self.path_manager = PathManager(
             self.paths,
             self.num_paths,
-            self.path_colors,
             self.path_to_color,
             self.passengers,
             self.stations,
