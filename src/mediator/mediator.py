@@ -65,7 +65,6 @@ class PathManager:
         stations: List[Station],
         travel_plans: TravelPlans,
         metros: List[Metro],
-        num_metros: int,
         status: MediatorStatus,
         ui: UI,
     ):
@@ -79,7 +78,7 @@ class PathManager:
             self.path_colors[color] = False  # not taken
         self.stations: Final = stations
         self.travel_plans: Final = travel_plans
-        self.metros: List[Metro] = metros
+        self.metros: Final[List[Metro]] = metros
         self.num_metros: Final = num_metros
         self.ui: Final = ui
         self.path_being_created: PathBeingCreated | None = None
@@ -223,7 +222,6 @@ class Mediator:
     __slots__ = (
         "_passenger_spawning",
         "num_paths",
-        "num_metros",
         "num_stations",
         "ui",
         "stations",
@@ -245,7 +243,6 @@ class Mediator:
             PassengerSpawningConfig.start_step, PassengerSpawningConfig.interval_step
         )
         self.num_paths: Final[int] = num_paths
-        self.num_metros: int = num_metros
         self.num_stations: int = num_stations
 
         # UI
@@ -275,7 +272,6 @@ class Mediator:
             self.stations,
             self.travel_plans,
             self.metros,
-            self.num_metros,
             self._status,
             self.ui,
         )
