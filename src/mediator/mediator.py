@@ -38,17 +38,17 @@ pp = pprint.PrettyPrinter(indent=4)
 
 class PathManager:
     __slots__ = (
-        "num_paths",
-        "ui",
-        "metros",
-        "num_metros",
         "paths",
+        "num_paths",
         "passengers",
-        "stations",
         "path_colors",
         "path_to_color",
-        "path_being_created",
+        "metros",
+        "num_metros",
+        "stations",
         "travel_plans",
+        "ui",
+        "path_being_created",
         "_status",
     )
 
@@ -63,19 +63,16 @@ class PathManager:
     ):
         self.paths: Final[List[Path]] = []
         self.num_paths: Final[int] = num_paths
+        self.passengers: Final = passengers
         self.path_to_color: Final[Dict[Path, Color]] = {}
-        self.passengers: Final[List[Passenger]] = passengers
-        self.path_colors: Dict[Color, bool] = {}
-        for i in range(num_paths):
-            color = hue_to_rgb(i / (num_paths + 1))
-            self.path_colors[color] = False  # not taken
+        self.path_colors: Final = self._get_initial_path_colors()
+        self.metros: Final = metros
+        self.num_metros: Final = num_metros
         self.stations: Final = stations
         self.travel_plans: Final = travel_plans
-        self.metros: Final[List[Metro]] = metros
-        self.num_metros: Final = num_metros
         self.ui: Final = ui
         self.path_being_created: PathBeingCreated | None = None
-        self._status = status
+        self._status: Final = status
 
     def start_path_on_station(self, station: Station) -> None:
         if len(self.paths) >= self.num_paths:
@@ -142,6 +139,13 @@ class PathManager:
                 self._find_travel_plan_for_passenger(
                     station_nodes_mapping, station, passenger
                 )
+
+    def _get_initial_path_colors(self) -> Dict[Color, bool]:
+        path_colors: Final[Dict[Color, bool]] = {}
+        for i in range(num_paths):
+            color = hue_to_rgb(i / (num_paths + 1))
+            path_colors[color] = False  # not taken
+        return path_colors
 
     def _finish_path_creation(self) -> None:
         assert self.path_being_created is not None
@@ -237,7 +241,6 @@ class Mediator:
         # entities
         self.stations: Final = get_random_stations(self.num_stations)
         self.metros: Final[List[Metro]] = []
-
         self.passengers: Final[List[Passenger]] = []
 
         # status
