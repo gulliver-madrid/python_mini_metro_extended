@@ -10,7 +10,7 @@ from src.event.keyboard import KeyboardEvent
 from src.event.mouse import MouseEvent
 from src.event.type import KeyboardEventType, MouseEventType
 from src.geometry.point import Point
-from src.mediator.mediator import Mediator
+from src.mediator.mediator import Mediator, PathManager
 from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 
@@ -51,7 +51,7 @@ class TestGameplay(BaseTestCase):
             )
         )
 
-    @patch.object(Mediator, "start_path_on_station", new_callable=Mock)
+    @patch.object(PathManager, "start_path_on_station", new_callable=Mock)
     def test_react_mouse_down_start_path(self, mock_start_path_on_station: Any) -> None:
         self.reactor.react(
             MouseEvent(
@@ -59,7 +59,7 @@ class TestGameplay(BaseTestCase):
                 self.mediator.stations[3].position + Point(1, 1),
             )
         )
-        self.mediator.start_path_on_station.assert_called_once()  # type: ignore
+        self.mediator.path_manager.start_path_on_station.assert_called_once()  # type: ignore
 
     def test_mouse_down_and_up_at_the_same_point_does_not_create_path(self) -> None:
         self.reactor.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))
@@ -148,7 +148,8 @@ class TestGameplay(BaseTestCase):
         )
 
     def test_path_button_removes_path_on_click(self) -> None:
-        self.mediator.stations = get_random_stations(5)
+        self.mediator.stations.clear()
+        self.mediator.stations.extend(get_random_stations(5))
         for station in self.mediator.stations:
             station.draw(self.screen)
         self.connect_stations([0, 1])
@@ -161,7 +162,8 @@ class TestGameplay(BaseTestCase):
         self.assertEqual(len(self.mediator.ui.path_to_button.items()), 0)
 
     def test_path_buttons_get_assigned_upon_path_creation(self) -> None:
-        self.mediator.stations = get_random_stations(5)
+        self.mediator.stations.clear()
+        self.mediator.stations.extend(get_random_stations(5))
         for station in self.mediator.stations:
             station.draw(self.screen)
         self.connect_stations([0, 1])
@@ -178,7 +180,8 @@ class TestGameplay(BaseTestCase):
         self.assertIn(self.mediator.paths[2], self.mediator.ui.path_to_button)
 
     def test_more_paths_can_be_created_after_removing_paths(self) -> None:
-        self.mediator.stations = get_random_stations(5)
+        self.mediator.stations.clear()
+        self.mediator.stations.extend(get_random_stations(5))
         for station in self.mediator.stations:
             station.draw(self.screen)
         self.connect_stations([0, 1])
@@ -194,7 +197,8 @@ class TestGameplay(BaseTestCase):
         self.assertEqual(len(self.mediator.paths), 3)
 
     def test_assigned_path_buttons_bubble_to_left(self) -> None:
-        self.mediator.stations = get_random_stations(5)
+        self.mediator.stations.clear()
+        self.mediator.stations.extend(get_random_stations(5))
         for station in self.mediator.stations:
             station.draw(self.screen)
         self.connect_stations([0, 1])

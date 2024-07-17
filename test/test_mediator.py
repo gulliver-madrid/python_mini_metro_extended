@@ -113,23 +113,26 @@ class TestMediator(BaseTestCase):
                 )
 
     def test_passengers_at_connected_stations_have_a_way_to_destination(self) -> None:
-        self.mediator.stations = [
-            Station(
-                Rect(
-                    color=station_color,
-                    width=2 * station_size,
-                    height=2 * station_size,
+        self.mediator.stations.clear()
+        self.mediator.stations.extend(
+            [
+                Station(
+                    Rect(
+                        color=station_color,
+                        width=2 * station_size,
+                        height=2 * station_size,
+                    ),
+                    Point(100, 100),
                 ),
-                Point(100, 100),
-            ),
-            Station(
-                Circle(
-                    color=station_color,
-                    radius=station_size,
+                Station(
+                    Circle(
+                        color=station_color,
+                        radius=station_size,
+                    ),
+                    Point(100, 200),
                 ),
-                Point(100, 200),
-            ),
-        ]
+            ]
+        )
         # Need to draw stations if you want to override them
         for station in self.mediator.stations:
             station.draw(self.screen)
@@ -159,58 +162,61 @@ class TestMediator(BaseTestCase):
             self.assertIsNone(self.mediator.travel_plans[passenger].next_station)
 
     def test_get_station_for_shape_type(self) -> None:
-        self.mediator.stations = [
-            Station(
-                Rect(
-                    color=station_color,
-                    width=2 * station_size,
-                    height=2 * station_size,
+        self.mediator.stations.clear()
+        self.mediator.stations.extend(
+            [
+                Station(
+                    Rect(
+                        color=station_color,
+                        width=2 * station_size,
+                        height=2 * station_size,
+                    ),
+                    get_random_position(self.width, self.height),
                 ),
-                get_random_position(self.width, self.height),
-            ),
-            Station(
-                Circle(
-                    color=station_color,
-                    radius=station_size,
+                Station(
+                    Circle(
+                        color=station_color,
+                        radius=station_size,
+                    ),
+                    get_random_position(self.width, self.height),
                 ),
-                get_random_position(self.width, self.height),
-            ),
-            Station(
-                Circle(
-                    color=station_color,
-                    radius=station_size,
+                Station(
+                    Circle(
+                        color=station_color,
+                        radius=station_size,
+                    ),
+                    get_random_position(self.width, self.height),
                 ),
-                get_random_position(self.width, self.height),
-            ),
-            Station(
-                Triangle(
-                    color=station_color,
-                    size=station_size,
+                Station(
+                    Triangle(
+                        color=station_color,
+                        size=station_size,
+                    ),
+                    get_random_position(self.width, self.height),
                 ),
-                get_random_position(self.width, self.height),
-            ),
-            Station(
-                Triangle(
-                    color=station_color,
-                    size=station_size,
+                Station(
+                    Triangle(
+                        color=station_color,
+                        size=station_size,
+                    ),
+                    get_random_position(self.width, self.height),
                 ),
-                get_random_position(self.width, self.height),
-            ),
-            Station(
-                Triangle(
-                    color=station_color,
-                    size=station_size,
+                Station(
+                    Triangle(
+                        color=station_color,
+                        size=station_size,
+                    ),
+                    get_random_position(self.width, self.height),
                 ),
-                get_random_position(self.width, self.height),
-            ),
-        ]
-        rect_stations = self.mediator._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
+            ]
+        )
+        rect_stations = self.mediator.path_manager._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
             ShapeType.RECT
         )
-        circle_stations = self.mediator._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
+        circle_stations = self.mediator.path_manager._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
             ShapeType.CIRCLE
         )
-        triangle_stations = self.mediator._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
+        triangle_stations = self.mediator.path_manager._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
             ShapeType.TRIANGLE
         )
 
@@ -219,12 +225,13 @@ class TestMediator(BaseTestCase):
         self.assertCountEqual(triangle_stations, self.mediator.stations[3:])
 
     def test_skip_stations_on_same_path(self) -> None:
-        self.mediator.stations = get_random_stations(5)
+        self.mediator.stations.clear()
+        self.mediator.stations.extend(get_random_stations(5))
         for station in self.mediator.stations:
             station.draw(self.screen)
         self.connect_stations([i for i in range(5)])
         self.mediator._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
-        self.mediator._find_travel_plan_for_passengers()  # pyright: ignore [reportPrivateUsage]
+        self.mediator.path_manager.find_travel_plan_for_passengers()
         for station in self.mediator.stations:
             for passenger in station.passengers:
                 self.assertEqual(

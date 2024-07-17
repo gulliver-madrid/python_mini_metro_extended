@@ -60,23 +60,28 @@ class UI_Reactor:
 
     def _on_mouse_down(self, entity: Station | PathButton | None) -> None:
         if isinstance(entity, Station):
-            self.mediator.start_path_on_station(entity)
+            self.mediator.path_manager.start_path_on_station(entity)
 
     def _on_mouse_up(self, entity: Station | PathButton | None) -> None:
         if self.mediator.is_creating_path:
-            assert self.mediator.path_being_created is not None
+            assert self.mediator.path_manager.path_being_created is not None
             if isinstance(entity, Station):
-                self.mediator.end_path_on_station(entity)
+                self.mediator.path_manager.end_path_on_station(entity)
             else:
-                self.mediator.abort_path_creation()
+                self.mediator.path_manager.abort_path_creation()
         elif isinstance(entity, PathButton) and entity.path:
-            self.mediator.remove_path(entity.path)
+            self.mediator.path_manager.remove_path(entity.path)
 
     def _on_mouse_motion_with_mouse_down(
         self, entity: Station | PathButton | None, position: Point
     ) -> None:
-        if self.mediator.is_creating_path and self.mediator.path_being_created:
+        if (
+            self.mediator.is_creating_path
+            and self.mediator.path_manager.path_being_created
+        ):
             if isinstance(entity, Station):
-                self.mediator.add_station_to_path(entity)
+                self.mediator.path_manager.add_station_to_path(entity)
             else:
-                self.mediator.path_being_created.path.set_temporary_point(position)
+                self.mediator.path_manager.path_being_created.path.set_temporary_point(
+                    position
+                )

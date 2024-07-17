@@ -56,23 +56,26 @@ class TestGraph(BaseTestCase):
         )
 
     def test_build_station_nodes_dict(self) -> None:
-        self.mediator.stations = [
-            Station(
-                Rect(
-                    color=station_color,
-                    width=2 * station_size,
-                    height=2 * station_size,
+        self.mediator.stations.clear()
+        self.mediator.stations.extend(
+            [
+                Station(
+                    Rect(
+                        color=station_color,
+                        width=2 * station_size,
+                        height=2 * station_size,
+                    ),
+                    get_random_position(self.width, self.height),
                 ),
-                get_random_position(self.width, self.height),
-            ),
-            Station(
-                Circle(
-                    color=station_color,
-                    radius=station_size,
+                Station(
+                    Circle(
+                        color=station_color,
+                        radius=station_size,
+                    ),
+                    get_random_position(self.width, self.height),
                 ),
-                get_random_position(self.width, self.height),
-            ),
-        ]
+            ]
+        )
         for station in self.mediator.stations:
             station.draw(self.screen)
 
@@ -86,7 +89,8 @@ class TestGraph(BaseTestCase):
             self.assertEqual(node.station, station)
 
     def test_bfs_two_stations(self) -> None:
-        self.mediator.stations = get_random_stations(2)
+        self.mediator.stations.clear()
+        self.mediator.stations.extend(get_random_stations(2))
         for station in self.mediator.stations:
             station.draw(self.screen)
 
@@ -106,7 +110,8 @@ class TestGraph(BaseTestCase):
         )
 
     def test_bfs_five_stations(self) -> None:
-        self.mediator.stations = get_random_stations(5)
+        self.mediator.stations.clear()
+        self.mediator.stations.extend(get_random_stations(5))
         for station in self.mediator.stations:
             station.draw(self.screen)
 
