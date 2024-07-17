@@ -1,8 +1,10 @@
 from collections.abc import Sequence
 from typing import Iterator
 
-from src.config import screen_height, screen_width, station_size
+from src.config import screen_width, station_size
+from src.geometry.point import Point
 from src.geometry.utils import distance
+from src.ui.ui import get_gui_height, get_main_surface_height
 from src.utils import get_random_position, get_random_station_shape
 
 from .metro import Metro
@@ -11,8 +13,8 @@ from .station import Station
 
 def get_random_station() -> Station:
     shape = get_random_station_shape()
-    position = get_random_position(screen_width, screen_height)
-    return Station(shape, position)
+    position = get_random_position(screen_width, round(get_main_surface_height()))
+    return Station(shape, position + Point(0, round(get_gui_height())))
 
 
 def generate_stations(previous: Sequence[Station]) -> Iterator[Station]:

@@ -4,7 +4,7 @@ from typing import Final
 
 import pygame
 
-from src.config import PassengerSpawningConfig, num_stations
+from src.config import PassengerSpawningConfig, num_stations, screen_width
 from src.entity.get_entity import get_random_stations
 from src.entity.metro import Metro
 from src.entity.passenger import Passenger
@@ -13,7 +13,7 @@ from src.entity.station import Station
 from src.geometry.point import Point
 from src.geometry.type import ShapeType
 from src.ui.path_button import PathButton
-from src.ui.ui import UI
+from src.ui.ui import UI, get_gui_height, get_main_surface_height
 
 from .impl import MediatorStatus, PassengerCreator, PassengerSpawning, TravelPlans
 from .passenger_mover import PassengerMover
@@ -26,15 +26,18 @@ class Mediator:
     __slots__ = (
         "_passenger_spawning",
         "num_stations",
-        "ui",
         "stations",
         "metros",
         "passengers",
         "travel_plans",
         "_status",
-        "_passenger_mover",
+        "ui",
         "path_manager",
+        "_passenger_mover",
     )
+
+    _gui_height: Final = get_gui_height()
+    _main_surface_height: Final = get_main_surface_height()
 
     def __init__(self) -> None:
         pygame.font.init()
@@ -102,6 +105,10 @@ class Mediator:
         self._move_passengers()
 
     def render(self, screen: pygame.surface.Surface) -> None:
+        main_surface = screen.subsurface(
+            0, self._gui_height, screen_width, self._main_surface_height
+        )
+        main_surface.fill((180, 180, 120))
         for idx, path in enumerate(self.paths):
             path_order = idx - round(self.path_manager.num_paths / 2)
             path.draw(screen, path_order)

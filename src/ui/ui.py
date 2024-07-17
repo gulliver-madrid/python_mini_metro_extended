@@ -2,10 +2,26 @@ from typing import Sequence
 
 import pygame
 
-from src.config import score_display_coords, score_font_size
+from src.config import (
+    gui_height_proportion,
+    score_display_coords,
+    score_font_size,
+    screen_height,
+)
 from src.entity.path import Path
 from src.geometry.point import Point
 from src.ui.path_button import PathButton, get_path_buttons
+
+_gui_height = screen_height * gui_height_proportion
+_main_surface_height = screen_height - _gui_height
+
+
+def get_gui_height() -> float:
+    return _gui_height
+
+
+def get_main_surface_height() -> float:
+    return _main_surface_height
 
 
 class UI:
@@ -46,7 +62,10 @@ class UI:
         return None
 
     def render(self, screen: pygame.surface.Surface, score: int) -> None:
+        gui_height = get_gui_height()
+        gui = screen.subsurface(0, 0, screen.get_width(), gui_height)
+        gui.fill((220, 220, 220))
         for button in self.buttons:
-            button.draw(screen)
+            button.draw(gui)
         text_surface = self.font.render(f"Score: {score}", True, (0, 0, 0))
-        screen.blit(text_surface, score_display_coords)
+        gui.blit(text_surface, score_display_coords)

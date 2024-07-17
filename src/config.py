@@ -58,6 +58,9 @@ path_button_start_left = 500
 path_button_cross_size = 25
 path_button_cross_width = 5
 
+# gui
+gui_height_proportion = 0.12
+
 # text
 score_font_size = 50
 score_display_coords = (20, 20)
