@@ -1,7 +1,4 @@
-from __future__ import annotations
-
 from collections.abc import Sequence
-from typing import List
 
 from src.entity.metro import Metro
 from src.entity.passenger import Passenger
@@ -14,8 +11,8 @@ from src.mediator.path_finder import find_next_path_for_passenger_at_station
 class PassengerMover:
     def __init__(
         self,
-        paths: List[Path],
-        passengers: List[Passenger],
+        paths: list[Path],
+        passengers: list[Passenger],
         travel_plans: TravelPlans,
         status: MediatorStatus,
     ):
@@ -28,9 +25,9 @@ class PassengerMover:
         current_station = metro.current_station
         assert current_station
 
-        to_remove: List[Passenger] = []
-        from_metro_to_station: List[Passenger] = []
-        from_station_to_metro: List[Passenger] = []
+        to_remove: list[Passenger] = []
+        from_metro_to_station: list[Passenger] = []
+        from_station_to_metro: list[Passenger] = []
 
         # queue
         for passenger in metro.passengers:

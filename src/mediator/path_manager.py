@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 import random
-from typing import Dict, Final, List, Mapping
+from typing import Final, Mapping
 
 from src.config import num_metros, num_paths
 from src.entity.metro import Metro
@@ -39,17 +37,17 @@ class PathManager:
 
     def __init__(
         self,
-        passengers: List[Passenger],
-        stations: List[Station],
+        passengers: list[Passenger],
+        stations: list[Station],
         travel_plans: TravelPlans,
-        metros: List[Metro],
+        metros: list[Metro],
         status: MediatorStatus,
         ui: UI,
     ):
-        self.paths: Final[List[Path]] = []
+        self.paths: Final[list[Path]] = []
         self.num_paths: Final[int] = num_paths
         self.passengers: Final = passengers
-        self.path_to_color: Final[Dict[Path, Color]] = {}
+        self.path_to_color: Final[dict[Path, Color]] = {}
         self.path_colors: Final = self._get_initial_path_colors()
         self.metros: Final = metros
         self.num_metros: Final = num_metros
@@ -125,8 +123,8 @@ class PathManager:
                     station_nodes_mapping, station, passenger
                 )
 
-    def _get_initial_path_colors(self) -> Dict[Color, bool]:
-        path_colors: Final[Dict[Color, bool]] = {}
+    def _get_initial_path_colors(self) -> dict[Color, bool]:
+        path_colors: Final[dict[Color, bool]] = {}
         for i in range(num_paths):
             color = hue_to_rgb(i / (num_paths + 1))
             path_colors[color] = False  # not taken
@@ -185,7 +183,7 @@ class PathManager:
         else:
             self.travel_plans[passenger] = TravelPlan([])
 
-    def _get_stations_for_shape_type(self, shape_type: ShapeType) -> List[Station]:
+    def _get_stations_for_shape_type(self, shape_type: ShapeType) -> list[Station]:
         stations = [
             station for station in self.stations if station.shape.type == shape_type
         ]

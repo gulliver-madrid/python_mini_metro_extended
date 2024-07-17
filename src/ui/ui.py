@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Dict, Sequence
+from typing import Sequence
 
 import pygame
 
@@ -20,7 +18,7 @@ class UI:
 
     def init(self, num_paths: int) -> None:
         pygame.font.init()
-        self.path_to_button: Dict[Path, PathButton] = {}
+        self.path_to_button: dict[Path, PathButton] = {}
 
         self.font = pygame.font.SysFont("arial", score_font_size)
         self.path_buttons: Sequence[PathButton] = get_path_buttons(num_paths)

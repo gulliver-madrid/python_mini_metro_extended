@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import pygame
 
 from src.geometry.line import Line

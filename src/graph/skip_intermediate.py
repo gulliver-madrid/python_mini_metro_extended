@@ -1,15 +1,13 @@
-from typing import List
-
 from .node import Node
 
 
-def skip_stations_on_same_path(node_path: List[Node]) -> List[Node]:
+def skip_stations_on_same_path(node_path: list[Node]) -> list[Node]:
     assert len(node_path) >= 2
 
     if len(node_path) == 2:
         return node_path
 
-    nodes_to_remove: List[Node] = []
+    nodes_to_remove: list[Node] = []
     i = 0  # Start of the current segment
     j = 1  # End of the current segment
 

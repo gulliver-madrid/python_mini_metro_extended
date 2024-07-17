@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import List
-
 import pygame
 
 from src.config import passenger_display_buffer, passenger_size
@@ -19,7 +17,7 @@ class Holder(Entity):
         self.shape = shape
         self.capacity = capacity
         self.position: Point
-        self.passengers: List[Passenger] = []
+        self.passengers: list[Passenger] = []
         self.passengers_per_row: int
         self.size: int
 

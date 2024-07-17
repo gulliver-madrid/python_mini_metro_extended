@@ -1,5 +1,4 @@
 import math
-from typing import List
 
 import pygame
 
@@ -22,14 +21,14 @@ class Path(Entity):
     def __init__(self, color: Color) -> None:
         super().__init__(create_new_path_id())
         self.color = color
-        self.stations: List[Station] = []
-        self.metros: List[Metro] = []
+        self.stations: list[Station] = []
+        self.metros: list[Metro] = []
         self.is_looped = False
         self.is_being_created = False
         self.temp_point: Point | None = None
-        self.segments: List[Segment] = []
-        self.path_segments: List[PathSegment] = []
-        self.padding_segments: List[PaddingSegment] = []
+        self.segments: list[Segment] = []
+        self.path_segments: list[PathSegment] = []
+        self.padding_segments: list[PaddingSegment] = []
         self.path_order = 0
 
     def __repr__(self) -> str:

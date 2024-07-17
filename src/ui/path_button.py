@@ -1,5 +1,3 @@
-from typing import List
-
 import pygame
 
 from src.config import (
@@ -53,8 +51,8 @@ class PathButton(Button):
             self.cross.draw(surface, self.position)
 
 
-def get_path_buttons(num: int) -> List[PathButton]:
-    path_buttons: List[PathButton] = []
+def get_path_buttons(num: int) -> list[PathButton]:
+    path_buttons: list[PathButton] = []
     for i in range(num):
         position = (
             Point(path_button_start_left, path_button_dist_to_bottom)

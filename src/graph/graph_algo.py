@@ -1,5 +1,4 @@
 from collections.abc import Sequence
-from typing import Dict, List
 
 from src.entity.path import Path
 from src.entity.station import Station
@@ -8,10 +7,10 @@ from src.graph.node import Node
 
 def build_station_nodes_dict(
     stations: Sequence[Station], paths: Sequence[Path]
-) -> Dict[Station, Node]:
-    station_nodes: List[Node] = []
-    connections: List[List[Node]] = []
-    station_nodes_dict: Dict[Station, Node] = {}
+) -> dict[Station, Node]:
+    station_nodes: list[Node] = []
+    connections: list[list[Node]] = []
+    station_nodes_dict: dict[Station, Node] = {}
 
     for station in stations:
         node = Node(station)
@@ -20,7 +19,7 @@ def build_station_nodes_dict(
     for path in paths:
         if path.is_being_created:
             continue
-        connection: List[Node] = []
+        connection: list[Node] = []
         for station in path.stations:
             station_nodes_dict[station].paths.add(path)
             connection.append(station_nodes_dict[station])
@@ -43,7 +42,7 @@ def build_station_nodes_dict(
     return station_nodes_dict
 
 
-def bfs(start: Node, end: Node) -> List[Node]:
+def bfs(start: Node, end: Node) -> list[Node]:
     # Create a queue and enqueue the start node\
     queue = [(start, [start])]
 

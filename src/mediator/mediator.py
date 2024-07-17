@@ -1,8 +1,6 @@
-from __future__ import annotations
-
 import pprint
 import sys
-from typing import Final, List
+from typing import Final
 
 import pygame
 
@@ -49,8 +47,8 @@ class Mediator:
 
         # entities
         self.stations: Final = get_random_stations(self.num_stations)
-        self.metros: Final[List[Metro]] = []
-        self.passengers: Final[List[Passenger]] = []
+        self.metros: Final[list[Metro]] = []
+        self.passengers: Final[list[Passenger]] = []
 
         # status
         self.travel_plans: Final[TravelPlans] = {}
@@ -121,7 +119,7 @@ class Mediator:
         sys.exit()
 
     @property
-    def paths(self) -> List[Path]:
+    def paths(self) -> list[Path]:
         return self.path_manager.paths
 
     @property
@@ -142,8 +140,8 @@ class Mediator:
             station.add_passenger(passenger)
             self.passengers.append(passenger)
 
-    def _get_station_shape_types(self) -> List[ShapeType]:
-        station_shape_types: List[ShapeType] = []
+    def _get_station_shape_types(self) -> list[ShapeType]:
+        station_shape_types: list[ShapeType] = []
         for station in self.stations:
             if station.shape.type not in station_shape_types:
                 station_shape_types.append(station.shape.type)

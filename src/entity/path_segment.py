@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from src.config import path_order_shift, path_width
 from src.geometry.line import Line
 from src.geometry.utils import direction

@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Iterator, List
+from typing import Iterator
 
 from src.config import screen_height, screen_width, station_size
 from src.geometry.utils import distance
@@ -26,16 +26,16 @@ def generate_stations(previous: Sequence[Station]) -> Iterator[Station]:
             yield new_station
 
 
-def get_random_stations(num: int) -> List[Station]:
-    stations: List[Station] = []
+def get_random_stations(num: int) -> list[Station]:
+    stations: list[Station] = []
     generator = generate_stations(stations)
     for _ in range(num):
         stations.append(next(generator))
     return stations
 
 
-def get_metros(num: int) -> List[Metro]:
-    metros: List[Metro] = []
+def get_metros(num: int) -> list[Metro]:
+    metros: list[Metro] = []
     for _ in range(num):
         metros.append(Metro())
     return metros
