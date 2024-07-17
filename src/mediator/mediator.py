@@ -38,9 +38,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 class PathManager:
     __slots__ = (
-        "_passenger_spawning",
         "num_paths",
-        "num_stations",
         "ui",
         "metros",
         "num_metros",
@@ -52,15 +50,12 @@ class PathManager:
         "path_being_created",
         "travel_plans",
         "_status",
-        "_passenger_mover",
-        "path_manager",
     )
 
     def __init__(
         self,
         paths: List[Path],
         num_paths: int,
-        path_to_color: Dict[Path, Color],
         passengers: List[Passenger],
         stations: List[Station],
         travel_plans: TravelPlans,
@@ -70,7 +65,7 @@ class PathManager:
     ):
         self.paths: Final = paths
         self.num_paths: Final[int] = num_paths
-        self.path_to_color: Dict[Path, Color] = path_to_color
+        self.path_to_color: Final[Dict[Path, Color]] = {}
         self.passengers: Final[List[Passenger]] = passengers
         self.path_colors: Dict[Color, bool] = {}
         for i in range(num_paths):
@@ -228,7 +223,6 @@ class Mediator:
         "metros",
         "paths",
         "passengers",
-        "path_to_color",
         "travel_plans",
         "_status",
         "_passenger_mover",
@@ -253,7 +247,6 @@ class Mediator:
         self.metros: Final[List[Metro]] = []
         self.paths: Final[List[Path]] = []
         self.passengers: Final[List[Passenger]] = []
-        self.path_to_color: Dict[Path, Color] = {}
 
         # status
         self.travel_plans: Final[TravelPlans] = {}
@@ -267,7 +260,6 @@ class Mediator:
         self.path_manager = PathManager(
             self.paths,
             self.num_paths,
-            self.path_to_color,
             self.passengers,
             self.stations,
             self.travel_plans,
