@@ -16,6 +16,7 @@ def main() -> None:
     # game constants initialization
     screen = pygame.display.set_mode((screen_width, screen_height), flags, vsync=1)
     clock = pygame.time.Clock()
+    pygame.display.set_caption("Python Minimetro")
 
     mediator = Mediator()
     reactor = UI_Reactor(mediator)
