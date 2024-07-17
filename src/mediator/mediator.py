@@ -54,8 +54,6 @@ class PathManager:
 
     def __init__(
         self,
-        paths: List[Path],
-        num_paths: int,
         passengers: List[Passenger],
         stations: List[Station],
         travel_plans: TravelPlans,
@@ -63,7 +61,7 @@ class PathManager:
         status: MediatorStatus,
         ui: UI,
     ):
-        self.paths: Final = paths
+        self.paths: Final[List[Path]] = []
         self.num_paths: Final[int] = num_paths
         self.path_to_color: Final[Dict[Path, Color]] = {}
         self.passengers: Final[List[Passenger]] = passengers
@@ -216,12 +214,10 @@ class PathManager:
 class Mediator:
     __slots__ = (
         "_passenger_spawning",
-        "num_paths",
         "num_stations",
         "ui",
         "stations",
         "metros",
-        "paths",
         "passengers",
         "travel_plans",
         "_status",
@@ -236,30 +232,23 @@ class Mediator:
         self._passenger_spawning = PassengerSpawning(
             PassengerSpawningConfig.start_step, PassengerSpawningConfig.interval_step
         )
-        self.num_paths: Final[int] = num_paths
         self.num_stations: int = num_stations
-
-        # UI
-        self.ui = UI(self.num_paths)
 
         # entities
         self.stations: Final = get_random_stations(self.num_stations)
         self.metros: Final[List[Metro]] = []
-        self.paths: Final[List[Path]] = []
+
         self.passengers: Final[List[Passenger]] = []
 
         # status
         self.travel_plans: Final[TravelPlans] = {}
         self._status: Final = MediatorStatus(PassengerSpawningConfig.interval_step)
 
-        # passenger mover
-        self._passenger_mover = PassengerMover(
-            self.paths, self.passengers, self.travel_plans, self._status
-        )
+        # UI
+        self.ui = UI()
 
+        # delegated classes
         self.path_manager = PathManager(
-            self.paths,
-            self.num_paths,
             self.passengers,
             self.stations,
             self.travel_plans,
@@ -267,6 +256,11 @@ class Mediator:
             self._status,
             self.ui,
         )
+        self._passenger_mover = PassengerMover(
+            self.path_manager.paths, self.passengers, self.travel_plans, self._status
+        )
+
+        self.ui.init(self.path_manager.num_paths)
 
     ######################
     ### public methods ###
@@ -299,7 +293,7 @@ class Mediator:
 
     def render(self, screen: pygame.surface.Surface) -> None:
         for idx, path in enumerate(self.paths):
-            path_order = idx - round(self.num_paths / 2)
+            path_order = idx - round(self.path_manager.num_paths / 2)
             path.draw(screen, path_order)
         for station in self.stations:
             station.draw(screen)
@@ -313,6 +307,10 @@ class Mediator:
     def exit(self) -> None:
         pygame.quit()
         sys.exit()
+
+    @property
+    def paths(self) -> List[Path]:
+        return self.path_manager.paths
 
     @property
     def is_creating_path(self) -> bool:

@@ -18,14 +18,13 @@ class UI:
         "font",
     )
 
-    def __init__(self, num_paths: int) -> None:
+    def init(self, num_paths: int) -> None:
         pygame.font.init()
-
-        # UI
-        self.path_buttons: Sequence[PathButton] = get_path_buttons(num_paths)
         self.path_to_button: Dict[Path, PathButton] = {}
-        self.buttons = [*self.path_buttons]
+
         self.font = pygame.font.SysFont("arial", score_font_size)
+        self.path_buttons: Sequence[PathButton] = get_path_buttons(num_paths)
+        self.buttons = [*self.path_buttons]
 
     def assign_paths_to_buttons(self, paths: Sequence[Path]) -> None:
         for path_button in self.path_buttons:
