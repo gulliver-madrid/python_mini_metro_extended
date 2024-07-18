@@ -1,3 +1,7 @@
+import random
+import sys
+
+import numpy as np
 import pygame
 
 from src.config import Config, framerate, screen_color
@@ -7,16 +11,24 @@ from src.reactor import UI_Reactor
 
 
 def main() -> None:
-    # init
     pygame.init()
 
-    # settings
     flags = pygame.SCALED
-
-    # game constants initialization
     screen = pygame.display.set_mode(
         (Config.screen_width, Config.screen_height), flags, vsync=1
     )
+
+    args = sys.argv[1:]
+    if args:
+        assert len(args) == 1
+        seed = int(args[0])
+        assert 0 <= seed <= 999
+    else:
+        seed = random.randint(0, 999)
+    print(f"Random seed: {seed}")
+    random.seed(seed)
+    np.random.seed(seed)
+
     clock = pygame.time.Clock()
     pygame.display.set_caption("Python Minimetro")
 
