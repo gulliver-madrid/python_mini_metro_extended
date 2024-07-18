@@ -95,6 +95,11 @@ class PathManager:
         else:
             self.abort_path_creation()
 
+    def end_path_on_last_station(self) -> None:
+        assert self.path_being_created is not None
+        last = self.path_being_created.path.stations[-1]
+        self.end_path_on_station(last)
+
     def abort_path_creation(self) -> None:
         assert self.path_being_created is not None
         self._status.is_creating_path = False

@@ -76,7 +76,7 @@ class UI_Reactor:
             if isinstance(entity, Station):
                 self.mediator.path_manager.end_path_on_station(entity)
             else:
-                self.mediator.path_manager.abort_path_creation()
+                self.mediator.path_manager.end_path_on_last_station()
         elif isinstance(entity, PathButton) and entity.path:
             self.mediator.path_manager.remove_path(entity.path)
 
