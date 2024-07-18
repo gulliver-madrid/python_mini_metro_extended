@@ -35,7 +35,7 @@ class PassengerSpawningConfig:
 
 
 # metro
-num_metros = 6
+max_num_metros = 6
 metro_size = 30
 metro_color = (200, 200, 200)
 metro_capacity = 6
@@ -43,7 +43,7 @@ metro_speed_per_ms = 150 / 1000  # pixels / ms
 metro_passengers_per_row = 3
 
 # path
-num_paths = 5
+max_num_paths = 5
 path_width = 10
 path_order_shift = 10
 

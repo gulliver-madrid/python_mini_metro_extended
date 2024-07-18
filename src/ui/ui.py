@@ -35,13 +35,13 @@ class UI:
         "clock",
     )
 
-    def init(self, num_paths: int) -> None:
+    def init(self, max_num_paths: int) -> None:
         pygame.font.init()
         self.path_to_button: dict[Path, PathButton] = {}
 
         self.font = pygame.font.SysFont("arial", score_font_size)
         self.small_font = pygame.font.SysFont("arial", 18)
-        self.path_buttons: Sequence[PathButton] = get_path_buttons(num_paths)
+        self.path_buttons: Sequence[PathButton] = get_path_buttons(max_num_paths)
         self.buttons = [*self.path_buttons]
         self.last_pos: Point | None = None
         self.clock: pygame.time.Clock | None = None

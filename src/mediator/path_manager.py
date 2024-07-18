@@ -1,7 +1,7 @@
 import random
 from typing import Final, Mapping
 
-from src.config import num_metros, num_paths
+from src.config import max_num_metros, max_num_paths
 from src.entity.metro import Metro
 from src.entity.passenger import Passenger
 from src.entity.path import Path
@@ -22,12 +22,12 @@ from .path_finder import find_next_path_for_passenger_at_station
 class PathManager:
     __slots__ = (
         "paths",
-        "num_paths",
+        "max_num_paths",
         "passengers",
         "path_colors",
         "path_to_color",
         "metros",
-        "num_metros",
+        "max_num_metros",
         "stations",
         "travel_plans",
         "ui",
@@ -45,12 +45,12 @@ class PathManager:
         ui: UI,
     ):
         self.paths: Final[list[Path]] = []
-        self.num_paths: Final[int] = num_paths
+        self.max_num_paths: Final[int] = max_num_paths
         self.passengers: Final = passengers
         self.path_to_color: Final[dict[Path, Color]] = {}
         self.path_colors: Final = self._get_initial_path_colors()
         self.metros: Final = metros
-        self.num_metros: Final = num_metros
+        self.max_num_metros: Final = max_num_metros
         self.stations: Final = stations
         self.travel_plans: Final = travel_plans
         self.ui: Final = ui
@@ -58,7 +58,7 @@ class PathManager:
         self._status: Final = status
 
     def start_path_on_station(self, station: Station) -> None:
-        if len(self.paths) >= self.num_paths:
+        if len(self.paths) >= self.max_num_paths:
             return
         self._status.is_creating_path = True
         assigned_color = (0, 0, 0)
@@ -125,8 +125,8 @@ class PathManager:
 
     def _get_initial_path_colors(self) -> dict[Color, bool]:
         path_colors: Final[dict[Color, bool]] = {}
-        for i in range(num_paths):
-            color = hue_to_rgb(i / (num_paths + 1))
+        for i in range(max_num_paths):
+            color = hue_to_rgb(i / (max_num_paths + 1))
             path_colors[color] = False  # not taken
         return path_colors
 
@@ -135,7 +135,7 @@ class PathManager:
         self._status.is_creating_path = False
         self.path_being_created.path.is_being_created = False
         self.path_being_created.path.remove_temporary_point()
-        if len(self.metros) < self.num_metros:
+        if len(self.metros) < self.max_num_metros:
             metro = Metro()
             self.path_being_created.path.add_metro(metro)
             self.metros.append(metro)

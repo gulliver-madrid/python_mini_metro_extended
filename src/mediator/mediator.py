@@ -78,7 +78,7 @@ class Mediator:
             self.path_manager.paths, self.passengers, self.travel_plans, self._status
         )
 
-        self.ui.init(self.path_manager.num_paths)
+        self.ui.init(self.path_manager.max_num_paths)
 
     ######################
     ### public methods ###
@@ -118,7 +118,7 @@ class Mediator:
         )
         main_surface.fill((180, 180, 120))
         for idx, path in enumerate(self.paths):
-            path_order = idx - round(self.path_manager.num_paths / 2)
+            path_order = idx - round(self.path_manager.max_num_paths / 2)
             path.draw(screen, path_order)
         for station in self.stations:
             station.draw(screen)
