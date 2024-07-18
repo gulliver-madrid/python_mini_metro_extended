@@ -56,20 +56,22 @@ class DebugRenderer:
     bg_color: Final = (0, 0, 0)
     size: Final = (300, 200)
 
+    def __init__(self) -> None:
+        self._debug_surf = pygame.Surface(self.size)
+
     def draw_debug(self, screen: pygame.surface.Surface, ui: UI, speed: float) -> None:
         font = ui.small_font
         mouse_pos = ui.last_pos
         fps = ui.clock.get_fps() if ui.clock else None
-        debug_surf = pygame.Surface(self.size)
-        debug_surf.set_alpha(180)
-        debug_surf.fill(self.bg_color)
+        self._debug_surf.set_alpha(180)
+        self._debug_surf.fill(self.bg_color)
 
         debug_texts = self._define_debug_texts(mouse_pos, fps, game_speed=speed)
 
-        self._draw_debug_texts(debug_surf, debug_texts, font, self.fg_color)
+        self._draw_debug_texts(debug_texts, font, self.fg_color)
 
         screen.blit(
-            debug_surf,
+            self._debug_surf,
             (Config.screen_width - self.size[0], Config.screen_height - self.size[1]),
         )
 
@@ -86,11 +88,10 @@ class DebugRenderer:
 
     def _draw_debug_texts(
         self,
-        debug_surf: pygame.surface.Surface,
         debug_texts: list[str],
         font: pygame.font.Font,
         fg_color: tuple[int, int, int],
     ) -> None:
         for i, text in enumerate(debug_texts):
             debug_label = font.render(text, True, fg_color)
-            debug_surf.blit(debug_label, (10, 10 + i * 30))
+            self._debug_surf.blit(debug_label, (10, 10 + i * 30))
