@@ -47,6 +47,8 @@ class UI_Reactor:
                 self.mediator.toggle_pause()
             elif event.key == pygame.K_ESCAPE:
                 self.mediator.exit()
+            elif event.key == pygame.K_d:
+                self.mediator.showing_debug = not self.mediator.showing_debug
 
     def _on_mouse_motion(
         self, entity: Station | PathButton | None, position: Point

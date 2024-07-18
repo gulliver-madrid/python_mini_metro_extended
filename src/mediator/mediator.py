@@ -39,6 +39,7 @@ class Mediator:
         "ui",
         "path_manager",
         "_passenger_mover",
+        "showing_debug",
     )
 
     _gui_height: Final = get_gui_height()
@@ -61,7 +62,7 @@ class Mediator:
         # status
         self.travel_plans: Final[TravelPlans] = {}
         self._status: Final = MediatorStatus(PassengerSpawningConfig.interval_step)
-
+        self.showing_debug = False
         # UI
         self.ui = UI()
 
@@ -126,7 +127,8 @@ class Mediator:
             metro.draw(screen)
         self.ui.render(screen, self._status.score)
         fps = self.ui.clock.get_fps() if self.ui.clock else None
-        draw_debug(screen, self.ui.small_font, self.ui.last_pos, fps)
+        if self.showing_debug:
+            draw_debug(screen, self.ui.small_font, self.ui.last_pos, fps)
 
     def toggle_pause(self) -> None:
         self._status.is_paused = not self._status.is_paused
