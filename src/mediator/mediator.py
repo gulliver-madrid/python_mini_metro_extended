@@ -209,8 +209,7 @@ class GameRenderer:
             metro.draw(screen)
         ui.render(screen, score)
         if showing_debug:
-            fps = ui.clock.get_fps() if ui.clock else None
-            self._draw_debug(screen, ui.small_font, ui.last_pos, fps, speed=game_speed)
+            self._draw_debug(screen, ui, game_speed)
 
     def _draw_paths(
         self, screen: pygame.surface.Surface, paths: Sequence[Path], max_num_paths: int
@@ -219,15 +218,10 @@ class GameRenderer:
             path_order = idx - round(max_num_paths / 2)
             path.draw(screen, path_order)
 
-    def _draw_debug(
-        self,
-        screen: pygame.surface.Surface,
-        font: pygame.font.Font,
-        mouse_pos: Point | None,
-        fps: float | None,
-        *,
-        speed: float = 1.0,
-    ) -> None:
+    def _draw_debug(self, screen: pygame.surface.Surface, ui: UI, speed: float) -> None:
+        font = ui.small_font
+        mouse_pos = ui.last_pos
+        fps = ui.clock.get_fps() if ui.clock else None
         fg_color = (255, 255, 255)
         bg_color = (0, 0, 0)
         size = (300, 200)
