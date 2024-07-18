@@ -136,13 +136,13 @@ class TestGameplay(BaseTestCase):
         self.assertFalse(self.mediator.paths[0].is_looped)
 
     def test_space_key_pauses_and_unpauses_game(self) -> None:
-        self.reactor.react(KeyboardEvent(KeyboardEventType.KEY_UP, pygame.K_SPACE))
+        self.reactor.react(KeyboardEvent(KeyboardEventType.KEY_DOWN, pygame.K_SPACE))
 
         self.assertTrue(
             self.mediator._status.is_paused  # pyright: ignore [reportPrivateUsage]
         )
 
-        self.reactor.react(KeyboardEvent(KeyboardEventType.KEY_UP, pygame.K_SPACE))
+        self.reactor.react(KeyboardEvent(KeyboardEventType.KEY_DOWN, pygame.K_SPACE))
 
         self.assertFalse(
             self.mediator._status.is_paused  # pyright: ignore [reportPrivateUsage]

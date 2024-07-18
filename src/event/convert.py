@@ -19,4 +19,6 @@ def convert_pygame_event(event: pygame.event.Event) -> Event | None:
         return MouseEvent(MouseEventType.MOUSE_MOTION, mouse_position)
     elif event.type == pygame.KEYUP:
         return KeyboardEvent(KeyboardEventType.KEY_UP, event.key)
+    elif event.type == pygame.KEYDOWN:
+        return KeyboardEvent(KeyboardEventType.KEY_DOWN, event.key)
     return None

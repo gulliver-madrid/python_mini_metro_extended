@@ -42,7 +42,7 @@ class UI_Reactor:
             self._on_mouse_motion(entity, event.position)
 
     def _on_keyboard_event(self, event: KeyboardEvent) -> None:
-        if event.event_type == KeyboardEventType.KEY_UP:
+        if event.event_type == KeyboardEventType.KEY_DOWN:
             if event.key == pygame.K_SPACE:
                 self.mediator.toggle_pause()
             elif event.key == pygame.K_ESCAPE:
