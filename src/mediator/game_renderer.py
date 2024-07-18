@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from typing import Final
 
 import pygame
 
@@ -6,10 +7,14 @@ from src.config import Config
 from src.entity.metro import Metro
 from src.entity.path import Path
 from src.entity.station import Station
+from src.geometry.point import Point
 from src.ui.ui import UI
 
 
 class GameRenderer:
+    def __init__(self) -> None:
+        self.debug_renderer = DebugRenderer()
+
     def render_game(
         self,
         screen: pygame.surface.Surface,
@@ -36,7 +41,7 @@ class GameRenderer:
             metro.draw(screen)
         ui.render(screen, score)
         if showing_debug:
-            self._draw_debug(screen, ui, game_speed)
+            self.debug_renderer.draw_debug(screen, ui, game_speed)
 
     def _draw_paths(
         self, screen: pygame.surface.Surface, paths: Sequence[Path], max_num_paths: int
@@ -45,29 +50,39 @@ class GameRenderer:
             path_order = idx - round(max_num_paths / 2)
             path.draw(screen, path_order)
 
-    def _draw_debug(self, screen: pygame.surface.Surface, ui: UI, speed: float) -> None:
+
+class DebugRenderer:
+    fg_color: Final = (255, 255, 255)
+    bg_color: Final = (0, 0, 0)
+    size: Final = (300, 200)
+
+    def draw_debug(self, screen: pygame.surface.Surface, ui: UI, speed: float) -> None:
         font = ui.small_font
         mouse_pos = ui.last_pos
         fps = ui.clock.get_fps() if ui.clock else None
-        fg_color = (255, 255, 255)
-        bg_color = (0, 0, 0)
-        size = (300, 200)
-        debug_surf = pygame.Surface(size)
+        debug_surf = pygame.Surface(self.size)
         debug_surf.set_alpha(180)
-        debug_surf.fill(bg_color)
+        debug_surf.fill(self.bg_color)
 
+        debug_texts = self._define_debug_texts(mouse_pos, fps, game_speed=speed)
+
+        self._draw_debug_texts(debug_surf, debug_texts, font, self.fg_color)
+
+        screen.blit(
+            debug_surf,
+            (Config.screen_width - self.size[0], Config.screen_height - self.size[1]),
+        )
+
+    def _define_debug_texts(
+        self, mouse_pos: Point | None, fps: float | None, *, game_speed: float
+    ) -> list[str]:
         debug_texts: list[str] = []
         if mouse_pos:
             debug_texts.append(f"Mouse position: {mouse_pos.to_tuple()}")
         if fps:
             debug_texts.append(f"FPS: {fps:.2f}")
-        debug_texts.append(f"Game speed: {speed:.2f}")
-
-        self._draw_debug_texts(debug_surf, debug_texts, font, fg_color)
-
-        screen.blit(
-            debug_surf, (Config.screen_width - size[0], Config.screen_height - size[1])
-        )
+        debug_texts.append(f"Game speed: {game_speed:.2f}")
+        return debug_texts
 
     def _draw_debug_texts(
         self,
