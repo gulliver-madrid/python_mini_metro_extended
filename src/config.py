@@ -6,8 +6,6 @@ from src.geometry.type import ShapeType
 framerate = 60
 
 # screen
-screen_width = 1600
-screen_height = 840
 screen_color = (255, 255, 255)
 
 # station
@@ -71,6 +69,9 @@ _padding_segments_color: tuple[int, int, int] | None = None
 
 
 class Config:
+    # screen
+    screen_width = 1600
+    screen_height = 840
     # components
     passenger_spawning = _PassengerSpawningConfig
     # debug

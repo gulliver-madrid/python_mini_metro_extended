@@ -4,7 +4,7 @@ from unittest.mock import Mock, create_autospec, patch
 
 import pygame
 
-from src.config import screen_height, screen_width
+from src.config import Config
 from src.entity.get_entity import get_random_stations
 from src.event.keyboard import KeyboardEvent
 from src.event.mouse import MouseEvent
@@ -21,7 +21,7 @@ from test.base_test import BaseTestCase
 class TestGameplay(BaseTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.width, self.height = screen_width, screen_height
+        self.width, self.height = Config.screen_width, Config.screen_height
         self.screen = create_autospec(pygame.surface.Surface)
         self.position = get_random_position(self.width, self.height)
         self.color = get_random_color()

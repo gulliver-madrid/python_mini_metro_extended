@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from typing import Iterator
 
-from src.config import screen_width, station_size
+from src.config import Config, station_size
 from src.geometry.point import Point
 from src.geometry.utils import distance
 from src.ui.ui import get_gui_height, get_main_surface_height
@@ -13,7 +13,9 @@ from .station import Station
 
 def get_random_station() -> Station:
     shape = get_random_station_shape()
-    position = get_random_position(screen_width, round(get_main_surface_height()))
+    position = get_random_position(
+        Config.screen_width, round(get_main_surface_height())
+    )
     return Station(shape, position + Point(0, round(get_gui_height())))
 
 

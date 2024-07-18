@@ -2,7 +2,7 @@ from collections.abc import Sequence
 
 import pygame
 
-from src.config import screen_height, screen_width
+from src.config import Config
 from src.entity.metro import Metro
 from src.entity.path import Path
 from src.entity.station import Station
@@ -26,7 +26,7 @@ class GameRenderer:
         game_speed: float,
     ) -> None:
         main_surface = screen.subsurface(
-            0, gui_height, screen_width, main_surface_height
+            0, gui_height, Config.screen_width, main_surface_height
         )
         main_surface.fill((180, 180, 120))
         self._draw_paths(screen, paths, max_num_paths)
@@ -65,7 +65,9 @@ class GameRenderer:
 
         self._draw_debug_texts(debug_surf, debug_texts, font, fg_color)
 
-        screen.blit(debug_surf, (screen_width - size[0], screen_height - size[1]))
+        screen.blit(
+            debug_surf, (Config.screen_width - size[0], Config.screen_height - size[1])
+        )
 
     def _draw_debug_texts(
         self,

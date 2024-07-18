@@ -3,17 +3,17 @@ from typing import Sequence
 import pygame
 
 from src.config import (
+    Config,
     gui_height_proportion,
     score_display_coords,
     score_font_size,
-    screen_height,
 )
 from src.entity.path import Path
 from src.geometry.point import Point
 from src.ui.path_button import PathButton, get_path_buttons
 
-_gui_height = screen_height * gui_height_proportion
-_main_surface_height = screen_height - _gui_height
+_gui_height = Config.screen_height * gui_height_proportion
+_main_surface_height = Config.screen_height - _gui_height
 
 
 def get_gui_height() -> float:

@@ -1,6 +1,6 @@
 import pygame
 
-from src.config import framerate, screen_color, screen_height, screen_width
+from src.config import Config, framerate, screen_color
 from src.event.convert import convert_pygame_event
 from src.mediator.mediator import Mediator
 from src.reactor import UI_Reactor
@@ -14,7 +14,9 @@ def main() -> None:
     flags = pygame.SCALED
 
     # game constants initialization
-    screen = pygame.display.set_mode((screen_width, screen_height), flags, vsync=1)
+    screen = pygame.display.set_mode(
+        (Config.screen_width, Config.screen_height), flags, vsync=1
+    )
     clock = pygame.time.Clock()
     pygame.display.set_caption("Python Minimetro")
 
