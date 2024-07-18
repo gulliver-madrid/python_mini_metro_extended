@@ -19,6 +19,7 @@ def main() -> None:
     pygame.display.set_caption("Python Minimetro")
 
     mediator = Mediator()
+    mediator.set_clock(clock)
     reactor = UI_Reactor(mediator)
 
     while True:

@@ -51,6 +51,7 @@ class UI_Reactor:
     def _on_mouse_motion(
         self, entity: Station | PathButton | None, position: Point
     ) -> None:
+        self.mediator.ui.last_pos = position
         if self.is_mouse_down:
             self._on_mouse_motion_with_mouse_down(entity, position)
         elif isinstance(entity, Button):

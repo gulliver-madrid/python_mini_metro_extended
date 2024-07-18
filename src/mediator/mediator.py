@@ -4,7 +4,12 @@ from typing import Final
 
 import pygame
 
-from src.config import PassengerSpawningConfig, num_stations, screen_width
+from src.config import (
+    PassengerSpawningConfig,
+    num_stations,
+    screen_height,
+    screen_width,
+)
 from src.entity.get_entity import get_random_stations
 from src.entity.metro import Metro
 from src.entity.passenger import Passenger
@@ -79,6 +84,9 @@ class Mediator:
     ### public methods ###
     ######################
 
+    def set_clock(self, clock: pygame.time.Clock) -> None:
+        self.ui.clock = clock
+
     def get_containing_entity(self, position: Point) -> Station | PathButton | None:
         for station in self.stations:
             if station.contains(position):
@@ -117,6 +125,8 @@ class Mediator:
         for metro in self.metros:
             metro.draw(screen)
         self.ui.render(screen, self._status.score)
+        fps = self.ui.clock.get_fps() if self.ui.clock else None
+        draw_debug(screen, self.ui.small_font, self.ui.last_pos, fps)
 
     def toggle_pause(self) -> None:
         self._status.is_paused = not self._status.is_paused
@@ -164,3 +174,29 @@ class Mediator:
                 continue
 
             self._passenger_mover.move_passengers(metro)
+
+
+def draw_debug(
+    screen: pygame.surface.Surface,
+    font: pygame.font.Font,
+    mouse_pos: Point | None,
+    fps: float | None,
+) -> None:
+    fg_color = (255, 255, 255)
+    bg_color = (0, 0, 0)
+    size = (300, 200)
+    debug_surf = pygame.Surface(size)
+    debug_surf.set_alpha(180)
+    debug_surf.fill(bg_color)
+
+    debug_texts: list[str] = []
+    if mouse_pos:
+        debug_texts.append(f"Mouse position: {mouse_pos.to_tuple()}")
+    if fps:
+        debug_texts.append(f"FPS: {fps:.2f}")
+
+    for i, text in enumerate(debug_texts):
+        debug_label = font.render(text, True, fg_color)
+        debug_surf.blit(debug_label, (10, 10 + i * 30))
+
+    screen.blit(debug_surf, (screen_width - size[0], screen_height - size[1]))
