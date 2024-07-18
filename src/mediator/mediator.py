@@ -40,6 +40,7 @@ class Mediator:
         "path_manager",
         "_passenger_mover",
         "showing_debug",
+        "game_speed",
     )
 
     _gui_height: Final = get_gui_height()
@@ -63,6 +64,7 @@ class Mediator:
         self.travel_plans: Final[TravelPlans] = {}
         self._status: Final = MediatorStatus(PassengerSpawningConfig.interval_step)
         self.showing_debug = False
+        self.game_speed = 1
         # UI
         self.ui = UI()
 
@@ -98,7 +100,8 @@ class Mediator:
         if self._status.is_paused:
             return
 
-        self._status.increment_time(dt_ms)
+        dt_ms = dt_ms * self.game_speed
+        self._status.increment_time(dt_ms, self.game_speed)
 
         # move metros
         for path in self.paths:
@@ -128,7 +131,9 @@ class Mediator:
         self.ui.render(screen, self._status.score)
         fps = self.ui.clock.get_fps() if self.ui.clock else None
         if self.showing_debug:
-            draw_debug(screen, self.ui.small_font, self.ui.last_pos, fps)
+            draw_debug(
+                screen, self.ui.small_font, self.ui.last_pos, fps, speed=self.game_speed
+            )
 
     def toggle_pause(self) -> None:
         self._status.is_paused = not self._status.is_paused
@@ -183,6 +188,8 @@ def draw_debug(
     font: pygame.font.Font,
     mouse_pos: Point | None,
     fps: float | None,
+    *,
+    speed: float = 1.0,
 ) -> None:
     fg_color = (255, 255, 255)
     bg_color = (0, 0, 0)
@@ -196,6 +203,7 @@ def draw_debug(
         debug_texts.append(f"Mouse position: {mouse_pos.to_tuple()}")
     if fps:
         debug_texts.append(f"FPS: {fps:.2f}")
+    debug_texts.append(f"Game speed: {speed:.2f}")
 
     for i, text in enumerate(debug_texts):
         debug_label = font.render(text, True, fg_color)

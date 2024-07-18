@@ -57,7 +57,7 @@ class PassengerSpawning:
 
     def is_passenger_spawn_time(self, status: MediatorStatus) -> bool:
         return (status.steps == self.step) or (
-            status.steps_since_last_spawn == self.interval_step
+            status.steps_since_last_spawn >= self.interval_step
         )
 
 
@@ -97,15 +97,15 @@ class MediatorStatus:
 
     def __init__(self, passenger_spawning_interval_step: int) -> None:
         self._time_ms: int = 0
-        self.steps: int = 0
-        self.steps_since_last_spawn: int = passenger_spawning_interval_step + 1
+        self.steps: float = 0
+        self.steps_since_last_spawn: float = passenger_spawning_interval_step + 1
         self.is_creating_path: bool = False
         self.is_paused: bool = False
         self.score: int = 0
 
-    def increment_time(self, dt_ms: int) -> None:
+    def increment_time(self, dt_ms: int, game_speed: float) -> None:
         assert not self.is_paused
 
         self._time_ms += dt_ms
-        self.steps += 1
-        self.steps_since_last_spawn += 1
+        self.steps += game_speed
+        self.steps_since_last_spawn += game_speed

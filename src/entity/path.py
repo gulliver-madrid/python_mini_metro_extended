@@ -136,7 +136,7 @@ class Path(Entity):
         radians = math.atan2(direct.top, direct.left)
         degrees = math.degrees(radians)
         metro.shape.set_degrees(degrees)
-        travel_dist_in_dt = metro.speed * dt_ms
+        travel_dist_in_dt = metro.game_speed * dt_ms
         # metro is not at one end of segment
         if dist > travel_dist_in_dt:
             metro.current_station = None

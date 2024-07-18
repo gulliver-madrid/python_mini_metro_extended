@@ -49,6 +49,11 @@ class UI_Reactor:
                 self.mediator.exit()
             elif event.key == pygame.K_d:
                 self.mediator.showing_debug = not self.mediator.showing_debug
+            elif event.key == pygame.K_s:
+                if self.mediator.game_speed == 1:
+                    self.mediator.game_speed = 5
+                else:
+                    self.mediator.game_speed = 1
 
     def _on_mouse_motion(
         self, entity: Station | PathButton | None, position: Point

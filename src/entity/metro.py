@@ -26,7 +26,7 @@ class Metro(Holder):
         self.current_segment: Segment | None = None
         self.current_segment_idx = 0
         self.path_id: EntityId | None = None
-        self.speed = metro_speed_per_ms
+        self.game_speed = metro_speed_per_ms
         self.is_forward = True
         self.passengers_per_row = metro_passengers_per_row
 
