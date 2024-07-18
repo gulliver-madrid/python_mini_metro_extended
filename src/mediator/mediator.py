@@ -4,7 +4,7 @@ from typing import Final
 
 import pygame
 
-from src.config import PassengerSpawningConfig, num_stations
+from src.config import Config, num_stations
 from src.entity.get_entity import get_random_stations
 from src.entity.metro import Metro
 from src.entity.passenger import Passenger
@@ -48,7 +48,8 @@ class Mediator:
 
         # configs
         self._passenger_spawning = PassengerSpawning(
-            PassengerSpawningConfig.start_step, PassengerSpawningConfig.interval_step
+            Config.passenger_spawning.start_step,
+            Config.passenger_spawning.interval_step,
         )
         self.num_stations: int = num_stations
 
@@ -59,7 +60,7 @@ class Mediator:
 
         # status
         self.travel_plans: Final[TravelPlans] = {}
-        self._status: Final = MediatorStatus(PassengerSpawningConfig.interval_step)
+        self._status: Final = MediatorStatus(Config.passenger_spawning.interval_step)
         self.showing_debug = False
         self.game_speed = 1
         # UI

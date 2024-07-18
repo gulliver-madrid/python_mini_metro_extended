@@ -29,7 +29,7 @@ passenger_color = (128, 128, 128)
 passenger_display_buffer = 3 * passenger_size
 
 
-class PassengerSpawningConfig:
+class _PassengerSpawningConfig:
     start_step: Final = 1
     interval_step: Final = 10 * framerate
 
@@ -71,5 +71,8 @@ _padding_segments_color: tuple[int, int, int] | None = None
 
 
 class Config:
+    # components
+    passenger_spawning = _PassengerSpawningConfig
+    # debug
     unfilled_shapes = _unfilled_shapes
     padding_segments_color = _padding_segments_color
