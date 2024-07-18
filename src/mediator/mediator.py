@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 import pprint
 import sys
 from typing import Final
@@ -117,23 +118,19 @@ class Mediator:
         self._move_passengers()
 
     def render(self, screen: pygame.surface.Surface) -> None:
-        main_surface = screen.subsurface(
-            0, self._gui_height, screen_width, self._main_surface_height
+        render_game(
+            screen,
+            gui_height=self._gui_height,
+            main_surface_height=self._main_surface_height,
+            paths=self.paths,
+            max_num_paths=self.path_manager.max_num_paths,
+            stations=self.stations,
+            metros=self.metros,
+            score=self._status.score,
+            ui=self.ui,
+            showing_debug=self.showing_debug,
+            game_speed=self.game_speed,
         )
-        main_surface.fill((180, 180, 120))
-        for idx, path in enumerate(self.paths):
-            path_order = idx - round(self.path_manager.max_num_paths / 2)
-            path.draw(screen, path_order)
-        for station in self.stations:
-            station.draw(screen)
-        for metro in self.metros:
-            metro.draw(screen)
-        self.ui.render(screen, self._status.score)
-        fps = self.ui.clock.get_fps() if self.ui.clock else None
-        if self.showing_debug:
-            draw_debug(
-                screen, self.ui.small_font, self.ui.last_pos, fps, speed=self.game_speed
-            )
 
     def toggle_pause(self) -> None:
         self._status.is_paused = not self._status.is_paused
@@ -181,6 +178,35 @@ class Mediator:
                 continue
 
             self._passenger_mover.move_passengers(metro)
+
+
+def render_game(
+    screen: pygame.surface.Surface,
+    *,
+    gui_height: float,
+    main_surface_height: float,
+    paths: Sequence[Path],
+    max_num_paths: int,
+    stations: Sequence[Station],
+    metros: Sequence[Metro],
+    score: int,
+    ui: UI,
+    showing_debug: bool,
+    game_speed: float,
+) -> None:
+    main_surface = screen.subsurface(0, gui_height, screen_width, main_surface_height)
+    main_surface.fill((180, 180, 120))
+    for idx, path in enumerate(paths):
+        path_order = idx - round(max_num_paths / 2)
+        path.draw(screen, path_order)
+    for station in stations:
+        station.draw(screen)
+    for metro in metros:
+        metro.draw(screen)
+    ui.render(screen, score)
+    fps = ui.clock.get_fps() if ui.clock else None
+    if showing_debug:
+        draw_debug(screen, ui.small_font, ui.last_pos, fps, speed=game_speed)
 
 
 def draw_debug(
