@@ -43,13 +43,12 @@ class PassengerMover:
                 from_station_to_metro.append(passenger)
 
         # process
-        self._remove_passengers(to_remove, metro)
-
-        self._transfer_passengers_between_metro_and_station(
-            metro,
-            current_station,
-            from_metro_to_station=from_metro_to_station,
-            from_station_to_metro=from_station_to_metro,
+        self._remove_passengers_from_metro(to_remove, metro)
+        self._transfer_passengers_from_metro_to_station(
+            metro, current_station, from_metro_to_station
+        )
+        self._transfer_passengers_from_station_to_metro(
+            metro, current_station, from_station_to_metro
         )
 
     # private methods
@@ -63,7 +62,9 @@ class PassengerMover:
         next_path = self._travel_plans[passenger].next_path
         return (next_path is not None) and (next_path.id == metro.path_id)
 
-    def _remove_passengers(self, to_remove: Sequence[Passenger], metro: Metro) -> None:
+    def _remove_passengers_from_metro(
+        self, to_remove: Sequence[Passenger], metro: Metro
+    ) -> None:
         for passenger in to_remove:
             passenger.is_at_destination = True
             metro.remove_passenger(passenger)
@@ -71,18 +72,22 @@ class PassengerMover:
             del self._travel_plans[passenger]
             self._status.score += 1
 
-    def _transfer_passengers_between_metro_and_station(
+    def _transfer_passengers_from_metro_to_station(
         self,
         metro: Metro,
         station: Station,
-        *,
         from_metro_to_station: Sequence[Passenger],
-        from_station_to_metro: Sequence[Passenger],
     ) -> None:
         for passenger in from_metro_to_station:
             if station.has_room():
                 self._move_passenger_to_current_station(passenger, metro)
 
+    def _transfer_passengers_from_station_to_metro(
+        self,
+        metro: Metro,
+        station: Station,
+        from_station_to_metro: Sequence[Passenger],
+    ) -> None:
         for passenger in from_station_to_metro:
             if metro.has_room():
                 station.move_passenger(passenger, metro)
