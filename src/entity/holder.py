@@ -12,14 +12,15 @@ from .passenger import Passenger
 
 
 class Holder(Entity):
+    passengers_per_row: int
+    size: int
+    position: Point
+
     def __init__(self, shape: Shape, capacity: int, id: EntityId) -> None:
         super().__init__(id)
         self.shape = shape
         self.capacity = capacity
-        self.position: Point
         self.passengers: list[Passenger] = []
-        self.passengers_per_row: int
-        self.size: int
 
     def draw(self, surface: pygame.surface.Surface) -> None:
         # draw self
