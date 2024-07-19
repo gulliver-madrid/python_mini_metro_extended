@@ -12,11 +12,12 @@ from src.entity.path import Path
 from src.entity.station import Station
 from src.geometry.point import Point
 from src.geometry.type import ShapeType
-from src.mediator.game_renderer import GameRenderer
 from src.ui.path_button import PathButton
 from src.ui.ui import UI, get_gui_height, get_main_surface_height
 
-from .impl import MediatorStatus, PassengerCreator, PassengerSpawning, TravelPlans
+from .game_renderer import GameRenderer
+from .impl import MediatorStatus, PassengerSpawning, TravelPlans
+from .passenger_creator import PassengerCreator
 from .passenger_mover import PassengerMover
 from .path_manager import PathManager
 

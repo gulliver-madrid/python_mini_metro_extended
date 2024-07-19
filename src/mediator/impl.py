@@ -1,16 +1,11 @@
 from __future__ import annotations
 
-import random
-from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final, Mapping
+from typing import Final
 
-from src.config import passenger_color, passenger_size
 from src.entity.passenger import Passenger
 from src.entity.path import Path
 from src.entity.station import Station
-from src.geometry.type import ShapeType
 from src.travel_plan import TravelPlan
-from src.utils import get_shape_from_type
 
 TravelPlans = dict[Passenger, TravelPlan]
 
@@ -63,26 +58,6 @@ class PassengerSpawning:
 
 def have_same_shape_type(station: Station, passenger: Passenger) -> bool:
     return station.shape.type == passenger.destination_shape.type
-
-
-class PassengerCreator:
-    if TYPE_CHECKING:
-        __slots__ = ("shape_types_to_others",)
-    shape_types_to_others: Final[Mapping[ShapeType, Sequence[ShapeType]]]
-
-    def __init__(self, station_types: Sequence[ShapeType]):
-        self.shape_types_to_others = {
-            shape_type: [x for x in station_types if x != shape_type]
-            for shape_type in set(station_types)
-        }
-
-    def create_passenger(self, station: Station) -> Passenger:
-        other_shape_types = self.shape_types_to_others[station.shape.type]
-        destination_shape_type = random.choice(other_shape_types)
-        destination_shape = get_shape_from_type(
-            destination_shape_type, passenger_color, passenger_size
-        )
-        return Passenger(destination_shape)
 
 
 class MediatorStatus:
