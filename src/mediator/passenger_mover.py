@@ -21,6 +21,8 @@ class PassengerMover:
         self._travel_plans = travel_plans
         self._status = status
 
+    # public methods
+
     def move_passengers(self, metro: Metro) -> None:
         current_station = metro.current_station
         assert current_station
@@ -49,6 +51,8 @@ class PassengerMover:
             from_metro_to_station=from_metro_to_station,
             from_station_to_metro=from_station_to_metro,
         )
+
+    # private methods
 
     def _is_next_planned_station(self, station: Station, passenger: Passenger) -> bool:
         return self._travel_plans[passenger].get_next_station() == station
