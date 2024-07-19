@@ -6,14 +6,13 @@ from src.type import Color
 
 class Cross(Polygon):
     def __init__(self, color: Color, size: int, width: int = 0) -> None:
-        self.size = size
-        size = round(size / 2)  # compensation
+        half_size = round(size / 2)
         if width == 0:
-            self.width = round(2 * size / 3)
+            self.width = round(2 * half_size / 3)
         else:
             self.width = width
         W = self.width
-        L = round(0.5 * (2 * size - W))
+        L = round(0.5 * (2 * half_size - W))
         points = [
             Point(L, 0),
             Point(L + W, 0),
@@ -29,5 +28,5 @@ class Cross(Polygon):
             Point(L, L),
         ]
         for i in range(len(points)):
-            points[i] += Point(-size, -size)
+            points[i] += Point(-half_size, -half_size)
         super().__init__(ShapeType.CROSS, color, points)

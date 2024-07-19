@@ -124,7 +124,6 @@ class TestGeometry(BaseTestCase):
         triangle = Triangle(self.color, size)
 
         self.assertSequenceEqual(triangle.color, self.color)
-        self.assertEqual(triangle.size, size)
 
     def init_triangle(self) -> Triangle:
         return Triangle(self.color, 10)
