@@ -1,10 +1,8 @@
-import code
 import queue
-import threading
-from typing import NoReturn
 
 import pygame
 
+from src.console import Console
 from src.entity.station import Station
 from src.event.event import Event
 from src.event.keyboard import KeyboardEvent
@@ -15,35 +13,17 @@ from src.mediator.mediator import Mediator
 from src.ui.button import Button
 from src.ui.path_button import PathButton
 
-console_queue: queue.Queue[str] = queue.Queue()
-
-
-def console_exit() -> NoReturn:
-    raise SystemExit
-
-
-def open_console(mediator: Mediator) -> None:
-    variables = globals() | {"m": mediator}
-    console = code.InteractiveConsole(variables | {"exit": console_exit})
-    print("Debugging console opened. The game is paused.")
-    print("Use 'print(variable)' to see values. Example: print(score)")
-    print("Type 'exit()' to return to the game.")
-    try:
-        console.interact(banner="")
-    except SystemExit:
-        pass
-    print("Exiting interactive console. Resuming game.")
-    console_queue.put("resume")
-
 
 class UI_Reactor:
     __slots__ = (
         "mediator",
         "is_mouse_down",
+        "_console",
     )
 
     def __init__(self, mediator: Mediator) -> None:
         self.mediator = mediator
+        self._console = Console()
         self.is_mouse_down: bool = False
 
     def react(self, event: Event | None) -> None:
@@ -53,7 +33,7 @@ class UI_Reactor:
             self._on_keyboard_event(event)
         # Process console commands
         try:
-            cmd = console_queue.get_nowait()
+            cmd = self._console.console_queue.get_nowait()
             if cmd == "resume":
                 if self.mediator.is_paused:
                     self.mediator.toggle_pause()
@@ -83,7 +63,7 @@ class UI_Reactor:
             elif event.key == pygame.K_c:
                 if not self.mediator.is_paused:
                     self.mediator.toggle_pause()
-                threading.Thread(target=lambda: open_console(self.mediator)).start()
+                self._console.launch_console(self.mediator)
             elif event.key == pygame.K_d:
                 self.mediator.showing_debug = not self.mediator.showing_debug
             elif event.key == pygame.K_s:
