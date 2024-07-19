@@ -17,6 +17,9 @@ class Passenger(Entity):
     def __repr__(self) -> str:
         return f"{self.id}-{self.destination_shape.type}"
 
+    def __str__(self) -> str:
+        return repr(self) + f"-{self.destination_shape.type}"
+
     def __hash__(self) -> int:
         return hash(self.id)
 

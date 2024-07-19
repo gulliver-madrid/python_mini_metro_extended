@@ -20,4 +20,4 @@ class Node:
         return hash(self.id)
 
     def __repr__(self) -> str:
-        return f"Node-{self.station.__repr__()}"
+        return f"Node-{repr(self.station)}"

@@ -5,6 +5,7 @@ from shortuuid import uuid
 from src.geometry.type import ShapeType
 
 EntityId = NewType("EntityId", str)
+EntityNumId = NewType("EntityNumId", int)
 
 
 def create_new_passenger_id() -> EntityId:

@@ -31,9 +31,6 @@ class Path(Entity):
         self.padding_segments: list[PaddingSegment] = []
         self.path_order = 0
 
-    def __repr__(self) -> str:
-        return self.id
-
     @property
     def id(self) -> EntityId:
         return super().id

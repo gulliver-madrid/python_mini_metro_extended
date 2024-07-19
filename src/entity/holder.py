@@ -21,9 +21,6 @@ class Holder(Entity):
         self.passengers_per_row: int
         self.size: int
 
-    def __repr__(self) -> str:
-        return self.id
-
     def draw(self, surface: pygame.surface.Surface) -> None:
         # draw self
         self.shape.draw(surface, self.position)
