@@ -31,12 +31,10 @@ class Holder(Entity):
         for passenger in self.passengers:
             passenger.position = (
                 self.position
+                + Point((-passenger_size - passenger_display_buffer), 0.75 * self.size)
                 + Point(
-                    (-2 * passenger_size - passenger_display_buffer), 1.5 * self.size
-                )
-                + Point(
-                    col * (passenger_size + passenger_display_buffer),
-                    row * (passenger_size + passenger_display_buffer),
+                    col * (passenger_size / 2 + passenger_display_buffer),
+                    row * (passenger_size / 2 + passenger_display_buffer),
                 )
             )
 

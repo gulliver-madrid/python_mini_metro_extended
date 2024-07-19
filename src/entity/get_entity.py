@@ -20,7 +20,7 @@ def get_random_station() -> Station:
 
 
 def generate_stations(previous: Sequence[Station]) -> Iterator[Station]:
-    min_distance = station_size * 2
+    min_distance = station_size
     while True:
         new_station = get_random_station()
         if all(

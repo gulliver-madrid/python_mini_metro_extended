@@ -12,6 +12,7 @@ class Triangle(Polygon):
     def __init__(self, color: Color, size: int) -> None:
         # Equilateral triangle
         self.size = size
+        size = round(size / 2)
         points = [
             Point(-size, round(-COS_30_DEGREES * size)),
             Point(size, round(-COS_30_DEGREES * size)),

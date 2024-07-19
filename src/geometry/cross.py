@@ -7,6 +7,7 @@ from src.type import Color
 class Cross(Polygon):
     def __init__(self, color: Color, size: int, width: int = 0) -> None:
         self.size = size
+        size = round(size / 2)  # compensation
         if width == 0:
             self.width = round(2 * size / 3)
         else:

@@ -10,7 +10,7 @@ screen_color = (255, 255, 255)
 
 # station
 num_stations = 10
-station_size = 30
+station_size = 60
 station_capacity = 12
 station_color = (0, 0, 0)
 station_shape_type_list = [
@@ -22,9 +22,9 @@ station_shape_type_list = [
 station_passengers_per_row = 4
 
 # passenger
-passenger_size = 5
+passenger_size = 10
 passenger_color = (128, 128, 128)
-passenger_display_buffer = 3 * passenger_size
+passenger_display_buffer = 1.5 * passenger_size
 
 
 class _PassengerSpawningConfig:

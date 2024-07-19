@@ -62,15 +62,15 @@ class TestGraph(BaseTestCase):
                 Station(
                     Rect(
                         color=station_color,
-                        width=2 * station_size,
-                        height=2 * station_size,
+                        width=station_size,
+                        height=station_size,
                     ),
                     get_random_position(self.width, self.height),
                 ),
                 Station(
                     Circle(
                         color=station_color,
-                        radius=station_size,
+                        radius=round(station_size / 2),
                     ),
                     get_random_position(self.width, self.height),
                 ),

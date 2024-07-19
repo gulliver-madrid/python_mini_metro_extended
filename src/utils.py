@@ -61,9 +61,9 @@ def tuple_to_point(tuple: Tuple[int, int]) -> Point:
 
 def get_shape_from_type(type: ShapeType, color: Color, size: int) -> Shape:
     if type == ShapeType.RECT:
-        return Rect(color=color, width=2 * size, height=2 * size)
+        return Rect(color=color, width=size, height=size)
     elif type == ShapeType.CIRCLE:
-        return Circle(color=color, radius=size)
+        return Circle(color=color, radius=round(size / 2))
     elif type == ShapeType.TRIANGLE:
         return Triangle(color=color, size=size)
     else:
