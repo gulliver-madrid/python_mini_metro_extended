@@ -145,6 +145,10 @@ class Mediator:
     def is_creating_path(self) -> bool:
         return self._status.is_creating_path
 
+    @property
+    def is_paused(self) -> bool:
+        return self._status.is_paused
+
     #######################
     ### private methods ###
     #######################

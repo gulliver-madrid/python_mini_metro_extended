@@ -45,7 +45,7 @@ def main() -> None:
         # react to user interaction
         for pygame_event in pygame.event.get():
             if pygame_event.type == pygame.QUIT:
-                raise SystemExit
+                mediator.exit()
             else:
                 event = convert_pygame_event(pygame_event)
                 reactor.react(event)
