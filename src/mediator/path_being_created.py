@@ -25,14 +25,15 @@ class PathBeingCreated:
             self.path.add_station(station)
 
     def can_end_with(self, station: Station) -> bool:
-        stations = self.path.stations
-        return len(stations) > 1 and self._is_last_station(station)
+        return self._num_stations_in_this_path() > 1 and self._is_last_station(station)
 
     def can_make_loop(self, station: Station) -> bool:
-        stations = self.path.stations
-        return len(stations) > 1 and self._is_first_station(station)
+        return self._num_stations_in_this_path() > 1 and self._is_first_station(station)
 
     # private methods
+
+    def _num_stations_in_this_path(self) -> int:
+        return len(self.path.stations)
 
     def _is_first_station(self, station: Station) -> bool:
         return self.path.stations[0] == station
