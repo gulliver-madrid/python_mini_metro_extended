@@ -15,7 +15,8 @@ from src.type import Color
 from src.ui.ui import UI
 from src.utils import hue_to_rgb
 
-from .impl import MediatorStatus, PathBeingCreated, TravelPlans
+from .impl import MediatorStatus, TravelPlans
+from .path_being_created import PathBeingCreated
 from .path_finder import find_next_path_for_passenger_at_station
 
 

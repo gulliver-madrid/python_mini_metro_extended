@@ -1,0 +1,41 @@
+from __future__ import annotations
+
+from src.entity.path import Path
+from src.entity.station import Station
+
+
+class PathBeingCreated:
+    __slots__ = ("path",)
+
+    def __init__(self, path: Path):
+        self.path = path
+
+    # public methods
+
+    def add_station_to_path(self, station: Station) -> None:
+        if self._is_last_station(station):
+            return
+        # loop
+        if self.can_make_loop(station):
+            self.path.set_loop()
+        # non-loop
+        elif not self._is_first_station(station):
+            if self.path.is_looped:
+                self.path.remove_loop()
+            self.path.add_station(station)
+
+    def can_end_with(self, station: Station) -> bool:
+        stations = self.path.stations
+        return len(stations) > 1 and self._is_last_station(station)
+
+    def can_make_loop(self, station: Station) -> bool:
+        stations = self.path.stations
+        return len(stations) > 1 and self._is_first_station(station)
+
+    # private methods
+
+    def _is_first_station(self, station: Station) -> bool:
+        return self.path.stations[0] == station
+
+    def _is_last_station(self, station: Station) -> bool:
+        return self.path.stations[-1] == station
