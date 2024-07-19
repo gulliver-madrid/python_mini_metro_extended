@@ -9,7 +9,7 @@ from src.geometry.utils import direction, distance
 from src.type import Color
 
 from .entity import Entity
-from .ids import EntityId, create_new_path_id
+from .ids import create_new_path_id
 from .metro import Metro
 from .padding_segment import PaddingSegment
 from .path_segment import PathSegment
@@ -30,10 +30,6 @@ class Path(Entity):
         self.path_segments: list[PathSegment] = []
         self.padding_segments: list[PaddingSegment] = []
         self.path_order = 0
-
-    @property
-    def id(self) -> EntityId:
-        return super().id
 
     def add_station(self, station: Station) -> None:
         self.stations.append(station)

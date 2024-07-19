@@ -3,7 +3,7 @@ from src.geometry.point import Point
 from src.geometry.shape import Shape
 
 from .holder import Holder
-from .ids import EntityId, create_new_station_id
+from .ids import create_new_station_id
 
 
 class Station(Holder):
@@ -22,7 +22,3 @@ class Station(Holder):
 
     def __hash__(self) -> int:
         return hash(self.id)
-
-    @property
-    def id(self) -> EntityId:
-        return super().id

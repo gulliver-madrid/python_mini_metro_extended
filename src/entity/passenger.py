@@ -4,7 +4,7 @@ from src.geometry.point import Point
 from src.geometry.shape import Shape
 
 from .entity import Entity
-from .ids import EntityId, create_new_passenger_id
+from .ids import create_new_passenger_id
 
 
 class Passenger(Entity):
@@ -22,10 +22,6 @@ class Passenger(Entity):
 
     def __hash__(self) -> int:
         return hash(self.id)
-
-    @property
-    def id(self) -> EntityId:
-        return super().id
 
     def draw(self, surface: pygame.surface.Surface) -> None:
         self.destination_shape.draw(surface, self.position)

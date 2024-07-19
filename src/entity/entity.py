@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from collections import defaultdict
 from typing import ClassVar, Final
 
@@ -16,7 +16,6 @@ class Entity(ABC):
         this_class._num_ids[this_class.__name__] += 1
 
     @property
-    @abstractmethod
     def id(self) -> EntityId:
         return self._id
 

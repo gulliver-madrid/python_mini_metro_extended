@@ -3,7 +3,7 @@ from src.geometry.line import Line
 from src.geometry.utils import direction
 from src.type import Color
 
-from .ids import EntityId, create_new_path_segment_id
+from .ids import create_new_path_segment_id
 from .segment import Segment
 from .station import Station
 
@@ -35,7 +35,3 @@ class PathSegment(Segment):
             end=self.segment_end,
             width=path_width,
         )
-
-    @property
-    def id(self) -> EntityId:
-        return super().id

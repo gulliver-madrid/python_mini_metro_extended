@@ -29,7 +29,3 @@ class Metro(Holder):
         self.game_speed = metro_speed_per_ms
         self.is_forward = True
         self.passengers_per_row = metro_passengers_per_row
-
-    @property
-    def id(self) -> EntityId:
-        return super().id

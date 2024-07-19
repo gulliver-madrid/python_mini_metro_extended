@@ -3,7 +3,7 @@ from src.geometry.line import Line
 from src.geometry.point import Point
 from src.type import Color
 
-from .ids import EntityId, create_new_padding_segment_id
+from .ids import create_new_padding_segment_id
 from .segment import Segment
 
 
@@ -18,7 +18,3 @@ class PaddingSegment(Segment):
             end=self.segment_end,
             width=path_width,
         )
-
-    @property
-    def id(self) -> EntityId:
-        return super().id
