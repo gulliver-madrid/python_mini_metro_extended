@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from typing import Final
 
 from src.entity.metro import Metro
 from src.entity.passenger import Passenger
@@ -16,16 +17,16 @@ class PassengerMover:
         travel_plans: TravelPlans,
         status: MediatorStatus,
     ):
-        self._paths = paths
-        self._passengers = passengers
-        self._travel_plans = travel_plans
-        self._status = status
+        self._paths: Final = paths
+        self._passengers: Final = passengers
+        self._travel_plans: Final = travel_plans
+        self._status: Final = status
 
     # public methods
 
     def move_passengers(self, metro: Metro) -> None:
-        current_station = metro.current_station
-        assert current_station
+        station = metro.current_station
+        assert station
 
         to_remove: list[Passenger] = []
         from_metro_to_station: list[Passenger] = []
@@ -33,34 +34,38 @@ class PassengerMover:
 
         # queue
         for passenger in metro.passengers:
-            if have_same_shape_type(current_station, passenger):
+            if have_same_shape_type(station, passenger):
                 to_remove.append(passenger)
-            elif self._is_next_planned_station(current_station, passenger):
+            elif self._is_next_planned_station(station, passenger):
                 from_metro_to_station.append(passenger)
 
-        for passenger in current_station.passengers:
+        for passenger in station.passengers:
             if self._metro_is_in_next_passenger_path(passenger, metro):
                 from_station_to_metro.append(passenger)
 
         # process
         self._remove_passengers_from_metro(to_remove, metro)
         self._transfer_passengers_from_metro_to_station(
-            metro, current_station, from_metro_to_station
+            metro, station, from_metro_to_station
         )
         self._transfer_passengers_from_station_to_metro(
-            metro, current_station, from_station_to_metro
+            metro, station, from_station_to_metro
         )
 
     # private methods
 
     def _is_next_planned_station(self, station: Station, passenger: Passenger) -> bool:
-        return self._travel_plans[passenger].get_next_station() == station
+        travel_plan = self._travel_plans[passenger]
+        return travel_plan.get_next_station() == station
 
     def _metro_is_in_next_passenger_path(
         self, passenger: Passenger, metro: Metro
     ) -> bool:
-        next_path = self._travel_plans[passenger].next_path
-        return (next_path is not None) and (next_path.id == metro.path_id)
+        travel_plan = self._travel_plans[passenger]
+        next_path = travel_plan.next_path
+        if not next_path:
+            return False
+        return next_path.id == metro.path_id
 
     def _remove_passengers_from_metro(
         self, to_remove: Sequence[Passenger], metro: Metro
@@ -80,7 +85,7 @@ class PassengerMover:
     ) -> None:
         for passenger in from_metro_to_station:
             if station.has_room():
-                self._move_passenger_to_current_station(passenger, metro)
+                self._move_passenger_to_station(passenger, metro, station)
 
     def _transfer_passengers_from_station_to_metro(
         self,
@@ -92,14 +97,13 @@ class PassengerMover:
             if metro.has_room():
                 station.move_passenger(passenger, metro)
 
-    def _move_passenger_to_current_station(
-        self, passenger: Passenger, metro: Metro
+    def _move_passenger_to_station(
+        self,
+        passenger: Passenger,
+        metro: Metro,
+        station: Station,
     ) -> None:
-        current_station = metro.current_station
-        assert current_station
-        metro.move_passenger(passenger, current_station)
+        metro.move_passenger(passenger, station)
         travel_plan = self._travel_plans[passenger]
         travel_plan.increment_next_station()
-        find_next_path_for_passenger_at_station(
-            self._paths, travel_plan, current_station
-        )
+        find_next_path_for_passenger_at_station(self._paths, travel_plan, station)
