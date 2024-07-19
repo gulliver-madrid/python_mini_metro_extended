@@ -42,13 +42,12 @@ def main() -> None:
         screen.fill(screen_color)
         mediator.render(screen)
 
-        # react to user interaction
         for pygame_event in pygame.event.get():
             if pygame_event.type == pygame.QUIT:
                 mediator.exit()
-            else:
-                event = convert_pygame_event(pygame_event)
-                reactor.react(event)
+
+            event = convert_pygame_event(pygame_event)
+            reactor.react(event)
 
         pygame.display.flip()
 

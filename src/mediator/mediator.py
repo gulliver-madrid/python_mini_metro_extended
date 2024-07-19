@@ -1,6 +1,6 @@
 import pprint
 import sys
-from typing import Final
+from typing import Final, NoReturn
 
 import pygame
 
@@ -133,7 +133,7 @@ class Mediator:
     def toggle_pause(self) -> None:
         self._status.is_paused = not self._status.is_paused
 
-    def exit(self) -> None:
+    def exit(self) -> NoReturn:
         pygame.quit()
         sys.exit()
 
