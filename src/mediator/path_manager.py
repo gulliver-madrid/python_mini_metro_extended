@@ -24,7 +24,6 @@ class PathManager:
     __slots__ = (
         "paths",
         "max_num_paths",
-        "passengers",
         "path_colors",
         "path_to_color",
         "metros",
@@ -38,7 +37,6 @@ class PathManager:
 
     def __init__(
         self,
-        passengers: list[Passenger],
         stations: list[Station],
         travel_plans: TravelPlans,
         metros: list[Metro],
@@ -47,7 +45,7 @@ class PathManager:
     ):
         self.paths: Final[list[Path]] = []
         self.max_num_paths: Final[int] = max_num_paths
-        self.passengers: Final = passengers
+
         self.path_to_color: Final[dict[Path, Color]] = {}
         self.path_colors: Final = self._get_initial_path_colors()
         self.metros: Final = metros
@@ -111,8 +109,7 @@ class PathManager:
     def remove_path(self, path: Path) -> None:
         self.ui.path_to_button[path].remove_path()
         for metro in path.metros:
-            for passenger in metro.passengers:
-                self.passengers.remove(passenger)
+            # this shouldn't remove the passengers but it does
             self.metros.remove(metro)
         self._release_color_for_path(path)
         self.paths.remove(path)

@@ -13,12 +13,10 @@ class PassengerMover:
     def __init__(
         self,
         paths: list[Path],
-        passengers: list[Passenger],
         travel_plans: TravelPlans,
         status: MediatorStatus,
     ):
         self._paths: Final = paths
-        self._passengers: Final = passengers
         self._travel_plans: Final = travel_plans
         self._status: Final = status
 
@@ -73,7 +71,6 @@ class PassengerMover:
         for passenger in to_remove:
             passenger.is_at_destination = True
             metro.remove_passenger(passenger)
-            self._passengers.remove(passenger)
             del self._travel_plans[passenger]
             self._status.score += 1
 

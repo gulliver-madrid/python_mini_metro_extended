@@ -30,7 +30,6 @@ class Mediator:
         "num_stations",
         "stations",
         "metros",
-        "passengers",
         "travel_plans",
         "_status",
         "ui",
@@ -57,7 +56,6 @@ class Mediator:
         # entities
         self.stations: Final = get_random_stations(self.num_stations)
         self.metros: Final[list[Metro]] = []
-        self.passengers: Final[list[Passenger]] = []
 
         # status
         self.travel_plans: Final[TravelPlans] = {}
@@ -70,7 +68,6 @@ class Mediator:
 
         # delegated classes
         self.path_manager = PathManager(
-            self.passengers,
             self.stations,
             self.travel_plans,
             self.metros,
@@ -78,7 +75,7 @@ class Mediator:
             self.ui,
         )
         self._passenger_mover = PassengerMover(
-            self.path_manager.paths, self.passengers, self.travel_plans, self._status
+            self.path_manager.paths, self.travel_plans, self._status
         )
 
         self.ui.init(self.path_manager.max_num_paths)
@@ -141,6 +138,16 @@ class Mediator:
         sys.exit()
 
     @property
+    def passengers(self) -> list[Passenger]:
+        passengers: list[Passenger] = []
+        for metro in self.metros:
+            passengers.extend(metro.passengers)
+
+        for station in self.stations:
+            passengers.extend(station.passengers)
+        return passengers
+
+    @property
     def paths(self) -> list[Path]:
         return self.path_manager.paths
 
@@ -164,7 +171,6 @@ class Mediator:
                 continue
             passenger = passenger_creator.create_passenger(station)
             station.add_passenger(passenger)
-            self.passengers.append(passenger)
 
     def _get_station_shape_types(self) -> list[ShapeType]:
         station_shape_types: list[ShapeType] = []
