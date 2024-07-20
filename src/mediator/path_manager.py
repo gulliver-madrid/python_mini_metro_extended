@@ -15,7 +15,7 @@ from src.type import Color
 from src.ui.ui import UI
 from src.utils import hue_to_rgb
 
-from .impl import MediatorStatus, TravelPlans
+from .impl import MediatorStatus
 from .path_being_created import PathBeingCreated
 from .path_finder import find_next_path_for_passenger_at_station
 
@@ -29,7 +29,6 @@ class PathManager:
         "metros",
         "max_num_metros",
         "stations",
-        "travel_plans",
         "ui",
         "path_being_created",
         "_status",
@@ -38,7 +37,6 @@ class PathManager:
     def __init__(
         self,
         stations: list[Station],
-        travel_plans: TravelPlans,
         metros: list[Metro],
         status: MediatorStatus,
         ui: UI,
@@ -51,7 +49,6 @@ class PathManager:
         self.metros: Final = metros
         self.max_num_metros: Final = max_num_metros
         self.stations: Final = stations
-        self.travel_plans: Final = travel_plans
         self.ui: Final = ui
         self.path_being_created: PathBeingCreated | None = None
         self._status: Final = status
@@ -154,8 +151,8 @@ class PathManager:
 
     def _passenger_has_travel_plan(self, passenger: Passenger) -> bool:
         return (
-            passenger in self.travel_plans
-            and self.travel_plans[passenger].next_path is not None
+            passenger.travel_plan is not None
+            and passenger.travel_plan.next_path is not None
         )
 
     def _find_travel_plan_for_passenger(
@@ -179,12 +176,12 @@ class PathManager:
             else:
                 assert len(node_path) > 1
                 node_path = skip_stations_on_same_path(node_path)
-                self.travel_plans[passenger] = TravelPlan(node_path[1:])
+                passenger.travel_plan = TravelPlan(node_path[1:])
                 self._find_next_path_for_passenger_at_station(passenger, station)
                 break
 
         else:
-            self.travel_plans[passenger] = TravelPlan([])
+            passenger.travel_plan = TravelPlan([])
 
     def _get_stations_for_shape_type(self, shape_type: ShapeType) -> list[Station]:
         stations = [
@@ -196,6 +193,7 @@ class PathManager:
     def _find_next_path_for_passenger_at_station(
         self, passenger: Passenger, station: Station
     ) -> None:
+        assert passenger.travel_plan
         find_next_path_for_passenger_at_station(
-            self.paths, self.travel_plans[passenger], station
+            self.paths, passenger.travel_plan, station
         )

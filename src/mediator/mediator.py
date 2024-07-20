@@ -16,7 +16,7 @@ from src.ui.path_button import PathButton
 from src.ui.ui import UI, get_gui_height, get_main_surface_height
 
 from .game_renderer import GameRenderer
-from .impl import MediatorStatus, PassengerSpawning, TravelPlans
+from .impl import MediatorStatus, PassengerSpawning, TravelPlansMapping
 from .passenger_creator import PassengerCreator
 from .passenger_mover import PassengerMover
 from .path_manager import PathManager
@@ -30,7 +30,6 @@ class Mediator:
         "num_stations",
         "stations",
         "metros",
-        "travel_plans",
         "_status",
         "ui",
         "path_manager",
@@ -58,7 +57,6 @@ class Mediator:
         self.metros: Final[list[Metro]] = []
 
         # status
-        self.travel_plans: Final[TravelPlans] = {}
         self._status: Final = MediatorStatus(Config.passenger_spawning.interval_step)
         self.showing_debug = False
         self.game_speed = 1
@@ -69,14 +67,11 @@ class Mediator:
         # delegated classes
         self.path_manager = PathManager(
             self.stations,
-            self.travel_plans,
             self.metros,
             self._status,
             self.ui,
         )
-        self._passenger_mover = PassengerMover(
-            self.path_manager.paths, self.travel_plans, self._status
-        )
+        self._passenger_mover = PassengerMover(self.path_manager.paths, self._status)
 
         self.ui.init(self.path_manager.max_num_paths)
 
@@ -146,6 +141,14 @@ class Mediator:
         for station in self.stations:
             passengers.extend(station.passengers)
         return passengers
+
+    @property
+    def travel_plans(self) -> TravelPlansMapping:
+        return {
+            passenger: passenger.travel_plan
+            for passenger in self.passengers
+            if passenger.travel_plan
+        }
 
     @property
     def paths(self) -> list[Path]:

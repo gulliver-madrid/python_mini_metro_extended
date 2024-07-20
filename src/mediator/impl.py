@@ -2,12 +2,11 @@ from __future__ import annotations
 
 from typing import Final, Mapping
 
-from src.entity.passenger import Passenger
+from src.entity.passenger import Passenger, TravelPlanProtocol
 from src.entity.station import Station
-from src.travel_plan import TravelPlan
 
-TravelPlans = dict[Passenger, TravelPlan]
-TravelPlansMapping = Mapping[Passenger, TravelPlan]
+TravelPlans = dict[Passenger, TravelPlanProtocol]
+TravelPlansMapping = Mapping[Passenger, TravelPlanProtocol]
 
 
 class PassengerSpawning:

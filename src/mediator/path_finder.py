@@ -1,12 +1,12 @@
 from collections.abc import Sequence
 
+from src.entity.passenger import TravelPlanProtocol
 from src.entity.path import Path
 from src.entity.station import Station
-from src.travel_plan import TravelPlan
 
 
 def find_next_path_for_passenger_at_station(
-    paths: Sequence[Path], travel_plan: TravelPlan, station: Station
+    paths: Sequence[Path], travel_plan: TravelPlanProtocol, station: Station
 ) -> None:
     next_station = travel_plan.get_next_station()
     assert next_station is not None

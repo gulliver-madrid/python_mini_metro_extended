@@ -5,7 +5,7 @@ from src.entity.metro import Metro
 from src.entity.passenger import Passenger
 from src.entity.path import Path
 from src.entity.station import Station
-from src.mediator.impl import MediatorStatus, TravelPlans, have_same_shape_type
+from src.mediator.impl import MediatorStatus, have_same_shape_type
 from src.mediator.path_finder import find_next_path_for_passenger_at_station
 
 
@@ -13,11 +13,9 @@ class PassengerMover:
     def __init__(
         self,
         paths: list[Path],
-        travel_plans: TravelPlans,
         status: MediatorStatus,
     ):
         self._paths: Final = paths
-        self._travel_plans: Final = travel_plans
         self._status: Final = status
 
     # public methods
@@ -53,13 +51,15 @@ class PassengerMover:
     # private methods
 
     def _is_next_planned_station(self, station: Station, passenger: Passenger) -> bool:
-        travel_plan = self._travel_plans[passenger]
+        travel_plan = passenger.travel_plan
+        assert travel_plan
         return travel_plan.get_next_station() == station
 
     def _metro_is_in_next_passenger_path(
         self, passenger: Passenger, metro: Metro
     ) -> bool:
-        travel_plan = self._travel_plans[passenger]
+        travel_plan = passenger.travel_plan
+        assert travel_plan
         next_path = travel_plan.next_path
         if not next_path:
             return False
@@ -71,7 +71,7 @@ class PassengerMover:
         for passenger in to_remove:
             passenger.is_at_destination = True
             metro.remove_passenger(passenger)
-            del self._travel_plans[passenger]
+            del passenger.travel_plan
             self._status.score += 1
 
     def _transfer_passengers_from_metro_to_station(
@@ -101,6 +101,7 @@ class PassengerMover:
         station: Station,
     ) -> None:
         metro.move_passenger(passenger, station)
-        travel_plan = self._travel_plans[passenger]
+        travel_plan = passenger.travel_plan
+        assert travel_plan
         travel_plan.increment_next_station()
         find_next_path_for_passenger_at_station(self._paths, travel_plan, station)
