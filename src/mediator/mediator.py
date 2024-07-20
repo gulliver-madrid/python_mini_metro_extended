@@ -93,21 +93,24 @@ class Mediator:
         if self._status.is_paused:
             return
 
-        dt_ms = dt_ms * self.game_speed
+        dt_ms *= self.game_speed
         self._status.increment_time(dt_ms, self.game_speed)
 
-        # move metros
+        self._move_metros(dt_ms)
+        self._manage_passengers_spawning()
+
+        self.path_manager.find_travel_plan_for_passengers()
+        self._move_passengers()
+
+    def _move_metros(self, dt_ms: int) -> None:
         for path in self.paths:
             for metro in path.metros:
                 path.move_metro(metro, dt_ms)
 
-        # spawn passengers
+    def _manage_passengers_spawning(self) -> None:
         if self._is_passenger_spawn_time():
             self._spawn_passengers()
             self._status.steps_since_last_spawn = 0
-
-        self.path_manager.find_travel_plan_for_passengers()
-        self._move_passengers()
 
     def render(self, screen: pygame.surface.Surface) -> None:
         self._game_renderer.render_game(
