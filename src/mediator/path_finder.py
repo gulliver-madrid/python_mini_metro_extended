@@ -1,8 +1,8 @@
 from collections.abc import Sequence
 
-from src.entity.passenger import TravelPlanProtocol
 from src.entity.path import Path
 from src.entity.station import Station
+from src.protocols.travel_plan import TravelPlanProtocol
 
 
 def find_next_path_for_passenger_at_station(
