@@ -1,4 +1,5 @@
 import queue
+from typing import TYPE_CHECKING
 
 import pygame
 
@@ -15,11 +16,12 @@ from src.ui.path_button import PathButton
 
 
 class UI_Reactor:
-    __slots__ = (
-        "mediator",
-        "is_mouse_down",
-        "_console",
-    )
+    if TYPE_CHECKING:
+        __slots__ = (
+            "mediator",
+            "is_mouse_down",
+            "_console",
+        )
 
     def __init__(self, mediator: Mediator) -> None:
         self.mediator = mediator

@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import TYPE_CHECKING, Sequence
 
 import pygame
 
@@ -25,15 +25,16 @@ def get_main_surface_height() -> float:
 
 
 class UI:
-    __slots__ = (
-        "path_buttons",
-        "path_to_button",
-        "buttons",
-        "font",
-        "small_font",
-        "last_pos",
-        "clock",
-    )
+    if TYPE_CHECKING:
+        __slots__ = (
+            "path_buttons",
+            "path_to_button",
+            "buttons",
+            "font",
+            "small_font",
+            "last_pos",
+            "clock",
+        )
 
     def init(self, max_num_paths: int) -> None:
         pygame.font.init()

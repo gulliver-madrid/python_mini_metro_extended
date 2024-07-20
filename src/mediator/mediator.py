@@ -1,6 +1,6 @@
 import pprint
 import sys
-from typing import Final, NoReturn
+from typing import TYPE_CHECKING, Final, NoReturn
 
 import pygame
 
@@ -25,19 +25,20 @@ pp = pprint.PrettyPrinter(indent=4)
 
 
 class Mediator:
-    __slots__ = (
-        "_passenger_spawning",
-        "num_stations",
-        "stations",
-        "metros",
-        "_status",
-        "ui",
-        "path_manager",
-        "_passenger_mover",
-        "showing_debug",
-        "game_speed",
-        "_game_renderer",
-    )
+    if TYPE_CHECKING:
+        __slots__ = (
+            "_passenger_spawning",
+            "num_stations",
+            "stations",
+            "metros",
+            "_status",
+            "ui",
+            "path_manager",
+            "_passenger_mover",
+            "showing_debug",
+            "game_speed",
+            "_game_renderer",
+        )
 
     _gui_height: Final = get_gui_height()
     _main_surface_height: Final = get_main_surface_height()

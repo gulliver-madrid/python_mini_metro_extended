@@ -1,5 +1,5 @@
 import random
-from typing import Final, Mapping
+from typing import TYPE_CHECKING, Final, Mapping
 
 from src.config import max_num_metros, max_num_paths
 from src.entity.metro import Metro
@@ -21,18 +21,19 @@ from .path_finder import find_next_path_for_passenger_at_station
 
 
 class PathManager:
-    __slots__ = (
-        "paths",
-        "max_num_paths",
-        "path_colors",
-        "path_to_color",
-        "metros",
-        "max_num_metros",
-        "stations",
-        "ui",
-        "path_being_created",
-        "_status",
-    )
+    if TYPE_CHECKING:
+        __slots__ = (
+            "paths",
+            "max_num_paths",
+            "path_colors",
+            "path_to_color",
+            "metros",
+            "max_num_metros",
+            "stations",
+            "ui",
+            "path_being_created",
+            "_status",
+        )
 
     def __init__(
         self,
