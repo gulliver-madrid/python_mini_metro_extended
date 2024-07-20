@@ -5,9 +5,11 @@ import pygame
 
 from src.config import Config
 from src.entity.metro import Metro
+from src.entity.passenger import Passenger
 from src.entity.path import Path
 from src.entity.station import Station
 from src.geometry.point import Point
+from src.mediator.impl import TravelPlansMapping
 from src.ui.ui import UI
 
 
@@ -23,6 +25,8 @@ class GameRenderer:
         main_surface_height: float,
         paths: Sequence[Path],
         max_num_paths: int,
+        passengers: Sequence[Passenger],
+        travel_plans: TravelPlansMapping,
         stations: Sequence[Station],
         metros: Sequence[Metro],
         score: int,
@@ -41,7 +45,9 @@ class GameRenderer:
             metro.draw(screen)
         ui.render(screen, score)
         if showing_debug:
-            self.debug_renderer.draw_debug(screen, ui, game_speed)
+            self.debug_renderer.draw_debug(
+                screen, ui, passengers, travel_plans, game_speed
+            )
 
     def _draw_paths(
         self, screen: pygame.surface.Surface, paths: Sequence[Path], max_num_paths: int
@@ -59,14 +65,23 @@ class DebugRenderer:
     def __init__(self) -> None:
         self._debug_surf = pygame.Surface(self.size)
 
-    def draw_debug(self, screen: pygame.surface.Surface, ui: UI, speed: float) -> None:
+    def draw_debug(
+        self,
+        screen: pygame.surface.Surface,
+        ui: UI,
+        passengers: Sequence[Passenger],
+        travel_plans: TravelPlansMapping,
+        speed: float,
+    ) -> None:
         font = ui.small_font
         mouse_pos = ui.last_pos
         fps = ui.clock.get_fps() if ui.clock else None
         self._debug_surf.set_alpha(180)
         self._debug_surf.fill(self.bg_color)
 
-        debug_texts = self._define_debug_texts(mouse_pos, fps, game_speed=speed)
+        debug_texts = self._define_debug_texts(
+            mouse_pos, fps, passengers, travel_plans, game_speed=speed
+        )
 
         self._draw_debug_texts(debug_texts, font, self.fg_color)
 
@@ -76,7 +91,13 @@ class DebugRenderer:
         )
 
     def _define_debug_texts(
-        self, mouse_pos: Point | None, fps: float | None, *, game_speed: float
+        self,
+        mouse_pos: Point | None,
+        fps: float | None,
+        passengers: Sequence[Passenger],
+        travel_plans: TravelPlansMapping,
+        *,
+        game_speed: float,
     ) -> list[str]:
         debug_texts: list[str] = []
         if mouse_pos:
@@ -84,6 +105,8 @@ class DebugRenderer:
         if fps:
             debug_texts.append(f"FPS: {fps:.2f}")
         debug_texts.append(f"Game speed: {game_speed:.2f}")
+        debug_texts.append(f"Number of passengers: {len(passengers)}")
+        debug_texts.append(f"Number of travel plans: {len(travel_plans)}")
         return debug_texts
 
     def _draw_debug_texts(

@@ -123,6 +123,8 @@ class Mediator:
             main_surface_height=self._main_surface_height,
             paths=self.paths,
             max_num_paths=self.path_manager.max_num_paths,
+            passengers=self.passengers,
+            travel_plans=self.travel_plans,
             stations=self.stations,
             metros=self.metros,
             score=self._status.score,
