@@ -68,7 +68,3 @@ def get_shape_from_type(type: ShapeType, color: Color, size: int) -> Shape:
         return Triangle(color=color, size=size)
     else:
         return Cross(color=color, size=size)
-
-
-def within_time_window(game_time_ms: int, time_mark_ms: int, window_ms: int) -> bool:
-    return window_ms <= game_time_ms - time_mark_ms < (2 * window_ms)
