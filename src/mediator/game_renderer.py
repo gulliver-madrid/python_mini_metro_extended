@@ -9,7 +9,7 @@ from src.entity.passenger import Passenger
 from src.entity.path import Path
 from src.entity.station import Station
 from src.geometry.point import Point
-from src.mediator.impl import TravelPlansMapping
+from src.mediator.impl import MediatorStatus, TravelPlansMapping
 from src.ui.ui import UI
 
 
@@ -31,6 +31,7 @@ class GameRenderer:
         metros: Sequence[Metro],
         score: int,
         ui: UI,
+        status: MediatorStatus,
         showing_debug: bool,
         game_speed: float,
     ) -> None:
@@ -46,7 +47,7 @@ class GameRenderer:
         ui.render(screen, score)
         if showing_debug:
             self.debug_renderer.draw_debug(
-                screen, ui, passengers, travel_plans, game_speed
+                screen, ui, passengers, travel_plans, status, game_speed
             )
 
     def _draw_paths(
@@ -71,6 +72,7 @@ class DebugRenderer:
         ui: UI,
         passengers: Sequence[Passenger],
         travel_plans: TravelPlansMapping,
+        status: MediatorStatus,
         speed: float,
     ) -> None:
         font = ui.small_font
@@ -80,7 +82,7 @@ class DebugRenderer:
         self._debug_surf.fill(self.bg_color)
 
         debug_texts = self._define_debug_texts(
-            mouse_pos, fps, passengers, travel_plans, game_speed=speed
+            mouse_pos, fps, passengers, travel_plans, status, game_speed=speed
         )
 
         self._draw_debug_texts(debug_texts, font, self.fg_color)
@@ -96,6 +98,7 @@ class DebugRenderer:
         fps: float | None,
         passengers: Sequence[Passenger],
         travel_plans: TravelPlansMapping,
+        status: MediatorStatus,
         *,
         game_speed: float,
     ) -> list[str]:
@@ -107,6 +110,9 @@ class DebugRenderer:
         debug_texts.append(f"Game speed: {game_speed:.2f}")
         debug_texts.append(f"Number of passengers: {len(passengers)}")
         debug_texts.append(f"Number of travel plans: {len(travel_plans)}")
+        debug_texts.append(
+            f"Until next spawning: { ( status.ms_until_next_spawn/1000):.2f}"
+        )
         return debug_texts
 
     def _draw_debug_texts(

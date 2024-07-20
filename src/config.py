@@ -28,8 +28,8 @@ passenger_display_buffer = 1.5 * passenger_size
 
 
 class _PassengerSpawningConfig:
-    start_step: Final = 1
-    interval_step: Final = 10 * framerate
+    first_time_divisor: Final = 3
+    interval_step: Final = 8
 
 
 # metro

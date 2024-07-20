@@ -48,7 +48,6 @@ class Mediator:
 
         # configs
         self._passenger_spawning = PassengerSpawning(
-            Config.passenger_spawning.start_step,
             Config.passenger_spawning.interval_step,
         )
         self.num_stations: int = num_stations
@@ -58,9 +57,13 @@ class Mediator:
         self.metros: Final[list[Metro]] = []
 
         # status
-        self._status: Final = MediatorStatus(Config.passenger_spawning.interval_step)
+        self._status: Final = MediatorStatus(
+            self._passenger_spawning.interval_step
+            / Config.passenger_spawning.first_time_divisor
+        )
         self.showing_debug = False
         self.game_speed = 1
+
         # UI
         self.ui = UI()
         self._game_renderer = GameRenderer()
@@ -94,7 +97,7 @@ class Mediator:
             return
 
         dt_ms *= self.game_speed
-        self._status.increment_time(dt_ms, self.game_speed)
+        self._status.increment_time(dt_ms)
 
         self._move_metros(dt_ms)
         self._manage_passengers_spawning()
@@ -110,7 +113,7 @@ class Mediator:
     def _manage_passengers_spawning(self) -> None:
         if self._is_passenger_spawn_time():
             self._spawn_passengers()
-            self._status.steps_since_last_spawn = 0
+            self._status.ms_until_next_spawn = self._passenger_spawning.interval_step
 
     def render(self, screen: pygame.surface.Surface) -> None:
         self._game_renderer.render_game(
@@ -125,6 +128,7 @@ class Mediator:
             metros=self.metros,
             score=self._status.score,
             ui=self.ui,
+            status=self._status,
             showing_debug=self.showing_debug,
             game_speed=self.game_speed,
         )

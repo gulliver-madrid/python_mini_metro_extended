@@ -14,14 +14,11 @@ class PassengerSpawning:
     if TYPE_CHECKING:
         __slots__ = ("step", "interval_step")
 
-    def __init__(self, start_step: int, interval_step: int):
-        self.step: Final[int] = start_step
-        self.interval_step: Final[int] = interval_step
+    def __init__(self, interval_step: int):
+        self.interval_step: Final[int] = interval_step * 1000
 
     def is_passenger_spawn_time(self, status: MediatorStatus) -> bool:
-        return (status.steps == self.step) or (
-            status.steps_since_last_spawn >= self.interval_step
-        )
+        return status.ms_until_next_spawn <= 0
 
 
 def have_same_shape_type(station: Station, passenger: Passenger) -> bool:
@@ -31,22 +28,19 @@ def have_same_shape_type(station: Station, passenger: Passenger) -> bool:
 class MediatorStatus:
     if TYPE_CHECKING:
         __slots__ = (
-            "steps",
-            "steps_since_last_spawn",
+            "ms_until_next_spawn",
             "is_creating_path",
             "is_paused",
             "score",
         )
 
-    def __init__(self, passenger_spawning_interval_step: int) -> None:
-        self.steps: float = 0
-        self.steps_since_last_spawn: float = passenger_spawning_interval_step + 1
+    def __init__(self, initial_ms_until_next_spawn: float) -> None:
+        self.ms_until_next_spawn: float = initial_ms_until_next_spawn
         self.is_creating_path: bool = False
         self.is_paused: bool = False
         self.score: int = 0
 
-    def increment_time(self, dt_ms: int, game_speed: float) -> None:
+    def increment_time(self, dt_ms: int) -> None:
         assert not self.is_paused
 
-        self.steps += game_speed
-        self.steps_since_last_spawn += game_speed
+        self.ms_until_next_spawn -= dt_ms
