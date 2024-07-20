@@ -1,5 +1,6 @@
 import unittest
 from math import ceil
+from typing import Final
 from unittest.mock import create_autospec
 
 import pygame
@@ -13,6 +14,8 @@ from src.geometry.point import Point
 from src.utils import get_random_color, get_random_position, get_random_station_shape
 
 from test.base_test import BaseTestCase
+
+dt_ms: Final = ceil(1000 / framerate)
 
 
 class TestPath(BaseTestCase):
@@ -72,7 +75,7 @@ class TestPath(BaseTestCase):
             station.draw(self.screen)
         metro = Metro()
         path.add_metro(metro)
-        dt_ms = ceil(1000 / framerate)
+
         for _ in range(framerate):
             path.move_metro(metro, dt_ms)
 
@@ -88,7 +91,7 @@ class TestPath(BaseTestCase):
             station.draw(self.screen)
         metro = Metro()
         path.add_metro(metro)
-        dt_ms = ceil(1000 / framerate)
+
         for _ in range(framerate + 1):
             path.move_metro(metro, dt_ms)
 
@@ -109,7 +112,7 @@ class TestPath(BaseTestCase):
             station.draw(self.screen)
         metro = Metro()
         path.add_metro(metro)
-        dt_ms = ceil(1000 / framerate)
+
         for station_idx in [1, 2, 3, 0, 1]:
             for _ in range(framerate):
                 path.move_metro(metro, dt_ms)

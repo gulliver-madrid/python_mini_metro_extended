@@ -1,7 +1,7 @@
 import unittest
 from collections.abc import Sequence
 from math import ceil
-from typing import Any
+from typing import Any, Final
 from unittest.mock import Mock, create_autospec, patch
 
 import pygame
@@ -21,6 +21,8 @@ from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 
 from test.base_test import BaseTestCase
+
+dt_ms: Final = ceil(1000 / framerate)
 
 
 class TestMediator(BaseTestCase):
@@ -88,12 +90,12 @@ class TestMediator(BaseTestCase):
         for _ in range(
             ceil(times_needed / Config.passenger_spawning.first_time_divisor)
         ):
-            self.mediator.increment_time(ceil(1000 / framerate))
+            self.mediator.increment_time(dt_ms)
 
         self.mediator._spawn_passengers.assert_called_once()  # type: ignore [attr-defined]
 
         for _ in range(times_needed):
-            self.mediator.increment_time(ceil(1000 / framerate))
+            self.mediator.increment_time(dt_ms)
 
         self.assertEqual(self.mediator._spawn_passengers.call_count, 2)  # type: ignore [attr-defined]
 
@@ -103,7 +105,7 @@ class TestMediator(BaseTestCase):
         for _ in range(
             ceil(times_needed / Config.passenger_spawning.first_time_divisor)
         ):
-            self.mediator.increment_time(ceil(1000 / framerate))
+            self.mediator.increment_time(dt_ms)
 
         assert self.mediator.passengers
 
@@ -140,10 +142,10 @@ class TestMediator(BaseTestCase):
 
         # Run the game until first wave of passengers spawn
         for _ in range(Config.passenger_spawning.interval_step):
-            self.mediator.increment_time(ceil(1000 / framerate))
+            self.mediator.increment_time(dt_ms)
 
         self.connect_stations([0, 1])
-        self.mediator.increment_time(ceil(1000 / framerate))
+        self.mediator.increment_time(dt_ms)
 
         for passenger in self.mediator.passengers:
             self.assertIn(passenger, self.mediator.travel_plans)
@@ -155,7 +157,7 @@ class TestMediator(BaseTestCase):
     def test_passengers_at_isolated_stations_have_no_way_to_destination(self) -> None:
         # Run the game until first wave of passengers spawn, then 1 more frame
         for _ in range(Config.passenger_spawning.interval_step + 1):
-            self.mediator.increment_time(ceil(1000 / framerate))
+            self.mediator.increment_time(dt_ms)
 
         for passenger in self.mediator.passengers:
             self.assertIn(passenger, self.mediator.travel_plans)
