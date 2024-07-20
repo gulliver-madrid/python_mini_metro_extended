@@ -32,6 +32,7 @@ class GameRenderer:
         score: int,
         ui: UI,
         status: MediatorStatus,
+        ms_until_next_spawn: float,
         showing_debug: bool,
         game_speed: float,
     ) -> None:
@@ -47,7 +48,13 @@ class GameRenderer:
         ui.render(screen, score)
         if showing_debug:
             self.debug_renderer.draw_debug(
-                screen, ui, passengers, travel_plans, status, game_speed
+                screen,
+                ui,
+                passengers,
+                travel_plans,
+                status,
+                ms_until_next_spawn,
+                game_speed,
             )
 
     def _draw_paths(
@@ -73,6 +80,7 @@ class DebugRenderer:
         passengers: Sequence[Passenger],
         travel_plans: TravelPlansMapping,
         status: MediatorStatus,
+        ms_until_next_spawn: float,
         speed: float,
     ) -> None:
         font = ui.small_font
@@ -82,7 +90,13 @@ class DebugRenderer:
         self._debug_surf.fill(self.bg_color)
 
         debug_texts = self._define_debug_texts(
-            mouse_pos, fps, passengers, travel_plans, status, game_speed=speed
+            mouse_pos,
+            fps,
+            passengers,
+            travel_plans,
+            status,
+            ms_until_next_spawn,
+            game_speed=speed,
         )
 
         self._draw_debug_texts(debug_texts, font, self.fg_color)
@@ -99,6 +113,7 @@ class DebugRenderer:
         passengers: Sequence[Passenger],
         travel_plans: TravelPlansMapping,
         status: MediatorStatus,
+        ms_until_next_spawn: float,
         *,
         game_speed: float,
     ) -> list[str]:
@@ -110,9 +125,8 @@ class DebugRenderer:
         debug_texts.append(f"Game speed: {game_speed:.2f}")
         debug_texts.append(f"Number of passengers: {len(passengers)}")
         debug_texts.append(f"Number of travel plans: {len(travel_plans)}")
-        debug_texts.append(
-            f"Until next spawning: { ( status.ms_until_next_spawn/1000):.2f}"
-        )
+        debug_texts.append(f"Until next spawning: { ( ms_until_next_spawn/1000):.2f}")
+        debug_texts.append(f"Is creating path: { ( status.is_creating_path)}")
         return debug_texts
 
     def _draw_debug_texts(
