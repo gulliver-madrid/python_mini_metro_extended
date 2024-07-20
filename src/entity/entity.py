@@ -6,6 +6,7 @@ from .ids import EntityId, EntityNumId
 
 
 class Entity(ABC):
+    __slots__ = ("_id", "_num_id")
     _id: Final[EntityId]
     _num_ids: ClassVar[dict[str, int]] = defaultdict(int)
 

@@ -28,6 +28,13 @@ class TravelPlanProtocol(Protocol):
 
 
 class Passenger(Entity):
+    __slots__ = (
+        "position",
+        "destination_shape",
+        "is_at_destination",
+        "travel_plan",
+    )
+
     def __init__(self, destination_shape: Shape) -> None:
         super().__init__(create_new_passenger_id())
         self.position = Point(0, 0)
