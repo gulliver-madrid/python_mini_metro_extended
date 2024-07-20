@@ -31,7 +31,6 @@ def have_same_shape_type(station: Station, passenger: Passenger) -> bool:
 class MediatorStatus:
     if TYPE_CHECKING:
         __slots__ = (
-            "_time_ms",
             "steps",
             "steps_since_last_spawn",
             "is_creating_path",
@@ -40,7 +39,6 @@ class MediatorStatus:
         )
 
     def __init__(self, passenger_spawning_interval_step: int) -> None:
-        self._time_ms: int = 0
         self.steps: float = 0
         self.steps_since_last_spawn: float = passenger_spawning_interval_step + 1
         self.is_creating_path: bool = False
@@ -50,6 +48,5 @@ class MediatorStatus:
     def increment_time(self, dt_ms: int, game_speed: float) -> None:
         assert not self.is_paused
 
-        self._time_ms += dt_ms
         self.steps += game_speed
         self.steps_since_last_spawn += game_speed
