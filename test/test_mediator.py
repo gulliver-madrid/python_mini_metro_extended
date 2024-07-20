@@ -139,9 +139,10 @@ class TestMediator(BaseTestCase):
 
         for passenger in self.mediator.passengers:
             self.assertIn(passenger, self.mediator.travel_plans)
-            self.assertIsNotNone(self.mediator.travel_plans[passenger])
-            self.assertIsNotNone(self.mediator.travel_plans[passenger].next_path)
-            self.assertIsNotNone(self.mediator.travel_plans[passenger].next_station)
+            self.assertIsNotNone(passenger.travel_plan)
+            assert passenger.travel_plan
+            self.assertIsNotNone(passenger.travel_plan.next_path)
+            self.assertIsNotNone(passenger.travel_plan.next_station)
 
     def test_passengers_at_isolated_stations_have_no_way_to_destination(self) -> None:
         # Run the game until first wave of passengers spawn, then 1 more frame
@@ -150,9 +151,10 @@ class TestMediator(BaseTestCase):
 
         for passenger in self.mediator.passengers:
             self.assertIn(passenger, self.mediator.travel_plans)
-            self.assertIsNotNone(self.mediator.travel_plans[passenger])
-            self.assertIsNone(self.mediator.travel_plans[passenger].next_path)
-            self.assertIsNone(self.mediator.travel_plans[passenger].next_station)
+            self.assertIsNotNone(passenger.travel_plan)
+            assert passenger.travel_plan
+            self.assertIsNone(passenger.travel_plan.next_path)
+            self.assertIsNone(passenger.travel_plan.next_station)
 
     def test_get_station_for_shape_type(self) -> None:
         self.mediator.stations.clear()
@@ -227,9 +229,8 @@ class TestMediator(BaseTestCase):
         self.mediator.path_manager.find_travel_plan_for_passengers()
         for station in self.mediator.stations:
             for passenger in station.passengers:
-                self.assertEqual(
-                    len(self.mediator.travel_plans[passenger].node_path), 1
-                )
+                assert passenger.travel_plan
+                self.assertEqual(len(passenger.travel_plan.node_path), 1)
 
 
 if __name__ == "__main__":
