@@ -30,7 +30,6 @@ class Mediator:
             "_components",
             "_passenger_spawning",
             "num_stations",
-            "_status",
             "ui",
             "path_manager",
             "_passenger_mover",
@@ -52,12 +51,13 @@ class Mediator:
         self.num_stations: int = num_stations
 
         # components
-        self._components = GameComponents(
-            stations=get_random_stations(self.num_stations), metros=[]
+        self._components: Final = GameComponents(
+            stations=get_random_stations(self.num_stations),
+            metros=[],
+            status=MediatorStatus(),
         )
 
         # status
-        self._status: Final = MediatorStatus()
         self.showing_debug = False
         self.game_speed = 1
 
@@ -68,10 +68,11 @@ class Mediator:
         # delegated classes
         self.path_manager = PathManager(
             self._components,
-            self._status,
             self.ui,
         )
-        self._passenger_mover = PassengerMover(self.path_manager.paths, self._status)
+        self._passenger_mover = PassengerMover(
+            self.path_manager.paths, self._components.status
+        )
 
         self.ui.init(self.path_manager.max_num_paths)
 
@@ -89,7 +90,7 @@ class Mediator:
         return self.ui.get_containing_button(position) or None
 
     def increment_time(self, dt_ms: int) -> None:
-        if self._status.is_paused:
+        if self._components.status.is_paused:
             return
 
         dt_ms *= self.game_speed
@@ -121,16 +122,14 @@ class Mediator:
             max_num_paths=self.path_manager.max_num_paths,
             passengers=self.passengers,
             travel_plans=self.travel_plans,
-            score=self._status.score,
             ui=self.ui,
-            status=self._status,
             ms_until_next_spawn=self._passenger_spawning.ms_until_next_spawn,
             showing_debug=self.showing_debug,
             game_speed=self.game_speed,
         )
 
     def toggle_pause(self) -> None:
-        self._status.is_paused = not self._status.is_paused
+        self._components.status.is_paused = not self._components.status.is_paused
 
     def exit(self) -> NoReturn:
         pygame.quit()
@@ -166,11 +165,11 @@ class Mediator:
 
     @property
     def is_creating_path(self) -> bool:
-        return self._status.is_creating_path
+        return self._components.status.is_creating_path
 
     @property
     def is_paused(self) -> bool:
-        return self._status.is_paused
+        return self._components.status.is_paused
 
     #######################
     ### private methods ###
@@ -193,7 +192,7 @@ class Mediator:
         return station_shape_types
 
     def _is_passenger_spawn_time(self) -> bool:
-        return self._passenger_spawning.is_passenger_spawn_time(self._status)
+        return self._passenger_spawning.is_passenger_spawn_time(self._components.status)
 
     def _move_passengers(self) -> None:
         for metro in self._components.metros:

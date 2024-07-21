@@ -16,7 +16,6 @@ from src.type import Color
 from src.ui.ui import UI
 from src.utils import hue_to_rgb
 
-from .impl import MediatorStatus
 from .path_being_created import PathBeingCreated
 from .path_finder import find_next_path_for_passenger_at_station
 
@@ -32,13 +31,11 @@ class PathManager:
             "max_num_metros",
             "ui",
             "path_being_created",
-            "_status",
         )
 
     def __init__(
         self,
         components: GameComponents,
-        status: MediatorStatus,
         ui: UI,
     ):
         self.paths: Final[list[Path]] = []
@@ -50,12 +47,11 @@ class PathManager:
         self._components: Final = components
         self.ui: Final = ui
         self.path_being_created: PathBeingCreated | None = None
-        self._status: Final = status
 
     def start_path_on_station(self, station: Station) -> None:
         if len(self.paths) >= self.max_num_paths:
             return
-        self._status.is_creating_path = True
+        self._components.status.is_creating_path = True
         assigned_color = (0, 0, 0)
         for path_color, taken in self.path_colors.items():
             if taken:
@@ -97,7 +93,7 @@ class PathManager:
 
     def abort_path_creation(self) -> None:
         assert self.path_being_created is not None
-        self._status.is_creating_path = False
+        self._components.status.is_creating_path = False
         self._release_color_for_path(self.path_being_created.path)
         self.paths.remove(self.path_being_created.path)
         self.path_being_created = None
@@ -133,7 +129,7 @@ class PathManager:
 
     def _finish_path_creation(self) -> None:
         assert self.path_being_created is not None
-        self._status.is_creating_path = False
+        self._components.status.is_creating_path = False
         self.path_being_created.path.is_being_created = False
         self.path_being_created.path.remove_temporary_point()
         if len(self._components.metros) < self.max_num_metros:

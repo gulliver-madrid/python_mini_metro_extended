@@ -139,13 +139,13 @@ class TestGameplay(BaseTestCase):
         self.reactor.react(KeyboardEvent(KeyboardEventType.KEY_DOWN, pygame.K_SPACE))
 
         self.assertTrue(
-            self.mediator._status.is_paused  # pyright: ignore [reportPrivateUsage]
+            self.mediator._components.status.is_paused  # pyright: ignore [reportPrivateUsage]
         )
 
         self.reactor.react(KeyboardEvent(KeyboardEventType.KEY_DOWN, pygame.K_SPACE))
 
         self.assertFalse(
-            self.mediator._status.is_paused  # pyright: ignore [reportPrivateUsage]
+            self.mediator._components.status.is_paused  # pyright: ignore [reportPrivateUsage]
         )
 
     def test_path_button_removes_path_on_click(self) -> None:

@@ -27,9 +27,7 @@ class GameRenderer:
         max_num_paths: int,
         passengers: Sequence[Passenger],
         travel_plans: TravelPlansMapping,
-        score: int,
         ui: UI,
-        status: MediatorStatus,
         ms_until_next_spawn: float,
         showing_debug: bool,
         game_speed: float,
@@ -43,14 +41,14 @@ class GameRenderer:
             station.draw(screen)
         for metro in components.metros:
             metro.draw(screen)
-        ui.render(screen, score)
+        ui.render(screen, components.status.score)
         if showing_debug:
             self.debug_renderer.draw_debug(
                 screen,
                 ui,
                 passengers,
                 travel_plans,
-                status,
+                components.status,
                 ms_until_next_spawn,
                 game_speed,
             )
