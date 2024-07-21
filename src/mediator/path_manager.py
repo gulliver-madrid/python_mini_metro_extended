@@ -10,6 +10,7 @@ from src.geometry.type import ShapeType
 from src.graph.graph_algo import bfs, build_station_nodes_dict
 from src.graph.node import Node
 from src.graph.skip_intermediate import skip_stations_on_same_path
+from src.mediator.game_components import GameComponents
 from src.travel_plan import TravelPlan
 from src.type import Color
 from src.ui.ui import UI
@@ -23,6 +24,7 @@ from .path_finder import find_next_path_for_passenger_at_station
 class PathManager:
     if TYPE_CHECKING:
         __slots__ = (
+            "_components",
             "paths",
             "max_num_paths",
             "path_colors",
@@ -37,7 +39,7 @@ class PathManager:
 
     def __init__(
         self,
-        stations: list[Station],
+        components: GameComponents,
         metros: list[Metro],
         status: MediatorStatus,
         ui: UI,
@@ -49,7 +51,7 @@ class PathManager:
         self.path_colors: Final = self._get_initial_path_colors()
         self.metros: Final = metros
         self.max_num_metros: Final = max_num_metros
-        self.stations: Final = stations
+        self._components: Final = components
         self.ui: Final = ui
         self.path_being_created: PathBeingCreated | None = None
         self._status: Final = status
@@ -115,8 +117,10 @@ class PathManager:
         self.find_travel_plan_for_passengers()
 
     def find_travel_plan_for_passengers(self) -> None:
-        station_nodes_mapping = build_station_nodes_dict(self.stations, self.paths)
-        for station in self.stations:
+        station_nodes_mapping = build_station_nodes_dict(
+            self._components.stations, self.paths
+        )
+        for station in self._components.stations:
             for passenger in station.passengers:
                 if self._passenger_has_travel_plan(passenger):
                     continue
@@ -186,7 +190,9 @@ class PathManager:
 
     def _get_stations_for_shape_type(self, shape_type: ShapeType) -> list[Station]:
         stations = [
-            station for station in self.stations if station.shape.type == shape_type
+            station
+            for station in self._components.stations
+            if station.shape.type == shape_type
         ]
         random.shuffle(stations)
         return stations

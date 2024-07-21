@@ -12,6 +12,7 @@ from src.entity.path import Path
 from src.entity.station import Station
 from src.geometry.point import Point
 from src.geometry.type import ShapeType
+from src.mediator.game_components import GameComponents
 from src.ui.path_button import PathButton
 from src.ui.ui import UI, get_gui_height, get_main_surface_height
 
@@ -27,9 +28,9 @@ pp = pprint.PrettyPrinter(indent=4)
 class Mediator:
     if TYPE_CHECKING:
         __slots__ = (
+            "_components",
             "_passenger_spawning",
             "num_stations",
-            "stations",
             "metros",
             "_status",
             "ui",
@@ -52,8 +53,12 @@ class Mediator:
         )
         self.num_stations: int = num_stations
 
+        # components
+        self._components = GameComponents(
+            stations=get_random_stations(self.num_stations)
+        )
+
         # entities
-        self.stations: Final = get_random_stations(self.num_stations)
         self.metros: Final[list[Metro]] = []
 
         # status
@@ -67,7 +72,7 @@ class Mediator:
 
         # delegated classes
         self.path_manager = PathManager(
-            self.stations,
+            self._components,
             self.metros,
             self._status,
             self.ui,
@@ -84,7 +89,7 @@ class Mediator:
         self.ui.clock = clock
 
     def get_containing_entity(self, position: Point) -> Station | PathButton | None:
-        for station in self.stations:
+        for station in self._components.stations:
             if station.contains(position):
                 return station
         return self.ui.get_containing_button(position) or None
@@ -121,7 +126,7 @@ class Mediator:
             max_num_paths=self.path_manager.max_num_paths,
             passengers=self.passengers,
             travel_plans=self.travel_plans,
-            stations=self.stations,
+            stations=self._components.stations,
             metros=self.metros,
             score=self._status.score,
             ui=self.ui,
@@ -144,7 +149,7 @@ class Mediator:
         for metro in self.metros:
             passengers.extend(metro.passengers)
 
-        for station in self.stations:
+        for station in self._components.stations:
             passengers.extend(station.passengers)
         return passengers
 
@@ -158,7 +163,13 @@ class Mediator:
 
     @property
     def paths(self) -> list[Path]:
+        # tests only
         return self.path_manager.paths
+
+    @property
+    def stations(self) -> list[Station]:
+        # tests only
+        return self._components.stations
 
     @property
     def is_creating_path(self) -> bool:
@@ -175,7 +186,7 @@ class Mediator:
     def _spawn_passengers(self) -> None:
         station_types = self._get_station_shape_types()
         passenger_creator = PassengerCreator(station_types)
-        for station in self.stations:
+        for station in self._components.stations:
             if not station.has_room():
                 continue
             passenger = passenger_creator.create_passenger(station)
@@ -183,7 +194,7 @@ class Mediator:
 
     def _get_station_shape_types(self) -> list[ShapeType]:
         station_shape_types: list[ShapeType] = []
-        for station in self.stations:
+        for station in self._components.stations:
             if station.shape.type not in station_shape_types:
                 station_shape_types.append(station.shape.type)
         return station_shape_types
