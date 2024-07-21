@@ -4,11 +4,10 @@ from typing import Final
 import pygame
 
 from src.config import Config
-from src.entity.metro import Metro
 from src.entity.passenger import Passenger
 from src.entity.path import Path
-from src.entity.station import Station
 from src.geometry.point import Point
+from src.mediator.game_components import GameComponents
 from src.mediator.impl import MediatorStatus, TravelPlansMapping
 from src.ui.ui import UI
 
@@ -23,12 +22,11 @@ class GameRenderer:
         *,
         gui_height: float,
         main_surface_height: float,
+        components: GameComponents,
         paths: Sequence[Path],
         max_num_paths: int,
         passengers: Sequence[Passenger],
         travel_plans: TravelPlansMapping,
-        stations: Sequence[Station],
-        metros: Sequence[Metro],
         score: int,
         ui: UI,
         status: MediatorStatus,
@@ -41,9 +39,9 @@ class GameRenderer:
         )
         main_surface.fill((180, 180, 120))
         self._draw_paths(screen, paths, max_num_paths)
-        for station in stations:
+        for station in components.stations:
             station.draw(screen)
-        for metro in metros:
+        for metro in components.metros:
             metro.draw(screen)
         ui.render(screen, score)
         if showing_debug:

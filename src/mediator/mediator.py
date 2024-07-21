@@ -6,7 +6,6 @@ import pygame
 
 from src.config import Config, num_stations
 from src.entity.get_entity import get_random_stations
-from src.entity.metro import Metro
 from src.entity.passenger import Passenger
 from src.entity.path import Path
 from src.entity.station import Station
@@ -31,7 +30,6 @@ class Mediator:
             "_components",
             "_passenger_spawning",
             "num_stations",
-            "metros",
             "_status",
             "ui",
             "path_manager",
@@ -55,11 +53,8 @@ class Mediator:
 
         # components
         self._components = GameComponents(
-            stations=get_random_stations(self.num_stations)
+            stations=get_random_stations(self.num_stations), metros=[]
         )
-
-        # entities
-        self.metros: Final[list[Metro]] = []
 
         # status
         self._status: Final = MediatorStatus()
@@ -73,7 +68,6 @@ class Mediator:
         # delegated classes
         self.path_manager = PathManager(
             self._components,
-            self.metros,
             self._status,
             self.ui,
         )
@@ -122,12 +116,11 @@ class Mediator:
             screen,
             gui_height=self._gui_height,
             main_surface_height=self._main_surface_height,
+            components=self._components,
             paths=self.paths,
             max_num_paths=self.path_manager.max_num_paths,
             passengers=self.passengers,
             travel_plans=self.travel_plans,
-            stations=self._components.stations,
-            metros=self.metros,
             score=self._status.score,
             ui=self.ui,
             status=self._status,
@@ -146,7 +139,7 @@ class Mediator:
     @property
     def passengers(self) -> list[Passenger]:
         passengers: list[Passenger] = []
-        for metro in self.metros:
+        for metro in self._components.metros:
             passengers.extend(metro.passengers)
 
         for station in self._components.stations:
@@ -203,7 +196,7 @@ class Mediator:
         return self._passenger_spawning.is_passenger_spawn_time(self._status)
 
     def _move_passengers(self) -> None:
-        for metro in self.metros:
+        for metro in self._components.metros:
 
             if not metro.current_station:
                 continue

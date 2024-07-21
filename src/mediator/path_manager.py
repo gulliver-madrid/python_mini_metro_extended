@@ -29,9 +29,7 @@ class PathManager:
             "max_num_paths",
             "path_colors",
             "path_to_color",
-            "metros",
             "max_num_metros",
-            "stations",
             "ui",
             "path_being_created",
             "_status",
@@ -40,7 +38,6 @@ class PathManager:
     def __init__(
         self,
         components: GameComponents,
-        metros: list[Metro],
         status: MediatorStatus,
         ui: UI,
     ):
@@ -49,7 +46,6 @@ class PathManager:
 
         self.path_to_color: Final[dict[Path, Color]] = {}
         self.path_colors: Final = self._get_initial_path_colors()
-        self.metros: Final = metros
         self.max_num_metros: Final = max_num_metros
         self._components: Final = components
         self.ui: Final = ui
@@ -110,7 +106,7 @@ class PathManager:
         self.ui.path_to_button[path].remove_path()
         for metro in path.metros:
             # this shouldn't remove the passengers but it does
-            self.metros.remove(metro)
+            self._components.metros.remove(metro)
         self._release_color_for_path(path)
         self.paths.remove(path)
         self._assign_paths_to_buttons()
@@ -140,10 +136,10 @@ class PathManager:
         self._status.is_creating_path = False
         self.path_being_created.path.is_being_created = False
         self.path_being_created.path.remove_temporary_point()
-        if len(self.metros) < self.max_num_metros:
+        if len(self._components.metros) < self.max_num_metros:
             metro = Metro()
             self.path_being_created.path.add_metro(metro)
-            self.metros.append(metro)
+            self._components.metros.append(metro)
         self.path_being_created = None
         self._assign_paths_to_buttons()
 
