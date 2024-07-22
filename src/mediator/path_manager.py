@@ -66,6 +66,8 @@ class PathManager:
     def add_station_to_path(self, station: Station) -> None:
         assert self.path_being_created
         self.path_being_created.add_station_to_path(station)
+        if self.path_being_created.path.is_looped:
+            self._finish_path_creation()
 
     def end_path_on_station(self, station: Station) -> None:
         assert self.path_being_created
