@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Final
+
 from src.entity.path import Path
 from src.entity.station import Station
 
@@ -8,7 +10,7 @@ class PathBeingCreated:
     __slots__ = ("path",)
 
     def __init__(self, path: Path):
-        self.path = path
+        self.path: Final = path
 
     # public methods
 

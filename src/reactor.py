@@ -107,6 +107,4 @@ class UI_Reactor:
             if isinstance(entity, Station):
                 self.mediator.path_manager.add_station_to_path(entity)
             else:
-                self.mediator.path_manager.path_being_created.path.set_temporary_point(
-                    position
-                )
+                self.mediator.path_manager.set_temporary_point(position)

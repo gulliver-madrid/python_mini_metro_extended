@@ -6,6 +6,7 @@ from src.entity.metro import Metro
 from src.entity.passenger import Passenger
 from src.entity.path import Path
 from src.entity.station import Station
+from src.geometry.point import Point
 from src.geometry.type import ShapeType
 from src.graph.graph_algo import bfs, build_station_nodes_dict
 from src.graph.node import Node
@@ -63,32 +64,33 @@ class PathManager:
         self._components.paths.append(path)
 
     def add_station_to_path(self, station: Station) -> None:
-        assert self.path_being_created is not None
+        assert self.path_being_created
         self.path_being_created.add_station_to_path(station)
 
     def end_path_on_station(self, station: Station) -> None:
-        assert self.path_being_created is not None
+        assert self.path_being_created
+        path = self.path_being_created.path
         # current station de-dupe
         if self.path_being_created.can_end_with(station):
             self._finish_path_creation()
         # loop
         elif self.path_being_created.can_make_loop(station):
-            self.path_being_created.path.set_loop()
+            path.set_loop()
             self._finish_path_creation()
         # non-loop
-        elif self.path_being_created.path.stations[0] != station:
-            self.path_being_created.path.add_station(station)
+        elif path.stations[0] != station:
+            path.add_station(station)
             self._finish_path_creation()
         else:
             self.abort_path_creation()
 
     def end_path_on_last_station(self) -> None:
-        assert self.path_being_created is not None
+        assert self.path_being_created
         last = self.path_being_created.path.stations[-1]
         self.end_path_on_station(last)
 
     def abort_path_creation(self) -> None:
-        assert self.path_being_created is not None
+        assert self.path_being_created
         self._components.status.is_creating_path = False
         self._release_color_for_path(self.path_being_created.path)
         self._components.paths.remove(self.path_being_created.path)
@@ -116,6 +118,10 @@ class PathManager:
                     station_nodes_mapping, station, passenger
                 )
 
+    def set_temporary_point(self, position: Point) -> None:
+        assert self.path_being_created
+        self.path_being_created.path.set_temporary_point(position)
+
     def _get_initial_path_colors(self) -> dict[Color, bool]:
         path_colors: Final[dict[Color, bool]] = {}
         for i in range(max_num_paths):
@@ -124,7 +130,7 @@ class PathManager:
         return path_colors
 
     def _finish_path_creation(self) -> None:
-        assert self.path_being_created is not None
+        assert self.path_being_created
         self._components.status.is_creating_path = False
         self.path_being_created.path.is_being_created = False
         self.path_being_created.path.remove_temporary_point()
