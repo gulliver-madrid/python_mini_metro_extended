@@ -1,7 +1,6 @@
 from collections.abc import Sequence
 
-from src.entity.path import Path
-from src.entity.station import Station
+from src.entity import Path, Station
 from src.protocols.travel_plan import TravelPlanProtocol
 
 

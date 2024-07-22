@@ -4,8 +4,7 @@ from typing import Final
 import pygame
 
 from src.config import Config
-from src.entity.passenger import Passenger
-from src.entity.path import Path
+from src.entity import Passenger, Path
 from src.geometry.point import Point
 from src.ui.ui import UI
 

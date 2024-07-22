@@ -6,10 +6,7 @@ from unittest.mock import create_autospec
 import pygame
 
 from src.config import framerate, metro_speed_per_ms
-from src.entity.get_entity import get_random_station, get_random_stations
-from src.entity.metro import Metro
-from src.entity.path import Path
-from src.entity.station import Station
+from src.entity import Metro, Path, Station, get_random_station, get_random_stations
 from src.geometry.point import Point
 from src.utils import get_random_color, get_random_position, get_random_station_shape
 

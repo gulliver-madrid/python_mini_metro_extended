@@ -1,9 +1,7 @@
 from collections.abc import Sequence
 from typing import Final
 
-from src.entity.metro import Metro
-from src.entity.passenger import Passenger
-from src.entity.station import Station
+from src.entity import Metro, Passenger, Station
 
 from .game_components import GameComponents
 from .path_finder import find_next_path_for_passenger_at_station

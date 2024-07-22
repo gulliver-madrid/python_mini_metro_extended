@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
-from src.entity.path import Path
-from src.entity.station import Station
+from src.entity import Path, Station
 
 
 class PathBeingCreated:

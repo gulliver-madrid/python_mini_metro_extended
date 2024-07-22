@@ -5,8 +5,7 @@ from unittest.mock import create_autospec
 import pygame
 
 from src.config import Config, station_color, station_size
-from src.entity.get_entity import get_random_stations
-from src.entity.station import Station
+from src.entity import Station, get_random_stations
 from src.event.mouse import MouseEvent
 from src.event.type import MouseEventType
 from src.geometry.circle import Circle

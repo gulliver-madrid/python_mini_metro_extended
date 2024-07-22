@@ -2,21 +2,18 @@ import random
 from typing import Final, Mapping
 
 from src.config import max_num_metros, max_num_paths
-from src.entity.metro import Metro
-from src.entity.passenger import Passenger
-from src.entity.path import Path
-from src.entity.station import Station
+from src.entity import Metro, Passenger, Path, Station
 from src.geometry.point import Point
 from src.geometry.type import ShapeType
 from src.graph.graph_algo import bfs, build_station_nodes_dict
 from src.graph.node import Node
 from src.graph.skip_intermediate import skip_stations_on_same_path
-from src.mediator.game_components import GameComponents
 from src.travel_plan import TravelPlan
 from src.type import Color
 from src.ui.ui import UI
 from src.utils import hue_to_rgb
 
+from .game_components import GameComponents
 from .path_being_created import PathBeingCreated
 from .path_finder import find_next_path_for_passenger_at_station
 

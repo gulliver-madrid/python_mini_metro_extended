@@ -5,8 +5,7 @@ from collections.abc import Sequence
 from typing import Final, Mapping
 
 from src.config import passenger_color, passenger_size
-from src.entity.passenger import Passenger
-from src.entity.station import Station
+from src.entity import Passenger, Station
 from src.geometry.type import ShapeType
 from src.utils import get_shape_from_type
 

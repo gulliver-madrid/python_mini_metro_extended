@@ -5,10 +5,7 @@ from typing import Final, NoReturn
 import pygame
 
 from src.config import Config, num_stations
-from src.entity.get_entity import get_random_stations
-from src.entity.passenger import Passenger
-from src.entity.path import Path
-from src.entity.station import Station
+from src.entity import Passenger, Path, Station, get_random_stations
 from src.geometry.point import Point
 from src.ui.path_button import PathButton
 from src.ui.ui import UI, get_gui_height, get_main_surface_height
