@@ -65,7 +65,7 @@ class GameRenderer:
 class DebugRenderer:
     fg_color: Final = (255, 255, 255)
     bg_color: Final = (0, 0, 0)
-    size: Final = (300, 200)
+    size: Final = (300, 300)
 
     def __init__(self) -> None:
         self._debug_surf = pygame.Surface(self.size)
