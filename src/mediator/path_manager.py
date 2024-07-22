@@ -45,6 +45,10 @@ class PathManager:
         self.ui: Final = ui
         self.path_being_created: PathBeingCreated | None = None
 
+    ######################
+    ### public methods ###
+    ######################
+
     def start_path_on_station(self, station: Station) -> None:
         if len(self._components.paths) >= self.max_num_paths:
             return
@@ -119,6 +123,10 @@ class PathManager:
     def set_temporary_point(self, position: Point) -> None:
         assert self.path_being_created
         self.path_being_created.path.set_temporary_point(position)
+
+    #######################
+    ### private methods ###
+    #######################
 
     def _get_initial_path_colors(self) -> dict[Color, bool]:
         path_colors: Final[dict[Color, bool]] = {}
