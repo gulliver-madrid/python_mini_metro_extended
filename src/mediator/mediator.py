@@ -121,6 +121,7 @@ class Mediator:
             passengers=self.passengers,
             travel_plans=self.travel_plans,
             ui=self.ui,
+            is_creating_path=self.path_manager.path_being_created is not None,
             ms_until_next_spawn=self._passenger_spawning.ms_until_next_spawn,
             showing_debug=self.showing_debug,
             game_speed=self.game_speed,
@@ -160,10 +161,6 @@ class Mediator:
     def stations(self) -> list[Station]:
         # tests only
         return self._components.stations
-
-    @property
-    def is_creating_path(self) -> bool:
-        return self._components.status.is_creating_path
 
     @property
     def is_paused(self) -> bool:

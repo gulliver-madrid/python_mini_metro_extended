@@ -44,12 +44,10 @@ def have_same_shape_type(station: Station, passenger: Passenger) -> bool:
 
 class MediatorStatus:
     __slots__ = (
-        "is_creating_path",
         "is_paused",
         "score",
     )
 
     def __init__(self) -> None:
-        self.is_creating_path: bool = False
         self.is_paused: bool = False
         self.score: int = 0

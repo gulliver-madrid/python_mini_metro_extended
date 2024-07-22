@@ -8,7 +8,7 @@ from src.entity.passenger import Passenger
 from src.entity.path import Path
 from src.geometry.point import Point
 from src.mediator.game_components import GameComponents
-from src.mediator.impl import MediatorStatus, TravelPlansMapping
+from src.mediator.impl import TravelPlansMapping
 from src.ui.ui import UI
 
 
@@ -28,6 +28,7 @@ class GameRenderer:
         passengers: Sequence[Passenger],
         travel_plans: TravelPlansMapping,
         ui: UI,
+        is_creating_path: bool,
         ms_until_next_spawn: float,
         showing_debug: bool,
         game_speed: float,
@@ -46,9 +47,9 @@ class GameRenderer:
             self.debug_renderer.draw_debug(
                 screen,
                 ui,
+                is_creating_path,
                 passengers,
                 travel_plans,
-                components.status,
                 ms_until_next_spawn,
                 game_speed,
             )
@@ -73,9 +74,9 @@ class DebugRenderer:
         self,
         screen: pygame.surface.Surface,
         ui: UI,
+        is_creating_path: bool,
         passengers: Sequence[Passenger],
         travel_plans: TravelPlansMapping,
-        status: MediatorStatus,
         ms_until_next_spawn: float,
         speed: float,
     ) -> None:
@@ -90,8 +91,8 @@ class DebugRenderer:
             fps,
             passengers,
             travel_plans,
-            status,
-            ms_until_next_spawn,
+            ms_until_next_spawn=ms_until_next_spawn,
+            is_creating_path=is_creating_path,
             game_speed=speed,
         )
 
@@ -108,9 +109,9 @@ class DebugRenderer:
         fps: float | None,
         passengers: Sequence[Passenger],
         travel_plans: TravelPlansMapping,
-        status: MediatorStatus,
-        ms_until_next_spawn: float,
         *,
+        ms_until_next_spawn: float,
+        is_creating_path: bool,
         game_speed: float,
     ) -> list[str]:
         debug_texts: list[str] = []
@@ -122,7 +123,7 @@ class DebugRenderer:
         debug_texts.append(f"Number of passengers: {len(passengers)}")
         debug_texts.append(f"Number of travel plans: {len(travel_plans)}")
         debug_texts.append(f"Until next spawning: { ( ms_until_next_spawn/1000):.2f}")
-        debug_texts.append(f"Is creating path: { ( status.is_creating_path)}")
+        debug_texts.append(f"Is creating path: { ( is_creating_path)}")
         return debug_texts
 
     def _draw_debug_texts(

@@ -48,7 +48,6 @@ class PathManager:
     def start_path_on_station(self, station: Station) -> None:
         if len(self._components.paths) >= self.max_num_paths:
             return
-        self._components.status.is_creating_path = True
         assigned_color = (0, 0, 0)
         for path_color, taken in self.path_colors.items():
             if taken:
@@ -91,7 +90,6 @@ class PathManager:
 
     def abort_path_creation(self) -> None:
         assert self.path_being_created
-        self._components.status.is_creating_path = False
         self._release_color_for_path(self.path_being_created.path)
         self._components.paths.remove(self.path_being_created.path)
         self.path_being_created = None
@@ -131,7 +129,6 @@ class PathManager:
 
     def _finish_path_creation(self) -> None:
         assert self.path_being_created
-        self._components.status.is_creating_path = False
         self.path_being_created.path.is_being_created = False
         self.path_being_created.path.remove_temporary_point()
         if len(self._components.metros) < self.max_num_metros:
