@@ -63,12 +63,18 @@ class GameRenderer:
 
 
 class DebugRenderer:
+    __slots__ = ("_debug_surf", "_position")
+
     fg_color: Final = (255, 255, 255)
     bg_color: Final = (0, 0, 0)
     size: Final = (300, 300)
 
     def __init__(self) -> None:
         self._debug_surf = pygame.Surface(self.size)
+        self._position: Final = Point(
+            Config.screen_width - self.size[0],
+            Config.screen_height - self.size[1],
+        )
 
     def draw_debug(
         self,
@@ -100,7 +106,7 @@ class DebugRenderer:
 
         screen.blit(
             self._debug_surf,
-            (Config.screen_width - self.size[0], Config.screen_height - self.size[1]),
+            self._position.to_tuple(),
         )
 
     def _define_debug_texts(
