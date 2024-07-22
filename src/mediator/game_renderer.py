@@ -7,9 +7,10 @@ from src.config import Config
 from src.entity.passenger import Passenger
 from src.entity.path import Path
 from src.geometry.point import Point
-from src.mediator.game_components import GameComponents
-from src.mediator.impl import TravelPlansMapping
 from src.ui.ui import UI
+
+from .game_components import GameComponents
+from .impl import TravelPlansMapping
 
 
 class GameRenderer:

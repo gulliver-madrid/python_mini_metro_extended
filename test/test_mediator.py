@@ -16,6 +16,7 @@ from src.geometry.point import Point
 from src.geometry.rect import Rect
 from src.geometry.triangle import Triangle
 from src.geometry.type import ShapeType
+from src.mediator.impl import PassengerSpawning
 from src.mediator.mediator import Mediator
 from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
@@ -79,11 +80,11 @@ class TestMediator(BaseTestCase):
         self.assertFalse(self.reactor.is_mouse_down)
 
     def test_passengers_are_added_to_stations(self) -> None:
-        self.mediator._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
+        self.mediator._passenger_spawning._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
 
         self.assertEqual(len(self.mediator.passengers), len(self.mediator.stations))
 
-    @patch.object(Mediator, "_spawn_passengers", new_callable=Mock)
+    @patch.object(PassengerSpawning, "_spawn_passengers", new_callable=Mock)
     def test_is_passenger_spawn_time(self, mock_spawn_passengers: Any) -> None:
         # Run the game until first wave of passengers spawn
         times_needed = Config.passenger_spawning.interval_step * framerate
@@ -92,12 +93,15 @@ class TestMediator(BaseTestCase):
         ):
             self.mediator.increment_time(dt_ms)
 
-        self.mediator._spawn_passengers.assert_called_once()  # type: ignore [attr-defined]
+        mock_spawn_passengers.assert_called_once()
 
         for _ in range(times_needed):
             self.mediator.increment_time(dt_ms)
 
-        self.assertEqual(self.mediator._spawn_passengers.call_count, 2)  # type: ignore [attr-defined]
+        self.assertEqual(
+            mock_spawn_passengers.call_count,
+            2,
+        )
 
     def test_passengers_spawned_at_a_station_have_a_different_destination(self) -> None:
         # Run the game until first wave of passengers spawn
@@ -235,7 +239,7 @@ class TestMediator(BaseTestCase):
         for station in self.mediator.stations:
             station.draw(self.screen)
         self.connect_stations([i for i in range(5)])
-        self.mediator._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
+        self.mediator._passenger_spawning._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
         self.mediator.path_manager.find_travel_plan_for_passengers()
         for station in self.mediator.stations:
             for passenger in station.passengers:

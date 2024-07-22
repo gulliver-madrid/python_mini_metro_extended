@@ -10,16 +10,15 @@ from src.entity.passenger import Passenger
 from src.entity.path import Path
 from src.entity.station import Station
 from src.geometry.point import Point
-from src.geometry.type import ShapeType
-from src.mediator.game_components import GameComponents
 from src.ui.path_button import PathButton
 from src.ui.ui import UI, get_gui_height, get_main_surface_height
 
+from .game_components import GameComponents
 from .game_renderer import GameRenderer
-from .impl import MediatorStatus, PassengerSpawning, TravelPlansMapping
-from .passenger_creator import PassengerCreator
+from .impl import PassengerSpawning, TravelPlansMapping
 from .passenger_mover import PassengerMover
 from .path_manager import PathManager
+from .status import MediatorStatus
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -44,9 +43,6 @@ class Mediator:
         pygame.font.init()
 
         # configs
-        self._passenger_spawning = PassengerSpawning(
-            Config.passenger_spawning.interval_step,
-        )
         self.num_stations: int = num_stations
 
         # components
@@ -66,6 +62,10 @@ class Mediator:
         self._game_renderer = GameRenderer()
 
         # delegated classes
+        self._passenger_spawning = PassengerSpawning(
+            self._components,
+            Config.passenger_spawning.interval_step,
+        )
         self.path_manager = PathManager(
             self._components,
             self.ui,
@@ -95,7 +95,7 @@ class Mediator:
         self._passenger_spawning.increment_time(dt_ms)
 
         self._move_metros(dt_ms)
-        self._manage_passengers_spawning()
+        self._passenger_spawning.manage_passengers_spawning()
 
         self.path_manager.find_travel_plan_for_passengers()
         self._move_passengers()
@@ -104,11 +104,6 @@ class Mediator:
         for path in self.paths:
             for metro in path.metros:
                 path.move_metro(metro, dt_ms)
-
-    def _manage_passengers_spawning(self) -> None:
-        if self._is_passenger_spawn_time():
-            self._spawn_passengers()
-            self._passenger_spawning.reset()
 
     def render(self, screen: pygame.surface.Surface) -> None:
         self._game_renderer.render_game(
@@ -169,25 +164,6 @@ class Mediator:
     #######################
     ### private methods ###
     #######################
-
-    def _spawn_passengers(self) -> None:
-        station_types = self._get_station_shape_types()
-        passenger_creator = PassengerCreator(station_types)
-        for station in self._components.stations:
-            if not station.has_room():
-                continue
-            passenger = passenger_creator.create_passenger(station)
-            station.add_passenger(passenger)
-
-    def _get_station_shape_types(self) -> list[ShapeType]:
-        station_shape_types: list[ShapeType] = []
-        for station in self._components.stations:
-            if station.shape.type not in station_shape_types:
-                station_shape_types.append(station.shape.type)
-        return station_shape_types
-
-    def _is_passenger_spawn_time(self) -> bool:
-        return self._passenger_spawning.is_passenger_spawn_time(self._components.status)
 
     def _move_passengers(self) -> None:
         for metro in self._components.metros:
