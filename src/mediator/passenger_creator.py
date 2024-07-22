@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import random
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final, Mapping
+from typing import Final, Mapping
 
 from src.config import passenger_color, passenger_size
 from src.entity.passenger import Passenger
@@ -14,8 +14,7 @@ ShapeTypesToOthers = Mapping[ShapeType, Sequence[ShapeType]]
 
 
 class PassengerCreator:
-    if TYPE_CHECKING:
-        __slots__ = ("_shape_types_to_others",)
+    __slots__ = ("_shape_types_to_others",)
     _shape_types_to_others: Final[ShapeTypesToOthers]
 
     def __init__(self, station_types: Sequence[ShapeType]):

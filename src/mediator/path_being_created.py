@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from src.entity.path import Path
 from src.entity.station import Station
 
 
 class PathBeingCreated:
-    if TYPE_CHECKING:
-        __slots__ = ("path",)
+    __slots__ = ("path",)
 
     def __init__(self, path: Path):
         self.path = path

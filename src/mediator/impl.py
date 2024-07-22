@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, Mapping
+from typing import Final, Mapping
 
 from src.config import Config
 from src.entity.passenger import Passenger
@@ -12,11 +12,10 @@ TravelPlansMapping = Mapping[Passenger, TravelPlanProtocol]
 
 
 class PassengerSpawning:
-    if TYPE_CHECKING:
-        __slots__ = (
-            "_interval_step",
-            "_ms_until_next_spawn",
-        )
+    __slots__ = (
+        "_interval_step",
+        "_ms_until_next_spawn",
+    )
 
     def __init__(self, interval_step: int):
         self._interval_step: Final[int] = interval_step * 1000
@@ -44,12 +43,11 @@ def have_same_shape_type(station: Station, passenger: Passenger) -> bool:
 
 
 class MediatorStatus:
-    if TYPE_CHECKING:
-        __slots__ = (
-            "is_creating_path",
-            "is_paused",
-            "score",
-        )
+    __slots__ = (
+        "is_creating_path",
+        "is_paused",
+        "score",
+    )
 
     def __init__(self) -> None:
         self.is_creating_path: bool = False
