@@ -51,6 +51,7 @@ class Mediator:
 
         # components
         self._components: Final = GameComponents(
+            paths=[],
             stations=get_random_stations(self.num_stations),
             metros=[],
             status=MediatorStatus(),
@@ -70,7 +71,7 @@ class Mediator:
             self.ui,
         )
         self._passenger_mover = PassengerMover(
-            self.path_manager.paths, self._components.status
+            self._components.paths, self._components.status
         )
 
         self.ui.init(self.path_manager.max_num_paths)
@@ -155,7 +156,7 @@ class Mediator:
     @property
     def paths(self) -> list[Path]:
         # tests only
-        return self.path_manager.paths
+        return self._components.paths
 
     @property
     def stations(self) -> list[Station]:

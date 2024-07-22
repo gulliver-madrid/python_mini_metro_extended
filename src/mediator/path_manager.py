@@ -23,7 +23,6 @@ from .path_finder import find_next_path_for_passenger_at_station
 class PathManager:
     __slots__ = (
         "_components",
-        "paths",
         "max_num_paths",
         "path_colors",
         "path_to_color",
@@ -37,9 +36,7 @@ class PathManager:
         components: GameComponents,
         ui: UI,
     ):
-        self.paths: Final[list[Path]] = []
         self.max_num_paths: Final[int] = max_num_paths
-
         self.path_to_color: Final[dict[Path, Color]] = {}
         self.path_colors: Final = self._get_initial_path_colors()
         self.max_num_metros: Final = max_num_metros
@@ -48,7 +45,7 @@ class PathManager:
         self.path_being_created: PathBeingCreated | None = None
 
     def start_path_on_station(self, station: Station) -> None:
-        if len(self.paths) >= self.max_num_paths:
+        if len(self._components.paths) >= self.max_num_paths:
             return
         self._components.status.is_creating_path = True
         assigned_color = (0, 0, 0)
@@ -63,7 +60,7 @@ class PathManager:
         path.add_station(station)
         path.is_being_created = True
         self.path_being_created = PathBeingCreated(path)
-        self.paths.append(path)
+        self._components.paths.append(path)
 
     def add_station_to_path(self, station: Station) -> None:
         assert self.path_being_created is not None
@@ -94,7 +91,7 @@ class PathManager:
         assert self.path_being_created is not None
         self._components.status.is_creating_path = False
         self._release_color_for_path(self.path_being_created.path)
-        self.paths.remove(self.path_being_created.path)
+        self._components.paths.remove(self.path_being_created.path)
         self.path_being_created = None
 
     def remove_path(self, path: Path) -> None:
@@ -103,13 +100,13 @@ class PathManager:
             # this shouldn't remove the passengers but it does
             self._components.metros.remove(metro)
         self._release_color_for_path(path)
-        self.paths.remove(path)
+        self._components.paths.remove(path)
         self._assign_paths_to_buttons()
         self.find_travel_plan_for_passengers()
 
     def find_travel_plan_for_passengers(self) -> None:
         station_nodes_mapping = build_station_nodes_dict(
-            self._components.stations, self.paths
+            self._components.stations, self._components.paths
         )
         for station in self._components.stations:
             for passenger in station.passengers:
@@ -139,7 +136,7 @@ class PathManager:
         self._assign_paths_to_buttons()
 
     def _assign_paths_to_buttons(self) -> None:
-        self.ui.assign_paths_to_buttons(self.paths)
+        self.ui.assign_paths_to_buttons(self._components.paths)
 
     def _release_color_for_path(self, path: Path) -> None:
         self.path_colors[path.color] = False
@@ -193,5 +190,5 @@ class PathManager:
     ) -> None:
         assert passenger.travel_plan
         find_next_path_for_passenger_at_station(
-            self.paths, passenger.travel_plan, station
+            self._components.paths, passenger.travel_plan, station
         )
