@@ -25,14 +25,13 @@ pp = pprint.PrettyPrinter(indent=4)
 
 class Mediator:
     __slots__ = (
-        "_components",
-        "_passenger_spawner",
-        "num_stations",
         "ui",
         "path_manager",
-        "_passenger_mover",
         "showing_debug",
         "game_speed",
+        "_components",
+        "_passenger_spawner",
+        "_passenger_mover",
         "_game_renderer",
     )
 
@@ -42,13 +41,10 @@ class Mediator:
     def __init__(self) -> None:
         pygame.font.init()
 
-        # configs
-        self.num_stations: int = num_stations
-
         # components
         self._components: Final = GameComponents(
             paths=[],
-            stations=get_random_stations(self.num_stations),
+            stations=get_random_stations(num_stations),
             metros=[],
             status=MediatorStatus(),
         )
