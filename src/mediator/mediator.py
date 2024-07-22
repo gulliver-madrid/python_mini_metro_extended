@@ -15,8 +15,8 @@ from src.ui.ui import UI, get_gui_height, get_main_surface_height
 
 from .game_components import GameComponents
 from .game_renderer import GameRenderer
-from .impl import PassengerSpawning, TravelPlansMapping
 from .passenger_mover import PassengerMover
+from .passenger_spawner import PassengerSpawner, TravelPlansMapping
 from .path_manager import PathManager
 from .status import MediatorStatus
 
@@ -26,7 +26,7 @@ pp = pprint.PrettyPrinter(indent=4)
 class Mediator:
     __slots__ = (
         "_components",
-        "_passenger_spawning",
+        "_passenger_spawner",
         "num_stations",
         "ui",
         "path_manager",
@@ -62,7 +62,7 @@ class Mediator:
         self._game_renderer = GameRenderer()
 
         # delegated classes
-        self._passenger_spawning = PassengerSpawning(
+        self._passenger_spawner = PassengerSpawner(
             self._components,
             Config.passenger_spawning.interval_step,
         )
@@ -92,10 +92,10 @@ class Mediator:
             return
 
         dt_ms *= self.game_speed
-        self._passenger_spawning.increment_time(dt_ms)
+        self._passenger_spawner.increment_time(dt_ms)
 
         self._move_metros(dt_ms)
-        self._passenger_spawning.manage_passengers_spawning()
+        self._passenger_spawner.manage_passengers_spawning()
 
         self.path_manager.find_travel_plan_for_passengers()
         self._move_passengers()
@@ -117,7 +117,7 @@ class Mediator:
             travel_plans=self.travel_plans,
             ui=self.ui,
             is_creating_path=self.path_manager.path_being_created is not None,
-            ms_until_next_spawn=self._passenger_spawning.ms_until_next_spawn,
+            ms_until_next_spawn=self._passenger_spawner.ms_until_next_spawn,
             showing_debug=self.showing_debug,
             game_speed=self.game_speed,
         )

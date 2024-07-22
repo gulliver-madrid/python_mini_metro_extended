@@ -16,8 +16,8 @@ from src.geometry.point import Point
 from src.geometry.rect import Rect
 from src.geometry.triangle import Triangle
 from src.geometry.type import ShapeType
-from src.mediator.impl import PassengerSpawning
 from src.mediator.mediator import Mediator
+from src.mediator.passenger_spawner import PassengerSpawner
 from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 
@@ -80,11 +80,11 @@ class TestMediator(BaseTestCase):
         self.assertFalse(self.reactor.is_mouse_down)
 
     def test_passengers_are_added_to_stations(self) -> None:
-        self.mediator._passenger_spawning._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
+        self.mediator._passenger_spawner._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
 
         self.assertEqual(len(self.mediator.passengers), len(self.mediator.stations))
 
-    @patch.object(PassengerSpawning, "_spawn_passengers", new_callable=Mock)
+    @patch.object(PassengerSpawner, "_spawn_passengers", new_callable=Mock)
     def test_is_passenger_spawn_time(self, mock_spawn_passengers: Any) -> None:
         # Run the game until first wave of passengers spawn
         times_needed = Config.passenger_spawning.interval_step * framerate
@@ -239,7 +239,7 @@ class TestMediator(BaseTestCase):
         for station in self.mediator.stations:
             station.draw(self.screen)
         self.connect_stations([i for i in range(5)])
-        self.mediator._passenger_spawning._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
+        self.mediator._passenger_spawner._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
         self.mediator.path_manager.find_travel_plan_for_passengers()
         for station in self.mediator.stations:
             for passenger in station.passengers:

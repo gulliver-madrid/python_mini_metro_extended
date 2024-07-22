@@ -6,7 +6,6 @@ from src.entity.passenger import Passenger
 from src.entity.station import Station
 
 from .game_components import GameComponents
-from .impl import have_same_shape_type
 from .path_finder import find_next_path_for_passenger_at_station
 
 
@@ -105,3 +104,7 @@ class PassengerMover:
         find_next_path_for_passenger_at_station(
             self._components.paths, travel_plan, station
         )
+
+
+def have_same_shape_type(station: Station, passenger: Passenger) -> bool:
+    return station.shape.type == passenger.destination_shape.type

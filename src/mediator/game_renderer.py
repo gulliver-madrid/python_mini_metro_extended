@@ -10,7 +10,7 @@ from src.geometry.point import Point
 from src.ui.ui import UI
 
 from .game_components import GameComponents
-from .impl import TravelPlansMapping
+from .passenger_spawner import TravelPlansMapping
 
 
 class GameRenderer:
