@@ -3,20 +3,18 @@ from typing import Final
 
 from src.entity.metro import Metro
 from src.entity.passenger import Passenger
-from src.entity.path import Path
 from src.entity.station import Station
-from src.mediator.impl import MediatorStatus, have_same_shape_type
-from src.mediator.path_finder import find_next_path_for_passenger_at_station
+
+from .game_components import GameComponents
+from .impl import have_same_shape_type
+from .path_finder import find_next_path_for_passenger_at_station
 
 
 class PassengerMover:
-    def __init__(
-        self,
-        paths: list[Path],
-        status: MediatorStatus,
-    ):
-        self._paths: Final = paths
-        self._status: Final = status
+    __slots__ = ("_components",)
+
+    def __init__(self, components: GameComponents):
+        self._components: Final = components
 
     # public methods
 
@@ -72,7 +70,7 @@ class PassengerMover:
             passenger.is_at_destination = True
             metro.remove_passenger(passenger)
             del passenger.travel_plan
-            self._status.score += 1
+            self._components.status.score += 1
 
     def _transfer_passengers_from_metro_to_station(
         self,
@@ -104,4 +102,6 @@ class PassengerMover:
         travel_plan = passenger.travel_plan
         assert travel_plan
         travel_plan.increment_next_station()
-        find_next_path_for_passenger_at_station(self._paths, travel_plan, station)
+        find_next_path_for_passenger_at_station(
+            self._components.paths, travel_plan, station
+        )

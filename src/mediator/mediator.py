@@ -70,9 +70,7 @@ class Mediator:
             self._components,
             self.ui,
         )
-        self._passenger_mover = PassengerMover(
-            self._components.paths, self._components.status
-        )
+        self._passenger_mover = PassengerMover(self._components)
 
         self.ui.init(self.path_manager.max_num_paths)
 
