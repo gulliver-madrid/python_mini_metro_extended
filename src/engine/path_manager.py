@@ -187,8 +187,9 @@ class PathManager:
                 break
 
         else:
-            passenger.travel_plan = TravelPlan([], passenger.num_id)
-
+            travel_plan = TravelPlan([], passenger.num_id)
+            if travel_plan != passenger.travel_plan:
+                passenger.travel_plan = travel_plan
 
     def _get_stations_for_shape_type(self, shape_type: ShapeType) -> list[Station]:
         stations = [

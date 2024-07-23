@@ -18,7 +18,7 @@ class Passenger(Entity):
         "position",
         "destination_shape",
         "is_at_destination",
-        "travel_plan",
+        "_travel_plan",
         "last_station",
     )
 
@@ -27,7 +27,7 @@ class Passenger(Entity):
         self.position = Point(0, 0)
         self.destination_shape = destination_shape
         self.is_at_destination = False
-        self.travel_plan: TravelPlanProtocol | None = None
+        self._travel_plan: TravelPlanProtocol | None = None
         # last_station is used to reposition the passenger if their metro
         # is removed
         self.last_station: Station | None = None
@@ -40,3 +40,17 @@ class Passenger(Entity):
 
     def draw(self, surface: pygame.surface.Surface) -> None:
         self.destination_shape.draw(surface, self.position)
+
+    @property
+    def travel_plan(self) -> TravelPlanProtocol | None:
+        return self._travel_plan
+
+    @travel_plan.setter
+    def travel_plan(self, value: TravelPlanProtocol) -> None:
+        if self._travel_plan:
+            assert value.node_path != self._travel_plan.node_path
+        self._travel_plan = value
+
+    @travel_plan.deleter
+    def travel_plan(self) -> None:
+        self._travel_plan = None

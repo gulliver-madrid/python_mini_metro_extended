@@ -31,5 +31,13 @@ class TravelPlan:
     def increment_next_station(self) -> None:
         self.next_station_idx += 1
 
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, type(self)):
+            return False
+        return self.next_path == value.next_path
+
     def __repr__(self) -> str:
+        return f"TravelPlan(passenger_num_id={self._passenger_num_id}, node_path=({self.node_path})"
+
+    def __str__(self) -> str:
         return f"TravelPlan (passenger {self._passenger_num_id}) = get on {self.next_path}, then get off at {self.next_station}"

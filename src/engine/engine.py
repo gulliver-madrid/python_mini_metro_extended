@@ -89,7 +89,8 @@ class Engine:
 
         self._move_metros(dt_ms)
         self._passenger_spawner.manage_passengers_spawning()
-
+        # is this needed? or is better only to find travel plans when
+        # something change (paths)
         self.path_manager.find_travel_plan_for_passengers()
         self._move_passengers()
 
