@@ -12,6 +12,14 @@ from .passenger import Passenger
 
 
 class Holder(Entity):
+    __slots__ = (
+        "shape",
+        "capacity",
+        "passengers",
+        "passengers_per_row",
+        "size",
+        "position",
+    )
     passengers_per_row: int
     size: int
     position: Point

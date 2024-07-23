@@ -14,6 +14,15 @@ from .station import Station
 
 
 class Metro(Holder):
+    __slots__ = (
+        "current_station",
+        "current_segment",
+        "current_segment_idx",
+        "path_id",
+        "game_speed",
+        "is_forward",
+    )
+
     def __init__(self) -> None:
         self.size = metro_size
         metro_shape = Rect(color=metro_color, width=2 * self.size, height=self.size)

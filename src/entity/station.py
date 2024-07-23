@@ -7,6 +7,8 @@ from .ids import create_new_station_id
 
 
 class Station(Holder):
+    __slots__ = ()
+
     def __init__(self, shape: Shape, position: Point) -> None:
         super().__init__(
             shape=shape,
