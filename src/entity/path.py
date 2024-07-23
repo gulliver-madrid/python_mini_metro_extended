@@ -1,4 +1,5 @@
 import math
+from typing import Final
 
 import pygame
 
@@ -18,6 +19,22 @@ from .station import Station
 
 
 class Path(Entity):
+    __slots__ = (
+        "color",
+        "stations",
+        "metros",
+        "is_looped",
+        "is_being_created",
+        "temp_point",
+        "segments",
+        "path_segments",
+        "padding_segments",
+        "path_order",
+    )
+    segments: Final[list[Segment]]
+    path_segments: Final[list[PathSegment]]
+    padding_segments: Final[list[PaddingSegment]]
+
     def __init__(self, color: Color) -> None:
         super().__init__(create_new_path_id())
         self.color = color
@@ -26,9 +43,9 @@ class Path(Entity):
         self.is_looped = False
         self.is_being_created = False
         self.temp_point: Point | None = None
-        self.segments: list[Segment] = []
-        self.path_segments: list[PathSegment] = []
-        self.padding_segments: list[PaddingSegment] = []
+        self.segments = []
+        self.path_segments = []
+        self.padding_segments = []
         self.path_order = 0
 
     def add_station(self, station: Station) -> None:
@@ -36,9 +53,9 @@ class Path(Entity):
         self.update_segments()
 
     def update_segments(self) -> None:
-        self.segments = []
-        self.path_segments = []
-        self.padding_segments = []
+        self.segments.clear()
+        self.path_segments.clear()
+        self.padding_segments.clear()
 
         for i in range(len(self.stations) - 1):
             self.path_segments.append(
