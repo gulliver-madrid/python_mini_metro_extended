@@ -32,9 +32,6 @@ class Passenger(Entity):
         # is removed
         self.last_station: Station | None = None
 
-    def __repr__(self) -> str:
-        return f"{self.id}-{self.destination_shape.type}"
-
     def __str__(self) -> str:
         return repr(self) + f"-{self.destination_shape.type}"
 

@@ -182,12 +182,13 @@ class PathManager:
             else:
                 assert len(node_path) > 1
                 node_path = skip_stations_on_same_path(node_path)
-                passenger.travel_plan = TravelPlan(node_path[1:])
+                passenger.travel_plan = TravelPlan(node_path[1:], passenger.num_id)
                 self._find_next_path_for_passenger_at_station(passenger, station)
                 break
 
         else:
-            passenger.travel_plan = TravelPlan([])
+            passenger.travel_plan = TravelPlan([], passenger.num_id)
+
 
     def _get_stations_for_shape_type(self, shape_type: ShapeType) -> list[Station]:
         stations = [
