@@ -8,6 +8,8 @@ from .segment import Segment
 
 
 class PaddingSegment(Segment):
+    __slots__ = ()
+
     def __init__(self, color: Color, start_point: Point, end_point: Point) -> None:
         super().__init__(color, create_new_padding_segment_id())
         self.segment_start = start_point

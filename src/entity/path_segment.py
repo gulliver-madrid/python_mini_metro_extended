@@ -9,6 +9,8 @@ from .station import Station
 
 
 class PathSegment(Segment):
+    __slots__ = ("path_order",)
+
     def __init__(
         self,
         color: Color,
