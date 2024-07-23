@@ -5,6 +5,7 @@ from unittest.mock import create_autospec
 import pygame
 
 from src.config import Config, station_color, station_size
+from src.engine.engine import Mediator
 from src.entity import Station, get_random_stations
 from src.event.mouse import MouseEvent
 from src.event.type import MouseEventType
@@ -12,7 +13,6 @@ from src.geometry.circle import Circle
 from src.geometry.rect import Rect
 from src.graph.graph_algo import bfs, build_station_nodes_dict
 from src.graph.node import Node
-from src.mediator.mediator import Mediator
 from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 

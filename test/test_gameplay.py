@@ -5,13 +5,13 @@ from unittest.mock import Mock, create_autospec, patch
 import pygame
 
 from src.config import Config
+from src.engine.engine import Mediator
+from src.engine.path_manager import PathManager
 from src.entity.get_entity import get_random_stations
 from src.event.keyboard import KeyboardEvent
 from src.event.mouse import MouseEvent
 from src.event.type import KeyboardEventType, MouseEventType
 from src.geometry.point import Point
-from src.mediator.mediator import Mediator
-from src.mediator.path_manager import PathManager
 from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 

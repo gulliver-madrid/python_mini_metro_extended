@@ -11,7 +11,9 @@ class PathBeingCreated:
     def __init__(self, path: Path):
         self.path: Final = path
 
-    # public methods
+    ######################
+    ### public methods ###
+    ######################
 
     def add_station_to_path(self, station: Station) -> None:
         if self._is_last_station(station):
@@ -31,7 +33,9 @@ class PathBeingCreated:
     def can_make_loop(self, station: Station) -> bool:
         return self._num_stations_in_this_path() > 1 and self._is_first_station(station)
 
-    # private methods
+    #######################
+    ### private methods ###
+    #######################
 
     def _num_stations_in_this_path(self) -> int:
         return len(self.path.stations)

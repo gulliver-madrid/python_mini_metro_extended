@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 
 from src.entity import Metro, Passenger, Path, Station
-from src.mediator.status import MediatorStatus
+
+from .status import MediatorStatus
 
 
 @dataclass(frozen=True)

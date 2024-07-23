@@ -3,13 +3,13 @@ import queue
 import pygame
 
 from src.console import Console
+from src.engine.engine import Mediator
 from src.entity.station import Station
 from src.event.event import Event
 from src.event.keyboard import KeyboardEvent
 from src.event.mouse import MouseEvent
 from src.event.type import KeyboardEventType, MouseEventType
 from src.geometry.point import Point
-from src.mediator.mediator import Mediator
 from src.ui.button import Button
 from src.ui.path_button import PathButton
 

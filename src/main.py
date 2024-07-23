@@ -5,8 +5,8 @@ import numpy as np
 import pygame
 
 from src.config import Config, framerate, screen_color
+from src.engine.engine import Mediator
 from src.event.convert import convert_pygame_event
-from src.mediator.mediator import Mediator
 from src.reactor import UI_Reactor
 
 

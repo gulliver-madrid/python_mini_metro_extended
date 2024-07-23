@@ -7,6 +7,8 @@ from unittest.mock import Mock, create_autospec, patch
 import pygame
 
 from src.config import Config, framerate, station_color, station_size
+from src.engine.engine import Mediator
+from src.engine.passenger_spawner import PassengerSpawner
 from src.entity import Station, get_random_stations
 from src.event.mouse import MouseEvent
 from src.event.type import MouseEventType
@@ -15,8 +17,6 @@ from src.geometry.point import Point
 from src.geometry.rect import Rect
 from src.geometry.triangle import Triangle
 from src.geometry.type import ShapeType
-from src.mediator.mediator import Mediator
-from src.mediator.passenger_spawner import PassengerSpawner
 from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 

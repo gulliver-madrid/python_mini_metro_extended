@@ -3,7 +3,7 @@ import queue
 import threading
 from typing import NoReturn
 
-from src.mediator.mediator import Mediator
+from src.engine.engine import Mediator
 
 
 class Console:
