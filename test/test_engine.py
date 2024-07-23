@@ -7,7 +7,7 @@ from unittest.mock import Mock, create_autospec, patch
 import pygame
 
 from src.config import Config, framerate, station_color, station_size
-from src.engine.engine import Mediator
+from src.engine.engine import Engine
 from src.engine.passenger_spawner import PassengerSpawner
 from src.entity import Station, get_random_stations
 from src.event.mouse import MouseEvent
@@ -25,16 +25,16 @@ from test.base_test import BaseTestCase
 dt_ms: Final = ceil(1000 / framerate)
 
 
-class TestMediator(BaseTestCase):
+class TestEngine(BaseTestCase):
     def setUp(self) -> None:
         super().setUp()
         self.width, self.height = Config.screen_width, Config.screen_height
         self.screen = create_autospec(pygame.surface.Surface)
         self.position = get_random_position(self.width, self.height)
         self.color = get_random_color()
-        self.mediator = Mediator()
-        self.reactor = UI_Reactor(self.mediator)
-        self.mediator.render(self.screen)
+        self.engine = Engine()
+        self.reactor = UI_Reactor(self.engine)
+        self.engine.render(self.screen)
 
     def tearDown(self) -> None:
         super().tearDown()
@@ -43,24 +43,24 @@ class TestMediator(BaseTestCase):
         self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
-                self.mediator.stations[station_idx[0]].position,
+                self.engine.stations[station_idx[0]].position,
             )
         )
         for idx in station_idx[1:]:
             self.reactor.react(
                 MouseEvent(
-                    MouseEventType.MOUSE_MOTION, self.mediator.stations[idx].position
+                    MouseEventType.MOUSE_MOTION, self.engine.stations[idx].position
                 )
             )
         self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP,
-                self.mediator.stations[station_idx[-1]].position,
+                self.engine.stations[station_idx[-1]].position,
             )
         )
 
     def test_react_mouse_down(self) -> None:
-        for station in self.mediator.stations:
+        for station in self.engine.stations:
             station.draw(self.screen)
         self.reactor.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))
 
@@ -68,8 +68,8 @@ class TestMediator(BaseTestCase):
 
     def test_get_containing_entity(self) -> None:
         self.assertTrue(
-            self.mediator.get_containing_entity(
-                self.mediator.stations[2].position + Point(1, 1)
+            self.engine.get_containing_entity(
+                self.engine.stations[2].position + Point(1, 1)
             )
         )
 
@@ -79,9 +79,9 @@ class TestMediator(BaseTestCase):
         self.assertFalse(self.reactor.is_mouse_down)
 
     def test_passengers_are_added_to_stations(self) -> None:
-        self.mediator._passenger_spawner._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
+        self.engine._passenger_spawner._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
 
-        self.assertEqual(len(self.mediator.passengers), len(self.mediator.stations))
+        self.assertEqual(len(self.engine.passengers), len(self.engine.stations))
 
     @patch.object(PassengerSpawner, "_spawn_passengers", new_callable=Mock)
     def test_is_passenger_spawn_time(self, mock_spawn_passengers: Any) -> None:
@@ -90,12 +90,12 @@ class TestMediator(BaseTestCase):
         for _ in range(
             ceil(times_needed / Config.passenger_spawning.first_time_divisor)
         ):
-            self.mediator.increment_time(dt_ms)
+            self.engine.increment_time(dt_ms)
 
         mock_spawn_passengers.assert_called_once()
 
         for _ in range(times_needed):
-            self.mediator.increment_time(dt_ms)
+            self.engine.increment_time(dt_ms)
 
         self.assertEqual(
             mock_spawn_passengers.call_count,
@@ -108,19 +108,19 @@ class TestMediator(BaseTestCase):
         for _ in range(
             ceil(times_needed / Config.passenger_spawning.first_time_divisor)
         ):
-            self.mediator.increment_time(dt_ms)
+            self.engine.increment_time(dt_ms)
 
-        assert self.mediator.passengers
+        assert self.engine.passengers
 
-        for station in self.mediator.stations:
+        for station in self.engine.stations:
             for passenger in station.passengers:
                 self.assertNotEqual(
                     passenger.destination_shape.type, station.shape.type
                 )
 
     def test_passengers_at_connected_stations_have_a_way_to_destination(self) -> None:
-        self.mediator.stations.clear()
-        self.mediator.stations.extend(
+        self.engine.stations.clear()
+        self.engine.stations.extend(
             [
                 Station(
                     Rect(
@@ -140,18 +140,18 @@ class TestMediator(BaseTestCase):
             ]
         )
         # Need to draw stations if you want to override them
-        for station in self.mediator.stations:
+        for station in self.engine.stations:
             station.draw(self.screen)
 
         # Run the game until first wave of passengers spawn
         for _ in range(Config.passenger_spawning.interval_step):
-            self.mediator.increment_time(dt_ms)
+            self.engine.increment_time(dt_ms)
 
         self.connect_stations([0, 1])
-        self.mediator.increment_time(dt_ms)
+        self.engine.increment_time(dt_ms)
 
-        for passenger in self.mediator.passengers:
-            self.assertIn(passenger, self.mediator.travel_plans)
+        for passenger in self.engine.passengers:
+            self.assertIn(passenger, self.engine.travel_plans)
             self.assertIsNotNone(passenger.travel_plan)
             assert passenger.travel_plan
             self.assertIsNotNone(passenger.travel_plan.next_path)
@@ -160,18 +160,18 @@ class TestMediator(BaseTestCase):
     def test_passengers_at_isolated_stations_have_no_way_to_destination(self) -> None:
         # Run the game until first wave of passengers spawn, then 1 more frame
         for _ in range(Config.passenger_spawning.interval_step + 1):
-            self.mediator.increment_time(dt_ms)
+            self.engine.increment_time(dt_ms)
 
-        for passenger in self.mediator.passengers:
-            self.assertIn(passenger, self.mediator.travel_plans)
+        for passenger in self.engine.passengers:
+            self.assertIn(passenger, self.engine.travel_plans)
             self.assertIsNotNone(passenger.travel_plan)
             assert passenger.travel_plan
             self.assertIsNone(passenger.travel_plan.next_path)
             self.assertIsNone(passenger.travel_plan.next_station)
 
     def test_get_station_for_shape_type(self) -> None:
-        self.mediator.stations.clear()
-        self.mediator.stations.extend(
+        self.engine.stations.clear()
+        self.engine.stations.extend(
             [
                 Station(
                     Rect(
@@ -218,29 +218,29 @@ class TestMediator(BaseTestCase):
                 ),
             ]
         )
-        rect_stations = self.mediator.path_manager._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
+        rect_stations = self.engine.path_manager._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
             ShapeType.RECT
         )
-        circle_stations = self.mediator.path_manager._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
+        circle_stations = self.engine.path_manager._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
             ShapeType.CIRCLE
         )
-        triangle_stations = self.mediator.path_manager._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
+        triangle_stations = self.engine.path_manager._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
             ShapeType.TRIANGLE
         )
 
-        self.assertCountEqual(rect_stations, self.mediator.stations[0:1])
-        self.assertCountEqual(circle_stations, self.mediator.stations[1:3])
-        self.assertCountEqual(triangle_stations, self.mediator.stations[3:])
+        self.assertCountEqual(rect_stations, self.engine.stations[0:1])
+        self.assertCountEqual(circle_stations, self.engine.stations[1:3])
+        self.assertCountEqual(triangle_stations, self.engine.stations[3:])
 
     def test_skip_stations_on_same_path(self) -> None:
-        self.mediator.stations.clear()
-        self.mediator.stations.extend(get_random_stations(5))
-        for station in self.mediator.stations:
+        self.engine.stations.clear()
+        self.engine.stations.extend(get_random_stations(5))
+        for station in self.engine.stations:
             station.draw(self.screen)
         self.connect_stations([i for i in range(5)])
-        self.mediator._passenger_spawner._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
-        self.mediator.path_manager.find_travel_plan_for_passengers()
-        for station in self.mediator.stations:
+        self.engine._passenger_spawner._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
+        self.engine.path_manager.find_travel_plan_for_passengers()
+        for station in self.engine.stations:
             for passenger in station.passengers:
                 assert passenger.travel_plan
                 self.assertEqual(len(passenger.travel_plan.node_path), 1)

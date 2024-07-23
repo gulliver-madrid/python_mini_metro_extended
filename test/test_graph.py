@@ -5,7 +5,7 @@ from unittest.mock import create_autospec
 import pygame
 
 from src.config import Config, station_color, station_size
-from src.engine.engine import Mediator
+from src.engine.engine import Engine
 from src.entity import Station, get_random_stations
 from src.event.mouse import MouseEvent
 from src.event.type import MouseEventType
@@ -26,9 +26,9 @@ class TestGraph(BaseTestCase):
         self.screen = create_autospec(pygame.surface.Surface)
         self.position = get_random_position(self.width, self.height)
         self.color = get_random_color()
-        self.mediator = Mediator()
-        self.reactor = UI_Reactor(self.mediator)
-        for station in self.mediator.stations:
+        self.engine = Engine()
+        self.reactor = UI_Reactor(self.engine)
+        for station in self.engine.stations:
             station.draw(self.screen)
 
     def tearDown(self) -> None:
@@ -38,25 +38,25 @@ class TestGraph(BaseTestCase):
         self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
-                self.mediator.stations[station_idx[0]].position,
+                self.engine.stations[station_idx[0]].position,
             )
         )
         for idx in station_idx[1:]:
             self.reactor.react(
                 MouseEvent(
-                    MouseEventType.MOUSE_MOTION, self.mediator.stations[idx].position
+                    MouseEventType.MOUSE_MOTION, self.engine.stations[idx].position
                 )
             )
         self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP,
-                self.mediator.stations[station_idx[-1]].position,
+                self.engine.stations[station_idx[-1]].position,
             )
         )
 
     def test_build_station_nodes_dict(self) -> None:
-        self.mediator.stations.clear()
-        self.mediator.stations.extend(
+        self.engine.stations.clear()
+        self.engine.stations.extend(
             [
                 Station(
                     Rect(
@@ -75,31 +75,31 @@ class TestGraph(BaseTestCase):
                 ),
             ]
         )
-        for station in self.mediator.stations:
+        for station in self.engine.stations:
             station.draw(self.screen)
 
         self.connect_stations([0, 1])
 
         station_nodes_dict = build_station_nodes_dict(
-            self.mediator.stations, self.mediator.paths
+            self.engine.stations, self.engine.paths
         )
-        self.assertCountEqual(list(station_nodes_dict.keys()), self.mediator.stations)
+        self.assertCountEqual(list(station_nodes_dict.keys()), self.engine.stations)
         for station, node in station_nodes_dict.items():
             self.assertEqual(node.station, station)
 
     def test_bfs_two_stations(self) -> None:
-        self.mediator.stations.clear()
-        self.mediator.stations.extend(get_random_stations(2))
-        for station in self.mediator.stations:
+        self.engine.stations.clear()
+        self.engine.stations.extend(get_random_stations(2))
+        for station in self.engine.stations:
             station.draw(self.screen)
 
         self.connect_stations([0, 1])
 
         station_nodes_dict = build_station_nodes_dict(
-            self.mediator.stations, self.mediator.paths
+            self.engine.stations, self.engine.paths
         )
-        start_station = self.mediator.stations[0]
-        end_station = self.mediator.stations[1]
+        start_station = self.engine.stations[0]
+        end_station = self.engine.stations[1]
         start_node = station_nodes_dict[start_station]
         end_node = station_nodes_dict[end_station]
         node_path = bfs(start_node, end_node)
@@ -109,41 +109,41 @@ class TestGraph(BaseTestCase):
         )
 
     def test_bfs_five_stations(self) -> None:
-        self.mediator.stations.clear()
-        self.mediator.stations.extend(get_random_stations(5))
-        for station in self.mediator.stations:
+        self.engine.stations.clear()
+        self.engine.stations.extend(get_random_stations(5))
+        for station in self.engine.stations:
             station.draw(self.screen)
 
         self.connect_stations([0, 1, 2])
         self.connect_stations([0, 3])
 
         station_nodes_dict = build_station_nodes_dict(
-            self.mediator.stations, self.mediator.paths
+            self.engine.stations, self.engine.paths
         )
-        start_node = station_nodes_dict[self.mediator.stations[0]]
-        end_node = station_nodes_dict[self.mediator.stations[2]]
+        start_node = station_nodes_dict[self.engine.stations[0]]
+        end_node = station_nodes_dict[self.engine.stations[2]]
         node_path = bfs(start_node, end_node)
         self.assertSequenceEqual(
             node_path,
             [
-                Node(self.mediator.stations[0]),
-                Node(self.mediator.stations[1]),
-                Node(self.mediator.stations[2]),
+                Node(self.engine.stations[0]),
+                Node(self.engine.stations[1]),
+                Node(self.engine.stations[2]),
             ],
         )
-        start_node = station_nodes_dict[self.mediator.stations[1]]
-        end_node = station_nodes_dict[self.mediator.stations[3]]
+        start_node = station_nodes_dict[self.engine.stations[1]]
+        end_node = station_nodes_dict[self.engine.stations[3]]
         node_path = bfs(start_node, end_node)
         self.assertSequenceEqual(
             node_path,
             [
-                Node(self.mediator.stations[1]),
-                Node(self.mediator.stations[0]),
-                Node(self.mediator.stations[3]),
+                Node(self.engine.stations[1]),
+                Node(self.engine.stations[0]),
+                Node(self.engine.stations[3]),
             ],
         )
-        start_node = station_nodes_dict[self.mediator.stations[0]]
-        end_node = station_nodes_dict[self.mediator.stations[4]]
+        start_node = station_nodes_dict[self.engine.stations[0]]
+        end_node = station_nodes_dict[self.engine.stations[4]]
         node_path = bfs(start_node, end_node)
         self.assertSequenceEqual(
             node_path,

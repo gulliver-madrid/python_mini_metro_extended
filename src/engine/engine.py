@@ -20,7 +20,7 @@ from .status import MediatorStatus
 pp = pprint.PrettyPrinter(indent=4)
 
 
-class Mediator:
+class Engine:
     __slots__ = (
         "ui",
         "path_manager",

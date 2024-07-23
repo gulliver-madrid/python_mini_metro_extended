@@ -5,7 +5,7 @@ import numpy as np
 import pygame
 
 from src.config import Config, framerate, screen_color
-from src.engine.engine import Mediator
+from src.engine.engine import Engine
 from src.event.convert import convert_pygame_event
 from src.reactor import UI_Reactor
 
@@ -32,19 +32,19 @@ def main() -> None:
     clock = pygame.time.Clock()
     pygame.display.set_caption("Python Minimetro")
 
-    mediator = Mediator()
-    mediator.set_clock(clock)
-    reactor = UI_Reactor(mediator)
+    engine = Engine()
+    engine.set_clock(clock)
+    reactor = UI_Reactor(engine)
 
     while True:
         dt_ms = clock.tick(framerate)
-        mediator.increment_time(dt_ms)
+        engine.increment_time(dt_ms)
         screen.fill(screen_color)
-        mediator.render(screen)
+        engine.render(screen)
 
         for pygame_event in pygame.event.get():
             if pygame_event.type == pygame.QUIT:
-                mediator.exit()
+                engine.exit()
 
             event = convert_pygame_event(pygame_event)
             reactor.react(event)
