@@ -1,10 +1,10 @@
-from src.entity.passenger import Passenger
 from src.config import station_capacity, station_passengers_per_row, station_size
 from src.geometry.point import Point
 from src.geometry.shape import Shape
 
 from .holder import Holder
 from .ids import create_new_station_id
+from .passenger import Passenger
 
 
 class Station(Holder):

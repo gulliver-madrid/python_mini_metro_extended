@@ -1,5 +1,7 @@
-import pygame
 from typing import TYPE_CHECKING
+
+import pygame
+
 from src.geometry.point import Point
 from src.geometry.shape import Shape
 from src.protocols.travel_plan import TravelPlanProtocol

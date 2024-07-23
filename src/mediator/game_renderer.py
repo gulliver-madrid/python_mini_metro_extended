@@ -27,7 +27,6 @@ class GameRenderer:
         main_surface_height: float,
         paths: Sequence[Path],
         max_num_paths: int,
-        passengers: Sequence[Passenger],
         travel_plans: TravelPlansMapping,
         ui: UI,
         is_creating_path: bool,
@@ -45,6 +44,7 @@ class GameRenderer:
         for metro in self._components.metros:
             metro.draw(screen)
         ui.render(screen, self._components.status.score)
+        passengers: Sequence[Passenger] = self._components.passengers
         if showing_debug:
             self.debug_renderer.draw_debug(
                 screen,

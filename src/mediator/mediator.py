@@ -100,7 +100,6 @@ class Mediator:
             main_surface_height=self._main_surface_height,
             paths=self.paths,
             max_num_paths=self.path_manager.max_num_paths,
-            passengers=self.passengers,
             travel_plans=self.travel_plans,
             ui=self.ui,
             is_creating_path=self.path_manager.path_being_created is not None,
@@ -118,19 +117,14 @@ class Mediator:
 
     @property
     def passengers(self) -> list[Passenger]:
-        passengers: list[Passenger] = []
-        for metro in self._components.metros:
-            passengers.extend(metro.passengers)
-
-        for station in self._components.stations:
-            passengers.extend(station.passengers)
-        return passengers
+        # tests only
+        return self._components.passengers
 
     @property
     def travel_plans(self) -> TravelPlansMapping:
         return {
             passenger: passenger.travel_plan
-            for passenger in self.passengers
+            for passenger in self._components.passengers
             if passenger.travel_plan
         }
 
