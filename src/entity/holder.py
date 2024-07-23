@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Final
 
 import pygame
 
@@ -35,17 +36,15 @@ class Holder(Entity):
         self.shape.draw(surface, self.position)
 
         # draw passengers
+        abs_offset: Final = Point(
+            (-passenger_size - passenger_display_buffer), 0.75 * self.size
+        )
+        gap: Final = passenger_size / 2 + passenger_display_buffer
         row = 0
         col = 0
         for passenger in self.passengers:
-            passenger.position = (
-                self.position
-                + Point((-passenger_size - passenger_display_buffer), 0.75 * self.size)
-                + Point(
-                    col * (passenger_size / 2 + passenger_display_buffer),
-                    row * (passenger_size / 2 + passenger_display_buffer),
-                )
-            )
+            rel_offset = Point(col * gap, row * gap)
+            passenger.position = self.position + abs_offset + rel_offset
 
             passenger.draw(surface)
 
