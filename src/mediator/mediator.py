@@ -93,11 +93,6 @@ class Mediator:
         self.path_manager.find_travel_plan_for_passengers()
         self._move_passengers()
 
-    def _move_metros(self, dt_ms: int) -> None:
-        for path in self.paths:
-            for metro in path.metros:
-                path.move_metro(metro, dt_ms)
-
     def render(self, screen: pygame.surface.Surface) -> None:
         self._game_renderer.render_game(
             screen,
@@ -157,6 +152,11 @@ class Mediator:
     #######################
     ### private methods ###
     #######################
+
+    def _move_metros(self, dt_ms: int) -> None:
+        for path in self.paths:
+            for metro in path.metros:
+                path.move_metro(metro, dt_ms)
 
     def _move_passengers(self) -> None:
         for metro in self._components.metros:
