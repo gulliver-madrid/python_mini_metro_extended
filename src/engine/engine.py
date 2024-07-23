@@ -30,6 +30,7 @@ class Engine:
         "_passenger_spawner",
         "_passenger_mover",
         "_game_renderer",
+        "steps_allowed",
     )
 
     _gui_height: Final = get_gui_height()
@@ -49,6 +50,7 @@ class Engine:
         # status
         self.showing_debug = False
         self.game_speed = 1
+        self.steps_allowed: int | None = None
 
         # UI
         self.ui = UI()
@@ -87,12 +89,19 @@ class Engine:
         dt_ms *= self.game_speed
         self._passenger_spawner.increment_time(dt_ms)
 
-        self._move_metros(dt_ms)
-        self._passenger_spawner.manage_passengers_spawning()
         # is this needed? or is better only to find travel plans when
         # something change (paths)
         self.path_manager.find_travel_plan_for_passengers()
         self._move_passengers()
+
+        self._move_metros(dt_ms)
+        self._passenger_spawner.manage_passengers_spawning()
+        if self.steps_allowed is not None:
+            self.steps_allowed -= 1
+            if self.steps_allowed == 0:
+                if not self.is_paused:
+                    self.toggle_pause()
+                    self.steps_allowed = None
 
     def render(self, screen: pygame.surface.Surface) -> None:
         self._game_renderer.render_game(
@@ -110,6 +119,8 @@ class Engine:
         )
 
     def toggle_pause(self) -> None:
+        if self.is_paused:
+            self.steps_allowed = None
         self._components.status.is_paused = not self._components.status.is_paused
 
     def exit(self) -> NoReturn:

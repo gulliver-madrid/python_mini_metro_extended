@@ -58,6 +58,10 @@ class UI_Reactor:
         if event.event_type == KeyboardEventType.KEY_DOWN:
             if event.key == pygame.K_SPACE:
                 self.engine.toggle_pause()
+            if event.key == pygame.K_t:
+                if self.engine.is_paused:
+                    self.engine.toggle_pause()
+                self.engine.steps_allowed = 1
             elif event.key == pygame.K_ESCAPE:
                 self.engine.exit()
             elif event.key == pygame.K_c:

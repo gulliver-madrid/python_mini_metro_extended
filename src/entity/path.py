@@ -110,6 +110,8 @@ class Path(Entity):
         metro.current_segment = self.segments[metro.current_segment_idx]
         metro.position = metro.current_segment.segment_start
         metro.path_id = self.id
+        # TODO: review this
+        metro.current_station = metro.current_segment.start_station
         self.metros.append(metro)
 
     def move_metro(self, metro: Metro, dt_ms: int) -> None:
