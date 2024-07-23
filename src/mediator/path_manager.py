@@ -100,7 +100,10 @@ class PathManager:
     def remove_path(self, path: Path) -> None:
         self.ui.path_to_button[path].remove_path()
         for metro in path.metros:
-            # this shouldn't remove the passengers but it does
+            # TODO: ensure passengers go to valid stations
+            for passenger in metro.passengers:
+                assert passenger.last_station
+                passenger.last_station.passengers.append(passenger)
             self._components.metros.remove(metro)
         self._release_color_for_path(path)
         self._components.paths.remove(path)

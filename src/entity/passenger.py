@@ -1,11 +1,14 @@
 import pygame
-
+from typing import TYPE_CHECKING
 from src.geometry.point import Point
 from src.geometry.shape import Shape
 from src.protocols.travel_plan import TravelPlanProtocol
 
 from .entity import Entity
 from .ids import create_new_passenger_id
+
+if TYPE_CHECKING:
+    from .station import Station
 
 
 class Passenger(Entity):
@@ -14,6 +17,7 @@ class Passenger(Entity):
         "destination_shape",
         "is_at_destination",
         "travel_plan",
+        "last_station",
     )
 
     def __init__(self, destination_shape: Shape) -> None:
@@ -22,6 +26,9 @@ class Passenger(Entity):
         self.destination_shape = destination_shape
         self.is_at_destination = False
         self.travel_plan: TravelPlanProtocol | None = None
+        # last_station is used to reposition the passenger if their metro
+        # is removed
+        self.last_station: Station | None = None
 
     def __repr__(self) -> str:
         return f"{self.id}-{self.destination_shape.type}"

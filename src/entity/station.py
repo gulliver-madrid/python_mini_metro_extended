@@ -1,3 +1,4 @@
+from src.entity.passenger import Passenger
 from src.config import station_capacity, station_passengers_per_row, station_size
 from src.geometry.point import Point
 from src.geometry.shape import Shape
@@ -24,3 +25,8 @@ class Station(Holder):
 
     def __hash__(self) -> int:
         return hash(self.id)
+
+    def remove_passenger(self, passenger: Passenger) -> None:
+        super().remove_passenger(passenger)
+        # TODO: manage cases where station is removed before removing path
+        passenger.last_station = self
