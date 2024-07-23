@@ -13,7 +13,10 @@ from .passenger_spawner import TravelPlansMapping
 
 
 class GameRenderer:
-    def __init__(self) -> None:
+    __slots__ = ("_components", "debug_renderer")
+
+    def __init__(self, components: GameComponents) -> None:
+        self._components = components
         self.debug_renderer = DebugRenderer()
 
     def render_game(
@@ -22,7 +25,6 @@ class GameRenderer:
         *,
         gui_height: float,
         main_surface_height: float,
-        components: GameComponents,
         paths: Sequence[Path],
         max_num_paths: int,
         passengers: Sequence[Passenger],
@@ -38,11 +40,11 @@ class GameRenderer:
         )
         main_surface.fill((180, 180, 120))
         self._draw_paths(screen, paths, max_num_paths)
-        for station in components.stations:
+        for station in self._components.stations:
             station.draw(screen)
-        for metro in components.metros:
+        for metro in self._components.metros:
             metro.draw(screen)
-        ui.render(screen, components.status.score)
+        ui.render(screen, self._components.status.score)
         if showing_debug:
             self.debug_renderer.draw_debug(
                 screen,

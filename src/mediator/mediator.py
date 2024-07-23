@@ -52,7 +52,7 @@ class Mediator:
 
         # UI
         self.ui = UI()
-        self._game_renderer = GameRenderer()
+        self._game_renderer = GameRenderer(self._components)
 
         # delegated classes
         self._passenger_spawner = PassengerSpawner(
@@ -98,7 +98,6 @@ class Mediator:
             screen,
             gui_height=self._gui_height,
             main_surface_height=self._main_surface_height,
-            components=self._components,
             paths=self.paths,
             max_num_paths=self.path_manager.max_num_paths,
             passengers=self.passengers,
