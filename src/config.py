@@ -58,7 +58,9 @@ score_display_coords = (20, 20)
 
 # debug
 _unfilled_shapes = False
+_padding_segments_color: tuple[int, int, int] | None = None
 
 
 class Config:
     unfilled_shapes = _unfilled_shapes
+    padding_segments_color = _padding_segments_color

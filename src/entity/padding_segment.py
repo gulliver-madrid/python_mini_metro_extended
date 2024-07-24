@@ -1,7 +1,6 @@
-import pygame
 from shortuuid import uuid  # type: ignore
 
-from src.config import path_width
+from src.config import Config, path_width
 from src.entity.segment import Segment
 from src.geometry.line import Line
 from src.geometry.point import Point
@@ -15,7 +14,7 @@ class PaddingSegment(Segment):
         self.segment_start = start_point
         self.segment_end = end_point
         self.line = Line(
-            color=self.color,
+            color=Config.padding_segments_color or self.color,
             start=self.segment_start,
             end=self.segment_end,
             width=path_width,
