@@ -1,3 +1,4 @@
+from itertools import pairwise
 import math
 from typing import Final
 
@@ -69,13 +70,13 @@ class Path(Entity):
             )
 
         # add padding segments
-        for i in range(len(self._path_segments) - 1):
+        for current_segment, next_segment in pairwise(self._path_segments):
             padding_segment = PaddingSegment(
                 self.color,
-                self._path_segments[i].segment_end,
-                self._path_segments[i + 1].segment_start,
+                current_segment.segment_end,
+                next_segment.segment_start,
             )
-            self._segments.append(self._path_segments[i])
+            self._segments.append(current_segment)
             self._segments.append(padding_segment)
 
         if self._path_segments:
