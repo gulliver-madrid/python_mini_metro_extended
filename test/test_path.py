@@ -58,7 +58,10 @@ class TestPath(BaseTestCase):
         metro = Metro()
         path.add_metro(metro)
 
-        self.assertEqual(metro.current_segment, path.segments[0])
+        self.assertEqual(
+            metro.current_segment,
+            path._segments[0],  # pyright: ignore [reportPrivateUsage]
+        )
         self.assertEqual(metro.current_segment_idx, 0)
         self.assertTrue(metro.is_forward)
 

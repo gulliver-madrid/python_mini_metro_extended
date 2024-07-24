@@ -26,14 +26,14 @@ class Path(Entity):
         "is_looped",
         "is_being_created",
         "temp_point",
-        "segments",
-        "path_segments",
-        "padding_segments",
+        "_segments",
+        "_path_segments",
+        "_padding_segments",
         "path_order",
     )
-    segments: Final[list[Segment]]
-    path_segments: Final[list[PathSegment]]
-    padding_segments: Final[list[PaddingSegment]]
+    _segments: Final[list[Segment]]
+    _path_segments: Final[list[PathSegment]]
+    _padding_segments: Final[list[PaddingSegment]]
 
     def __init__(self, color: Color) -> None:
         super().__init__(create_new_path_id())
@@ -43,9 +43,9 @@ class Path(Entity):
         self.is_looped = False
         self.is_being_created = False
         self.temp_point: Point | None = None
-        self.segments = []
-        self.path_segments = []
-        self.padding_segments = []
+        self._segments = []
+        self._path_segments = []
+        self._padding_segments = []
         self.path_order = 0
 
     def add_station(self, station: Station) -> None:
@@ -53,50 +53,52 @@ class Path(Entity):
         self.update_segments()
 
     def update_segments(self) -> None:
-        self.segments.clear()
-        self.path_segments.clear()
-        self.padding_segments.clear()
+        self._segments.clear()
+        self._path_segments.clear()
+        self._padding_segments.clear()
 
+        # add path segments
         for i in range(len(self.stations) - 1):
-            self.path_segments.append(
+            self._path_segments.append(
                 PathSegment(
                     self.color, self.stations[i], self.stations[i + 1], self.path_order
                 )
             )
 
         if self.is_looped:
-            self.path_segments.append(
+            self._path_segments.append(
                 PathSegment(
                     self.color, self.stations[-1], self.stations[0], self.path_order
                 )
             )
 
-        for i in range(len(self.path_segments) - 1):
+        # add padding segments
+        for i in range(len(self._path_segments) - 1):
             padding_segment = PaddingSegment(
                 self.color,
-                self.path_segments[i].segment_end,
-                self.path_segments[i + 1].segment_start,
+                self._path_segments[i].segment_end,
+                self._path_segments[i + 1].segment_start,
             )
-            self.padding_segments.append(padding_segment)
-            self.segments.append(self.path_segments[i])
-            self.segments.append(padding_segment)
+            self._padding_segments.append(padding_segment)
+            self._segments.append(self._path_segments[i])
+            self._segments.append(padding_segment)
 
-        if self.path_segments:
-            self.segments.append(self.path_segments[-1])
+        if self._path_segments:
+            self._segments.append(self._path_segments[-1])
 
         if self.is_looped:
             padding_segment = PaddingSegment(
                 self.color,
-                self.path_segments[-1].segment_end,
-                self.path_segments[0].segment_start,
+                self._path_segments[-1].segment_end,
+                self._path_segments[0].segment_start,
             )
-            self.padding_segments.append(padding_segment)
-            self.segments.append(padding_segment)
+            self._padding_segments.append(padding_segment)
+            self._segments.append(padding_segment)
 
     def draw(self, surface: pygame.surface.Surface, path_order: int) -> None:
         self.path_order = path_order
 
-        for segment in self.segments:
+        for segment in self._segments:
             segment.draw(surface)
 
         if self.temp_point:
@@ -124,7 +126,7 @@ class Path(Entity):
 
     def add_metro(self, metro: Metro) -> None:
         metro.shape.color = self.color
-        metro.current_segment = self.segments[metro.current_segment_idx]
+        metro.current_segment = self._segments[metro.current_segment_idx]
         metro.position = metro.current_segment.segment_start
         metro.path_id = self.id
         # TODO: review this
@@ -158,9 +160,9 @@ class Path(Entity):
                 metro.current_station = dst_station
                 for passenger in metro.passengers:
                     passenger.last_station = dst_station
-            if len(self.segments) == 1:
+            if len(self._segments) == 1:
                 metro.is_forward = not metro.is_forward
-            elif metro.current_segment_idx == len(self.segments) - 1:
+            elif metro.current_segment_idx == len(self._segments) - 1:
                 if self.is_looped:
                     metro.current_segment_idx = 0
                 else:
@@ -173,7 +175,7 @@ class Path(Entity):
                     metro.current_segment_idx += 1
                 else:
                     if self.is_looped:
-                        metro.current_segment_idx = len(self.segments) - 1
+                        metro.current_segment_idx = len(self._segments) - 1
                     else:
                         metro.is_forward = True
             else:
@@ -182,4 +184,4 @@ class Path(Entity):
                 else:
                     metro.current_segment_idx -= 1
 
-            metro.current_segment = self.segments[metro.current_segment_idx]
+            metro.current_segment = self._segments[metro.current_segment_idx]
