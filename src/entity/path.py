@@ -28,11 +28,9 @@ class Path(Entity):
         "is_being_created",
         "temp_point",
         "_segments",
-        "_path_segments",
         "path_order",
     )
     _segments: Final[list[Segment]]
-    _path_segments: Final[list[PathSegment]]
 
     def __init__(self, color: Color) -> None:
         super().__init__(create_new_path_id())
@@ -43,7 +41,6 @@ class Path(Entity):
         self.is_being_created = False
         self.temp_point: Point | None = None
         self._segments = []
-        self._path_segments = []
         self.path_order = 0
 
     def add_station(self, station: Station) -> None:
@@ -52,25 +49,25 @@ class Path(Entity):
 
     def update_segments(self) -> None:
         self._segments.clear()
-        self._path_segments.clear()
+        path_segments: list[Segment] = []
 
         # add path segments
         for i in range(len(self.stations) - 1):
-            self._path_segments.append(
+            path_segments.append(
                 PathSegment(
                     self.color, self.stations[i], self.stations[i + 1], self.path_order
                 )
             )
 
         if self.is_looped:
-            self._path_segments.append(
+            path_segments.append(
                 PathSegment(
                     self.color, self.stations[-1], self.stations[0], self.path_order
                 )
             )
 
         # add padding segments
-        for current_segment, next_segment in pairwise(self._path_segments):
+        for current_segment, next_segment in pairwise(path_segments):
             padding_segment = PaddingSegment(
                 self.color,
                 current_segment.segment_end,
@@ -79,14 +76,14 @@ class Path(Entity):
             self._segments.append(current_segment)
             self._segments.append(padding_segment)
 
-        if self._path_segments:
-            self._segments.append(self._path_segments[-1])
+        if path_segments:
+            self._segments.append(path_segments[-1])
 
         if self.is_looped:
             padding_segment = PaddingSegment(
                 self.color,
-                self._path_segments[-1].segment_end,
-                self._path_segments[0].segment_start,
+                path_segments[-1].segment_end,
+                path_segments[0].segment_start,
             )
             self._segments.append(padding_segment)
 
