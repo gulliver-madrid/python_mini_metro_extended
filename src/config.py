@@ -55,3 +55,10 @@ path_button_cross_width = 5
 # text
 score_font_size = 50
 score_display_coords = (20, 20)
+
+# debug
+_unfilled_shapes = False
+
+
+class Config:
+    unfilled_shapes = _unfilled_shapes

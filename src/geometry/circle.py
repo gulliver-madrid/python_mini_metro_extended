@@ -1,6 +1,7 @@
 import pygame
 from shortuuid import uuid  # type: ignore
 
+from src.config import Config
 from src.geometry.point import Point
 from src.geometry.shape import Shape
 from src.geometry.type import ShapeType
@@ -17,7 +18,13 @@ class Circle(Shape):
         super().draw(surface, position)
         center = (position.left, position.top)
         radius = self.radius
-        return pygame.draw.circle(surface, self.color, center, radius)
+        pygame.draw.circle(
+            surface,
+            self.color,
+            center,
+            radius,
+            width=1 if Config.unfilled_shapes else 0,
+        )
 
     def contains(self, point: Point) -> bool:
         return (point.left - self.position.left) ** 2 + (
