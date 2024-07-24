@@ -28,12 +28,10 @@ class Path(Entity):
         "temp_point",
         "_segments",
         "_path_segments",
-        "_padding_segments",
         "path_order",
     )
     _segments: Final[list[Segment]]
     _path_segments: Final[list[PathSegment]]
-    _padding_segments: Final[list[PaddingSegment]]
 
     def __init__(self, color: Color) -> None:
         super().__init__(create_new_path_id())
@@ -45,7 +43,6 @@ class Path(Entity):
         self.temp_point: Point | None = None
         self._segments = []
         self._path_segments = []
-        self._padding_segments = []
         self.path_order = 0
 
     def add_station(self, station: Station) -> None:
@@ -55,7 +52,6 @@ class Path(Entity):
     def update_segments(self) -> None:
         self._segments.clear()
         self._path_segments.clear()
-        self._padding_segments.clear()
 
         # add path segments
         for i in range(len(self.stations) - 1):
@@ -79,7 +75,6 @@ class Path(Entity):
                 self._path_segments[i].segment_end,
                 self._path_segments[i + 1].segment_start,
             )
-            self._padding_segments.append(padding_segment)
             self._segments.append(self._path_segments[i])
             self._segments.append(padding_segment)
 
@@ -92,7 +87,6 @@ class Path(Entity):
                 self._path_segments[-1].segment_end,
                 self._path_segments[0].segment_start,
             )
-            self._padding_segments.append(padding_segment)
             self._segments.append(padding_segment)
 
     def draw(self, surface: pygame.surface.Surface, path_order: int) -> None:
