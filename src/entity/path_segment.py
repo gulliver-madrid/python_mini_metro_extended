@@ -4,7 +4,7 @@ from src.geometry.utils import direction
 from src.type import Color
 
 from .ids import create_new_path_segment_id
-from .segment import Segment
+from .segment import Segment, StationPair
 from .station import Station
 
 
@@ -19,8 +19,7 @@ class PathSegment(Segment):
         path_order: int,
     ) -> None:
         super().__init__(color, create_new_path_segment_id())
-        self.start_station = start_station
-        self.end_station = end_station
+        self.stations = StationPair(start_station, end_station)
         self._path_order = path_order
 
         start_point = start_station.position

@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import pygame
 
 from src.geometry.line import Line
@@ -9,17 +10,21 @@ from .ids import EntityId
 from .station import Station
 
 
+@dataclass
+class StationPair:
+    start: Station
+    end: Station
+
+
 class Segment(Entity):
     __slots__ = (
         "color",
-        "start_station",
-        "end_station",
+        "stations",
         "segment_start",
         "segment_end",
         "line",
     )
-    start_station: Station | None
-    end_station: Station | None
+    stations: StationPair | None
     segment_start: Point
     segment_end: Point
     line: Line
@@ -27,8 +32,7 @@ class Segment(Entity):
     def __init__(self, color: Color, id: EntityId) -> None:
         super().__init__(id)
         self.color = color
-        self.start_station = None
-        self.end_station = None
+        self.stations = None
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Segment) and self.id == other.id
