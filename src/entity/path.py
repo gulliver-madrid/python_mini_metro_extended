@@ -134,18 +134,22 @@ class Path(Entity):
         self.metros.append(metro)
 
     def move_metro(self, metro: Metro, dt_ms: int) -> None:
+        segment = metro.current_segment
         assert metro.current_segment is not None
-        dst_station = None
+
         if metro.is_forward:
-            if isinstance(metro.current_segment, PathSegment):
-                assert metro.current_segment.stations
-                dst_station = metro.current_segment.stations.end
             dst_position = metro.current_segment.segment_end
         else:
-            if isinstance(metro.current_segment, PathSegment):
-                assert metro.current_segment.stations
-                dst_station = metro.current_segment.stations.start
             dst_position = metro.current_segment.segment_start
+
+        if isinstance(metro.current_segment, PathSegment):
+            assert metro.current_segment.stations
+            if metro.is_forward:
+                dst_station = metro.current_segment.stations.end
+            else:
+                dst_station = metro.current_segment.stations.start
+        else:
+            dst_station = None
 
         start_point = metro.position
         end_point = dst_position
