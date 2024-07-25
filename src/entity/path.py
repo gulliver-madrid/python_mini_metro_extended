@@ -75,8 +75,8 @@ class Path(Entity):
         for current_segment, next_segment in pairwise(path_segments):
             padding_segment = PaddingSegment(
                 self.color,
-                current_segment.segment_end,
-                next_segment.segment_start,
+                current_segment.points.end,
+                next_segment.points.start,
             )
             self._segments.append(current_segment)
             self._segments.append(padding_segment)
@@ -87,8 +87,8 @@ class Path(Entity):
         if self.is_looped:
             padding_segment = PaddingSegment(
                 self.color,
-                path_segments[-1].segment_end,
-                path_segments[0].segment_start,
+                path_segments[-1].points.end,
+                path_segments[0].points.start,
             )
             self._segments.append(padding_segment)
 
@@ -126,7 +126,7 @@ class Path(Entity):
     def add_metro(self, metro: Metro) -> None:
         metro.shape.color = self.color
         metro.current_segment = self._segments[metro.current_segment_idx]
-        metro.position = metro.current_segment.segment_start
+        metro.position = metro.current_segment.points.start
         metro.path_id = self.id
         # TODO: review this
         assert metro.current_segment.stations
@@ -135,19 +135,19 @@ class Path(Entity):
 
     def move_metro(self, metro: Metro, dt_ms: int) -> None:
         segment = metro.current_segment
-        assert metro.current_segment is not None
+        assert segment is not None
 
         if metro.is_forward:
-            dst_position = metro.current_segment.segment_end
+            dst_position = segment.points.end
         else:
-            dst_position = metro.current_segment.segment_start
+            dst_position = segment.points.start
 
-        if isinstance(metro.current_segment, PathSegment):
-            assert metro.current_segment.stations
+        if isinstance(segment, PathSegment):
+            assert segment.stations
             if metro.is_forward:
-                dst_station = metro.current_segment.stations.end
+                dst_station = segment.stations.end
             else:
-                dst_station = metro.current_segment.stations.start
+                dst_station = segment.stations.start
         else:
             dst_station = None
 

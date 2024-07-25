@@ -16,17 +16,21 @@ class StationPair:
     end: Station
 
 
+@dataclass
+class PointPair:
+    start: Point
+    end: Point
+
+
 class Segment(Entity):
     __slots__ = (
         "color",
         "stations",
-        "segment_start",
-        "segment_end",
+        "points",
         "line",
     )
     stations: StationPair | None
-    segment_start: Point
-    segment_end: Point
+    points: PointPair
     line: Line
 
     def __init__(self, color: Color, id: EntityId) -> None:

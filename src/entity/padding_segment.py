@@ -4,7 +4,7 @@ from src.geometry.point import Point
 from src.type import Color
 
 from .ids import create_new_padding_segment_id
-from .segment import Segment
+from .segment import PointPair, Segment
 
 
 class PaddingSegment(Segment):
@@ -12,11 +12,10 @@ class PaddingSegment(Segment):
 
     def __init__(self, color: Color, start_point: Point, end_point: Point) -> None:
         super().__init__(color, create_new_padding_segment_id())
-        self.segment_start = start_point
-        self.segment_end = end_point
+        self.points = PointPair(start_point, end_point)
         self.line = Line(
             color=Config.padding_segments_color or self.color,
-            start=self.segment_start,
-            end=self.segment_end,
+            start=self.points.start,
+            end=self.points.end,
             width=path_width,
         )

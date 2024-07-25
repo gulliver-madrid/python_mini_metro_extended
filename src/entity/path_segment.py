@@ -4,7 +4,7 @@ from src.geometry.utils import direction
 from src.type import Color
 
 from .ids import create_new_path_segment_id
-from .segment import Segment, StationPair
+from .segment import PointPair, Segment, StationPair
 from .station import Station
 
 
@@ -28,11 +28,13 @@ class PathSegment(Segment):
         buffer_vector = direct * path_order_shift
         buffer_vector = buffer_vector.rotate(90)
 
-        self.segment_start = start_station.position + buffer_vector * self._path_order
-        self.segment_end = end_station.position + buffer_vector * self._path_order
+        offset_vector = buffer_vector * self._path_order
+        start = start_station.position + offset_vector
+        end = end_station.position + offset_vector
+        self.points = PointPair(start, end)
         self.line = Line(
             color=self.color,
-            start=self.segment_start,
-            end=self.segment_end,
+            start=self.points.start,
+            end=self.points.end,
             width=path_width,
         )
