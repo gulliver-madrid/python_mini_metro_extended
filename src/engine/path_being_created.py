@@ -18,13 +18,13 @@ class PathBeingCreated:
     def add_station_to_path(self, station: Station) -> None:
         if self._is_last_station(station):
             return
+        assert not self.path.is_looped
         # loop
         if self.can_make_loop(station):
             self.path.set_loop()
         # non-loop
-        elif not self._is_first_station(station):
-            if self.path.is_looped:
-                self.path.remove_loop()
+        else:
+            assert not self._is_first_station(station)
             self.path.add_station(station)
 
     def can_end_with(self, station: Station) -> bool:
