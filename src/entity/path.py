@@ -1,6 +1,5 @@
-from itertools import pairwise
 import math
-
+from itertools import pairwise
 from typing import Final
 
 import pygame

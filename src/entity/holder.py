@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Final
+from typing import Final, Sequence
 
 import pygame
 
@@ -17,7 +17,7 @@ class Holder(Entity):
     __slots__ = (
         "shape",
         "capacity",
-        "passengers",
+        "_passengers",
         "passengers_per_row",
         "size",
         "position",
@@ -30,7 +30,7 @@ class Holder(Entity):
         super().__init__(id)
         self.shape = shape
         self.capacity = capacity
-        self.passengers: list[Passenger] = []
+        self._passengers: Final[list[Passenger]] = []
 
     def draw(self, surface: pygame.surface.Surface) -> None:
         # draw self
@@ -43,7 +43,7 @@ class Holder(Entity):
         gap: Final = passenger_size / 2 + passenger_display_buffer
         row = 0
         col = 0
-        for passenger in self.passengers:
+        for passenger in self._passengers:
             rel_offset = Point(col * gap, row * gap)
             passenger.position = self.position + abs_offset + rel_offset
 
@@ -59,17 +59,21 @@ class Holder(Entity):
         return self.shape.contains(point)
 
     def has_room(self) -> bool:
-        return self.capacity > len(self.passengers)
+        return self.capacity > len(self._passengers)
 
     def add_passenger(self, passenger: Passenger) -> None:
         assert self.has_room()
-        self.passengers.append(passenger)
+        self._passengers.append(passenger)
 
     def remove_passenger(self, passenger: Passenger) -> None:
-        assert passenger in self.passengers
-        self.passengers.remove(passenger)
+        assert passenger in self._passengers
+        self._passengers.remove(passenger)
 
     def move_passenger(self, passenger: Passenger, holder: Holder) -> None:
         assert holder.has_room()
         holder.add_passenger(passenger)
         self.remove_passenger(passenger)
+
+    @property
+    def passengers(self) -> Sequence[Passenger]:
+        return self._passengers

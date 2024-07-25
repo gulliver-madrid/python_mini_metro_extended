@@ -103,7 +103,7 @@ class PathManager:
             # TODO: ensure passengers go to valid stations
             for passenger in metro.passengers:
                 assert passenger.last_station
-                passenger.last_station.passengers.append(passenger)
+                passenger.last_station.add_passenger(passenger)
             self._components.metros.remove(metro)
         self._release_color_for_path(path)
         self._components.paths.remove(path)

@@ -10,7 +10,6 @@ from src.protocols.travel_plan import TravelPlanProtocol
 from .game_components import GameComponents
 from .passenger_creator import PassengerCreator
 
-
 TravelPlansMapping = Mapping[Passenger, TravelPlanProtocol]
 
 

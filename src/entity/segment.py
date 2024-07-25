@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 import pygame
 
 from src.geometry.line import Line
