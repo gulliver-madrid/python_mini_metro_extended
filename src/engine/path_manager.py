@@ -22,10 +22,10 @@ class PathManager:
     __slots__ = (
         "_components",
         "max_num_paths",
-        "path_colors",
-        "path_to_color",
+        "_path_colors",
+        "_path_to_color",
         "max_num_metros",
-        "ui",
+        "_ui",
         "path_being_created",
     )
 
@@ -34,12 +34,12 @@ class PathManager:
         components: GameComponents,
         ui: UI,
     ):
-        self.max_num_paths: Final[int] = max_num_paths
-        self.path_to_color: Final[dict[Path, Color]] = {}
-        self.path_colors: Final = self._get_initial_path_colors()
+        self.max_num_paths: Final = max_num_paths
+        self._path_to_color: Final[dict[Path, Color]] = {}
+        self._path_colors: Final = self._get_initial_path_colors()
         self.max_num_metros: Final = max_num_metros
         self._components: Final = components
-        self.ui: Final = ui
+        self._ui: Final = ui
         self.path_being_created: PathBeingCreated | None = None
 
     ######################
@@ -50,14 +50,14 @@ class PathManager:
         if len(self._components.paths) >= self.max_num_paths:
             return
         assigned_color = (0, 0, 0)
-        for path_color, taken in self.path_colors.items():
+        for path_color, taken in self._path_colors.items():
             if taken:
                 continue
             assigned_color = path_color
-            self.path_colors[path_color] = True
+            self._path_colors[path_color] = True
             break
         path = Path(assigned_color)
-        self.path_to_color[path] = assigned_color
+        self._path_to_color[path] = assigned_color
         path.add_station(station)
         path.is_being_created = True
         self.path_being_created = PathBeingCreated(path)
@@ -98,7 +98,7 @@ class PathManager:
         self.path_being_created = None
 
     def remove_path(self, path: Path) -> None:
-        self.ui.path_to_button[path].remove_path()
+        self._ui.path_to_button[path].remove_path()
         for metro in path.metros:
             # TODO: ensure passengers go to valid stations
             for passenger in metro.passengers:
@@ -149,11 +149,11 @@ class PathManager:
         self._assign_paths_to_buttons()
 
     def _assign_paths_to_buttons(self) -> None:
-        self.ui.assign_paths_to_buttons(self._components.paths)
+        self._ui.assign_paths_to_buttons(self._components.paths)
 
     def _release_color_for_path(self, path: Path) -> None:
-        self.path_colors[path.color] = False
-        del self.path_to_color[path]
+        self._path_colors[path.color] = False
+        del self._path_to_color[path]
 
     def _passenger_has_travel_plan(self, passenger: Passenger) -> bool:
         return (
