@@ -28,7 +28,7 @@ class Path(Entity):
         "is_being_created",
         "temp_point",
         "_segments",
-        "path_order",
+        "_path_order",
     )
     _segments: Final[list[Segment]]
 
@@ -41,7 +41,7 @@ class Path(Entity):
         self.is_being_created = False
         self.temp_point: Point | None = None
         self._segments = []
-        self.path_order = 0
+        self._path_order = 0
 
     def add_station(self, station: Station) -> None:
         self.stations.append(station)
@@ -55,14 +55,14 @@ class Path(Entity):
         for i in range(len(self.stations) - 1):
             path_segments.append(
                 PathSegment(
-                    self.color, self.stations[i], self.stations[i + 1], self.path_order
+                    self.color, self.stations[i], self.stations[i + 1], self._path_order
                 )
             )
 
         if self.is_looped:
             path_segments.append(
                 PathSegment(
-                    self.color, self.stations[-1], self.stations[0], self.path_order
+                    self.color, self.stations[-1], self.stations[0], self._path_order
                 )
             )
 
@@ -88,7 +88,7 @@ class Path(Entity):
             self._segments.append(padding_segment)
 
     def draw(self, surface: pygame.surface.Surface, path_order: int) -> None:
-        self.path_order = path_order
+        self._path_order = path_order
 
         for segment in self._segments:
             segment.draw(surface)
