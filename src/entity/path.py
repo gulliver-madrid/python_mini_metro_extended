@@ -1,5 +1,6 @@
 from itertools import pairwise
 import math
+
 from typing import Final
 
 import pygame
@@ -52,19 +53,23 @@ class Path(Entity):
         path_segments: list[Segment] = []
 
         # add path segments
+        s1 = s2 = None
         for i in range(len(self.stations) - 1):
+            s1 = self.stations[i]
+            s2 = self.stations[i + 1]
             path_segments.append(
-                PathSegment(
-                    self.color, self.stations[i], self.stations[i + 1], self._path_order
-                )
+                PathSegment(self.color, s1, s2, self._path_order * get_sign(s1, s2))
             )
+        del s1, s2
 
+        s1 = s2 = None
         if self.is_looped:
+            s1 = self.stations[-1]
+            s2 = self.stations[0]
             path_segments.append(
-                PathSegment(
-                    self.color, self.stations[-1], self.stations[0], self._path_order
-                )
+                PathSegment(self.color, s1, s2, self._path_order * get_sign(s1, s2))
             )
+        del s1, s2
 
         # add padding segments
         for current_segment, next_segment in pairwise(path_segments):
@@ -88,7 +93,9 @@ class Path(Entity):
             self._segments.append(padding_segment)
 
     def draw(self, surface: pygame.surface.Surface, path_order: int) -> None:
+
         self._path_order = path_order
+        self.update_segments()
 
         for segment in self._segments:
             segment.draw(surface)
@@ -177,3 +184,11 @@ class Path(Entity):
                     metro.current_segment_idx -= 1
 
             metro.current_segment = self._segments[metro.current_segment_idx]
+
+
+def get_sign(s1: Station, s2: Station) -> int:
+    assert s1.num_id != s2.num_id
+    if s1.num_id > s2.num_id:
+        return 1
+    else:
+        return -1

@@ -43,7 +43,7 @@ metro_passengers_per_row = 3
 # path
 max_num_paths = 5
 path_width = 10
-path_order_shift = 10
+path_order_shift = path_width
 
 # button
 button_color = (180, 180, 180)
