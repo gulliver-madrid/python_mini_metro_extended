@@ -32,6 +32,12 @@ class TestGameplay(BaseTestCase):
     def tearDown(self) -> None:
         super().tearDown()
 
+    def _replace_with_random_stations(self, n: int) -> None:
+        self.engine.stations.clear()
+        self.engine.stations.extend(
+            get_random_stations(n, mediator=self.engine.mediator)
+        )
+
     def connect_stations(self, station_idx: Sequence[int]) -> None:
         self.reactor.react(
             MouseEvent(
@@ -149,8 +155,7 @@ class TestGameplay(BaseTestCase):
         )
 
     def test_path_button_removes_path_on_click(self) -> None:
-        self.engine.stations.clear()
-        self.engine.stations.extend(get_random_stations(5))
+        self._replace_with_random_stations(5)
         for station in self.engine.stations:
             station.draw(self.screen)
         self.connect_stations([0, 1])
@@ -161,8 +166,7 @@ class TestGameplay(BaseTestCase):
         self.assertEqual(len(self.engine.ui.path_to_button.items()), 0)
 
     def test_path_buttons_get_assigned_upon_path_creation(self) -> None:
-        self.engine.stations.clear()
-        self.engine.stations.extend(get_random_stations(5))
+        self._replace_with_random_stations(5)
         for station in self.engine.stations:
             station.draw(self.screen)
         self.connect_stations([0, 1])
@@ -179,8 +183,7 @@ class TestGameplay(BaseTestCase):
         self.assertIn(self.engine.paths[2], self.engine.ui.path_to_button)
 
     def test_more_paths_can_be_created_after_removing_paths(self) -> None:
-        self.engine.stations.clear()
-        self.engine.stations.extend(get_random_stations(5))
+        self._replace_with_random_stations(5)
         for station in self.engine.stations:
             station.draw(self.screen)
         self.connect_stations([0, 1])
@@ -194,8 +197,8 @@ class TestGameplay(BaseTestCase):
         self.assertEqual(len(self.engine.paths), 3)
 
     def test_assigned_path_buttons_bubble_to_left(self) -> None:
-        self.engine.stations.clear()
-        self.engine.stations.extend(get_random_stations(5))
+        self._replace_with_random_stations(5)
+
         for station in self.engine.stations:
             station.draw(self.screen)
         self.connect_stations([0, 1])

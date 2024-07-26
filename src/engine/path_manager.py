@@ -142,7 +142,7 @@ class PathManager:
         self.path_being_created.path.is_being_created = False
         self.path_being_created.path.remove_temporary_point()
         if len(self._components.metros) < self.max_num_metros:
-            metro = Metro()
+            metro = Metro(self._components.mediator)
             self.path_being_created.path.add_metro(metro)
             self._components.metros.append(metro)
         self.path_being_created = None

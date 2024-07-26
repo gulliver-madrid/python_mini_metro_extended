@@ -141,6 +141,7 @@ class TestEngine(BaseTestCase):
         )
         # Need to draw stations if you want to override them
         for station in self.engine.stations:
+            station.mediator = self.engine.mediator
             station.draw(self.screen)
 
         # Run the game until first wave of passengers spawn
@@ -236,6 +237,7 @@ class TestEngine(BaseTestCase):
         self.engine.stations.clear()
         self.engine.stations.extend(get_random_stations(5))
         for station in self.engine.stations:
+            station.mediator = self.engine.mediator
             station.draw(self.screen)
         self.connect_stations([i for i in range(5)])
         self.engine._passenger_spawner._spawn_passengers()  # pyright: ignore [reportPrivateUsage]

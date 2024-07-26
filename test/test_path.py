@@ -8,6 +8,7 @@ import pygame
 from src.config import framerate, metro_speed_per_ms
 from src.entity import Metro, Path, Station, get_random_station, get_random_stations
 from src.geometry.point import Point
+from src.mediator import Mediator
 from src.utils import get_random_color, get_random_position, get_random_station_shape
 
 from test.base_test import BaseTestCase
@@ -71,9 +72,11 @@ class TestPath(BaseTestCase):
         dist_in_one_sec = 1000 * metro_speed_per_ms
         path.add_station(Station(get_random_station_shape(), Point(dist_in_one_sec, 0)))
         path.draw(self.screen, 0)
+        mediator = Mediator()
         for station in path.stations:
+            station.mediator = mediator
             station.draw(self.screen)
-        metro = Metro()
+        metro = Metro(mediator)
         path.add_metro(metro)
 
         for _ in range(framerate):
@@ -87,9 +90,11 @@ class TestPath(BaseTestCase):
         dist_in_one_sec = 1000 * metro_speed_per_ms
         path.add_station(Station(get_random_station_shape(), Point(dist_in_one_sec, 0)))
         path.draw(self.screen, 0)
+        mediator = Mediator()
         for station in path.stations:
+            station.mediator = mediator
             station.draw(self.screen)
-        metro = Metro()
+        metro = Metro(mediator)
         path.add_metro(metro)
 
         for _ in range(framerate + 1):
@@ -108,9 +113,11 @@ class TestPath(BaseTestCase):
         path.add_station(Station(get_random_station_shape(), Point(0, dist_in_one_sec)))
         path.set_loop()
         path.draw(self.screen, 0)
+        mediator = Mediator()
         for station in path.stations:
+            station.mediator = mediator
             station.draw(self.screen)
-        metro = Metro()
+        metro = Metro(mediator)
         path.add_metro(metro)
 
         for station_idx in [1, 2, 3, 0, 1]:

@@ -34,6 +34,12 @@ class TestGraph(BaseTestCase):
     def tearDown(self) -> None:
         super().tearDown()
 
+    def _replace_with_random_stations(self, n: int) -> None:
+        self.engine.stations.clear()
+        self.engine.stations.extend(
+            get_random_stations(n, mediator=self.engine.mediator)
+        )
+
     def connect_stations(self, station_idx: Sequence[int]) -> None:
         self.reactor.react(
             MouseEvent(
@@ -76,6 +82,7 @@ class TestGraph(BaseTestCase):
             ]
         )
         for station in self.engine.stations:
+            station.mediator = self.engine.mediator
             station.draw(self.screen)
 
         self.connect_stations([0, 1])
@@ -88,8 +95,7 @@ class TestGraph(BaseTestCase):
             self.assertEqual(node.station, station)
 
     def test_bfs_two_stations(self) -> None:
-        self.engine.stations.clear()
-        self.engine.stations.extend(get_random_stations(2))
+        self._replace_with_random_stations(2)
         for station in self.engine.stations:
             station.draw(self.screen)
 
@@ -109,8 +115,7 @@ class TestGraph(BaseTestCase):
         )
 
     def test_bfs_five_stations(self) -> None:
-        self.engine.stations.clear()
-        self.engine.stations.extend(get_random_stations(5))
+        self._replace_with_random_stations(5)
         for station in self.engine.stations:
             station.draw(self.screen)
 

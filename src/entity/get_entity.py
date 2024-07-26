@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from collections.abc import Sequence
-from typing import Iterator
+from typing import TYPE_CHECKING, Iterator
 
 from src.config import Config, station_size
 from src.geometry.point import Point
@@ -9,6 +11,9 @@ from src.utils import get_random_position, get_random_station_shape
 
 from .metro import Metro
 from .station import Station
+
+if TYPE_CHECKING:
+    from src.mediator import Mediator
 
 
 def get_random_station() -> Station:
@@ -30,11 +35,13 @@ def generate_stations(previous: Sequence[Station]) -> Iterator[Station]:
             yield new_station
 
 
-def get_random_stations(num: int) -> list[Station]:
+def get_random_stations(num: int, mediator: Mediator | None = None) -> list[Station]:
     stations: list[Station] = []
     generator = generate_stations(stations)
     for _ in range(num):
         stations.append(next(generator))
+        if mediator:
+            stations[-1].mediator = mediator
     return stations
 
 

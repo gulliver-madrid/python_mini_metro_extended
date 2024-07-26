@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from src.config import (
     metro_capacity,
     metro_color,
@@ -12,6 +16,9 @@ from .ids import EntityId, create_new_metro_id
 from .segment import Segment
 from .station import Station
 
+if TYPE_CHECKING:
+    from src.mediator import Mediator
+
 
 class Metro(Holder):
     __slots__ = (
@@ -23,13 +30,14 @@ class Metro(Holder):
         "is_forward",
     )
 
-    def __init__(self) -> None:
+    def __init__(self, mediator: Mediator | None = None) -> None:
         self.size = metro_size
         metro_shape = Rect(color=metro_color, width=2 * self.size, height=self.size)
         super().__init__(
             shape=metro_shape,
             capacity=metro_capacity,
             id=create_new_metro_id(),
+            mediator=mediator,
         )
         self.current_station: Station | None = None
         self.current_segment: Segment | None = None
