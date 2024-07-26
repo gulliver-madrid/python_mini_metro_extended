@@ -38,8 +38,8 @@ class Holder(Entity):
         mediator: Mediator | None = None,
     ) -> None:
         super().__init__(id)
-        self.shape = shape
-        self.capacity = capacity
+        self.shape: Final = shape
+        self.capacity: Final = capacity
         self.mediator = mediator
 
     def draw(self, surface: pygame.surface.Surface) -> None:
