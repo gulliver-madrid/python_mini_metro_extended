@@ -42,29 +42,13 @@ class Holder(Entity):
         self.capacity: Final = capacity
         self.mediator = mediator
 
+    ######################
+    ### public methods ###
+    ######################
+
     def draw(self, surface: pygame.surface.Surface) -> None:
-        assert self.mediator
-        # draw self
         self.shape.draw(surface, self.position)
-
-        # draw passengers
-        abs_offset: Final = Point(
-            (-passenger_size - passenger_display_buffer), 0.75 * self.size
-        )
-        base_position = self.position + abs_offset
-        gap: Final = passenger_size / 2 + passenger_display_buffer
-        row = 0
-        col = 0
-        for passenger in self.mediator.get_passengers_in_holder(self):
-            rel_offset = Point(col * gap, row * gap)
-            passenger.position = base_position + rel_offset
-            passenger.draw(surface)
-
-            if col < (self.passengers_per_row - 1):
-                col += 1
-            else:
-                row += 1
-                col = 0
+        self._draw_passengers(surface)
 
     def contains(self, point: Point) -> bool:
         return self.shape.contains(point)
@@ -90,3 +74,27 @@ class Holder(Entity):
     def occupation(self) -> int:
         assert self.mediator
         return self.mediator.get_holder_occupation(self)
+
+    #######################
+    ### private methods ###
+    #######################
+
+    def _draw_passengers(self, surface: pygame.surface.Surface) -> None:
+        assert self.mediator
+        abs_offset: Final = Point(
+            (-passenger_size - passenger_display_buffer), 0.75 * self.size
+        )
+        base_position = self.position + abs_offset
+        gap: Final = passenger_size / 2 + passenger_display_buffer
+        row = 0
+        col = 0
+        for passenger in self.mediator.get_passengers_in_holder(self):
+            rel_offset = Point(col * gap, row * gap)
+            passenger.position = base_position + rel_offset
+            passenger.draw(surface)
+
+            if col < (self.passengers_per_row - 1):
+                col += 1
+            else:
+                row += 1
+                col = 0
