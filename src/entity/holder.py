@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, Sequence
+from typing import TYPE_CHECKING, Final, Protocol, Sequence
 
 import pygame
 
@@ -19,12 +19,13 @@ if TYPE_CHECKING:
 class Holder(Entity):
     __slots__ = (
         "shape",
-        "capacity",
+        "_capacity",
         "passengers_per_row",
         "size",
         "position",
         "mediator",
     )
+
     passengers_per_row: int
     size: int
     position: Point
@@ -39,7 +40,7 @@ class Holder(Entity):
     ) -> None:
         super().__init__(id)
         self.shape: Final = shape
-        self.capacity: Final = capacity
+        self._capacity: Final = capacity
         self.mediator = mediator
 
     ######################
@@ -75,6 +76,10 @@ class Holder(Entity):
         assert self.mediator
         return self.mediator.get_holder_occupation(self)
 
+    @property
+    def capacity(self) -> int:
+        return self._capacity
+
     #######################
     ### private methods ###
     #######################
@@ -98,3 +103,8 @@ class Holder(Entity):
             else:
                 row += 1
                 col = 0
+
+
+class HolderProtocol(Protocol):
+    @property
+    def capacity(self) -> int: ...
