@@ -71,6 +71,7 @@ class TestGraph(BaseTestCase):
                         height=station_size,
                     ),
                     get_random_position(self.width, self.height),
+                    self.engine.mediator,
                 ),
                 Station(
                     Circle(
@@ -78,11 +79,11 @@ class TestGraph(BaseTestCase):
                         radius=round(station_size / 2),
                     ),
                     get_random_position(self.width, self.height),
+                    self.engine.mediator,
                 ),
             ]
         )
         for station in self.engine.stations:
-            station.mediator = self.engine.mediator
             station.draw(self.screen)
 
         self.connect_stations([0, 1])

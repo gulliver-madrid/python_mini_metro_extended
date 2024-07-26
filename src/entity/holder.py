@@ -29,14 +29,14 @@ class Holder(Entity):
     _passengers_per_row: int
     _size: int
     position: Point
-    mediator: Mediator | None
+    mediator: Final[Mediator]
 
     def __init__(
         self,
         shape: Shape,
         capacity: int,
         id: EntityId,
-        mediator: Mediator | None = None,
+        mediator: Mediator,
     ) -> None:
         super().__init__(id)
         self.shape: Final = shape

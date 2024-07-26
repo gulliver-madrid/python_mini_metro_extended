@@ -129,6 +129,7 @@ class TestEngine(BaseTestCase):
                         height=station_size,
                     ),
                     Point(100, 100),
+                    self.engine.mediator,
                 ),
                 Station(
                     Circle(
@@ -136,12 +137,12 @@ class TestEngine(BaseTestCase):
                         radius=round(station_size / 2),
                     ),
                     Point(100, 200),
+                    self.engine.mediator,
                 ),
             ]
         )
         # Need to draw stations if you want to override them
         for station in self.engine.stations:
-            station.mediator = self.engine.mediator
             station.draw(self.screen)
 
         # Run the game until first wave of passengers spawn
@@ -181,6 +182,7 @@ class TestEngine(BaseTestCase):
                         height=station_size,
                     ),
                     get_random_position(self.width, self.height),
+                    self.engine.mediator,
                 ),
                 Station(
                     Circle(
@@ -188,6 +190,7 @@ class TestEngine(BaseTestCase):
                         radius=round(station_size / 2),
                     ),
                     get_random_position(self.width, self.height),
+                    self.engine.mediator,
                 ),
                 Station(
                     Circle(
@@ -195,6 +198,7 @@ class TestEngine(BaseTestCase):
                         radius=round(station_size / 2),
                     ),
                     get_random_position(self.width, self.height),
+                    self.engine.mediator,
                 ),
                 Station(
                     Triangle(
@@ -202,6 +206,7 @@ class TestEngine(BaseTestCase):
                         size=station_size,
                     ),
                     get_random_position(self.width, self.height),
+                    self.engine.mediator,
                 ),
                 Station(
                     Triangle(
@@ -209,6 +214,7 @@ class TestEngine(BaseTestCase):
                         size=station_size,
                     ),
                     get_random_position(self.width, self.height),
+                    self.engine.mediator,
                 ),
                 Station(
                     Triangle(
@@ -216,6 +222,7 @@ class TestEngine(BaseTestCase):
                         size=station_size,
                     ),
                     get_random_position(self.width, self.height),
+                    self.engine.mediator,
                 ),
             ]
         )
@@ -235,9 +242,8 @@ class TestEngine(BaseTestCase):
 
     def test_skip_stations_on_same_path(self) -> None:
         self.engine.stations.clear()
-        self.engine.stations.extend(get_random_stations(5))
+        self.engine.stations.extend(get_random_stations(5, self.engine.mediator))
         for station in self.engine.stations:
-            station.mediator = self.engine.mediator
             station.draw(self.screen)
         self.connect_stations([i for i in range(5)])
         self.engine._passenger_spawner._spawn_passengers()  # pyright: ignore [reportPrivateUsage]

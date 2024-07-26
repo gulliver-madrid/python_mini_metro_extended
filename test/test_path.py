@@ -23,20 +23,21 @@ class TestPath(BaseTestCase):
         self.screen = create_autospec(pygame.surface.Surface)
         self.position = get_random_position(self.width, self.height)
         self.color = get_random_color()
+        self.mediator = Mediator()
 
     def tearDown(self) -> None:
         super().tearDown()
 
     def test_init(self) -> None:
         path = Path(get_random_color())
-        station = get_random_station()
+        station = get_random_station(self.mediator)
         path.add_station(station)
 
         self.assertIn(station, path.stations)
 
     def test_draw(self) -> None:
         path = Path(get_random_color())
-        stations = get_random_stations(5)
+        stations = get_random_stations(5, self.mediator)
         for station in stations:
             path.add_station(station)
         path.draw(self.screen, 0)
@@ -45,7 +46,7 @@ class TestPath(BaseTestCase):
 
     def test_draw_temporary_point(self) -> None:
         path = Path(get_random_color())
-        path.add_station(get_random_station())
+        path.add_station(get_random_station(self.mediator))
         path.set_temporary_point(Point(1, 1))
         path.draw(self.screen, 0)
 
@@ -53,10 +54,10 @@ class TestPath(BaseTestCase):
 
     def test_metro_starts_at_beginning_of_first_line(self) -> None:
         path = Path(get_random_color())
-        path.add_station(get_random_station())
-        path.add_station(get_random_station())
+        path.add_station(get_random_station(self.mediator))
+        path.add_station(get_random_station(self.mediator))
         path.draw(self.screen, 0)
-        metro = Metro()
+        metro = Metro(self.mediator)
         path.add_metro(metro)
 
         self.assertEqual(
@@ -68,15 +69,20 @@ class TestPath(BaseTestCase):
 
     def test_metro_moves_from_beginning_to_end(self) -> None:
         path = Path(get_random_color())
-        path.add_station(Station(get_random_station_shape(), Point(0, 0)))
+        path.add_station(
+            Station(get_random_station_shape(), Point(0, 0), self.mediator)
+        )
         dist_in_one_sec = 1000 * metro_speed_per_ms
-        path.add_station(Station(get_random_station_shape(), Point(dist_in_one_sec, 0)))
+        path.add_station(
+            Station(
+                get_random_station_shape(), Point(dist_in_one_sec, 0), self.mediator
+            )
+        )
         path.draw(self.screen, 0)
-        mediator = Mediator()
+
         for station in path.stations:
-            station.mediator = mediator
             station.draw(self.screen)
-        metro = Metro(mediator)
+        metro = Metro(self.mediator)
         path.add_metro(metro)
 
         for _ in range(framerate):
@@ -86,15 +92,19 @@ class TestPath(BaseTestCase):
 
     def test_metro_turns_around_when_it_reaches_the_end(self) -> None:
         path = Path(get_random_color())
-        path.add_station(Station(get_random_station_shape(), Point(0, 0)))
+        path.add_station(
+            Station(get_random_station_shape(), Point(0, 0), self.mediator)
+        )
         dist_in_one_sec = 1000 * metro_speed_per_ms
-        path.add_station(Station(get_random_station_shape(), Point(dist_in_one_sec, 0)))
+        path.add_station(
+            Station(
+                get_random_station_shape(), Point(dist_in_one_sec, 0), self.mediator
+            )
+        )
         path.draw(self.screen, 0)
-        mediator = Mediator()
         for station in path.stations:
-            station.mediator = mediator
             station.draw(self.screen)
-        metro = Metro(mediator)
+        metro = Metro(self.mediator)
         path.add_metro(metro)
 
         for _ in range(framerate + 1):
@@ -104,20 +114,32 @@ class TestPath(BaseTestCase):
 
     def test_metro_loops_around_the_path(self) -> None:
         path = Path(get_random_color())
-        path.add_station(Station(get_random_station_shape(), Point(0, 0)))
-        dist_in_one_sec = 1000 * metro_speed_per_ms
-        path.add_station(Station(get_random_station_shape(), Point(dist_in_one_sec, 0)))
         path.add_station(
-            Station(get_random_station_shape(), Point(dist_in_one_sec, dist_in_one_sec))
+            Station(get_random_station_shape(), Point(0, 0), self.mediator)
         )
-        path.add_station(Station(get_random_station_shape(), Point(0, dist_in_one_sec)))
+        dist_in_one_sec = 1000 * metro_speed_per_ms
+        path.add_station(
+            Station(
+                get_random_station_shape(), Point(dist_in_one_sec, 0), self.mediator
+            )
+        )
+        path.add_station(
+            Station(
+                get_random_station_shape(),
+                Point(dist_in_one_sec, dist_in_one_sec),
+                self.mediator,
+            )
+        )
+        path.add_station(
+            Station(
+                get_random_station_shape(), Point(0, dist_in_one_sec), self.mediator
+            )
+        )
         path.set_loop()
         path.draw(self.screen, 0)
-        mediator = Mediator()
         for station in path.stations:
-            station.mediator = mediator
             station.draw(self.screen)
-        metro = Metro(mediator)
+        metro = Metro(self.mediator)
         path.add_metro(metro)
 
         for station_idx in [1, 2, 3, 0, 1]:

@@ -31,7 +31,7 @@ class Metro(Holder):
         "is_forward",
     )
 
-    def __init__(self, mediator: Mediator | None = None) -> None:
+    def __init__(self, mediator: Mediator) -> None:
         self._size = metro_size
         metro_shape = Rect(color=metro_color, width=2 * self._size, height=self._size)
         super().__init__(

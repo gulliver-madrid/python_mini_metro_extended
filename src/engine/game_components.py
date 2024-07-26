@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from src.entity import Metro, Passenger, Path, Station
 from src.mediator import Mediator
@@ -12,7 +12,7 @@ class GameComponents:
     stations: list[Station]
     metros: list[Metro]
     status: MediatorStatus
-    mediator: Mediator = field(default_factory=Mediator)
+    mediator: Mediator
 
     @property
     def passengers(self) -> list[Passenger]:

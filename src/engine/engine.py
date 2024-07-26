@@ -39,16 +39,16 @@ class Engine:
 
     def __init__(self) -> None:
         pygame.font.init()
+        mediator = Mediator()
 
         # components
         self._components: Final = GameComponents(
             paths=[],
-            stations=get_random_stations(num_stations),
+            stations=get_random_stations(num_stations, mediator),
             metros=[],
             status=MediatorStatus(),
+            mediator=mediator,
         )
-        for station in self._components.stations:
-            station.mediator = self._components.mediator
 
         # status
         self.showing_debug = False
