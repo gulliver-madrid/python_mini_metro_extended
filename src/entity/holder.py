@@ -51,13 +51,13 @@ class Holder(Entity):
         abs_offset: Final = Point(
             (-passenger_size - passenger_display_buffer), 0.75 * self.size
         )
+        base_position = self.position + abs_offset
         gap: Final = passenger_size / 2 + passenger_display_buffer
         row = 0
         col = 0
         for passenger in self.mediator.get_passengers(self):
             rel_offset = Point(col * gap, row * gap)
-            passenger.position = self.position + abs_offset + rel_offset
-
+            passenger.position = base_position + rel_offset
             passenger.draw(surface)
 
             if col < (self.passengers_per_row - 1):
