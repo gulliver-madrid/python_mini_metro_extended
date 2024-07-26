@@ -23,6 +23,9 @@ class Mediator:
     def get_holder_occupation(self, holder: Holder) -> int:
         return len(self._passengers[holder])
 
+    def holder_has_room(self, holder: Holder) -> bool:
+        return holder.capacity > holder.occupation
+
     def add_new_passenger_to_holder(self, holder: Holder, passenger: Passenger) -> None:
         assert all(
             passenger not in passengers for passengers in self._passengers.values()

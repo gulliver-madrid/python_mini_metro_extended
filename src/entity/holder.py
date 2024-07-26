@@ -55,7 +55,7 @@ class Holder(Entity):
 
     def has_room(self) -> bool:
         assert self.mediator
-        return self.capacity > self.occupation
+        return self.mediator.holder_has_room(self)
 
     def add_new_passenger(self, passenger: Passenger) -> None:
         assert self.mediator
