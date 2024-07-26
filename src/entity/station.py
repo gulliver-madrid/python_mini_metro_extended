@@ -17,7 +17,7 @@ class Station(Holder):
         )
         self._size = station_size
         self.position = position
-        self.passengers_per_row = station_passengers_per_row
+        self._passengers_per_row = station_passengers_per_row
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Station) and self.id == other.id

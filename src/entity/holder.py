@@ -20,13 +20,13 @@ class Holder(Entity):
     __slots__ = (
         "shape",
         "_capacity",
-        "passengers_per_row",
+        "_passengers_per_row",
         "_size",
         "position",
         "mediator",
     )
 
-    passengers_per_row: int
+    _passengers_per_row: int
     _size: int
     position: Point
     mediator: Mediator | None
@@ -98,7 +98,7 @@ class Holder(Entity):
             passenger.position = base_position + rel_offset
             passenger.draw(surface)
 
-            if col < (self.passengers_per_row - 1):
+            if col < (self._passengers_per_row - 1):
                 col += 1
             else:
                 row += 1

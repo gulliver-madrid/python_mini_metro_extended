@@ -46,7 +46,7 @@ class Metro(Holder):
         self.path_id: EntityId | None = None
         self.game_speed = metro_speed_per_ms
         self.is_forward = True
-        self.passengers_per_row = metro_passengers_per_row
+        self._passengers_per_row = metro_passengers_per_row
 
     def passenger_arrives(self, passenger: Passenger) -> None:
         assert self.mediator
