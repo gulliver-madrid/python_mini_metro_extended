@@ -4,7 +4,6 @@ from src.geometry.shape import Shape
 
 from .holder import Holder
 from .ids import create_new_station_id
-from .passenger import Passenger
 
 
 class Station(Holder):
@@ -25,8 +24,3 @@ class Station(Holder):
 
     def __hash__(self) -> int:
         return hash(self.id)
-
-    def remove_passenger(self, passenger: Passenger) -> None:
-        super().remove_passenger(passenger)
-        # TODO: manage cases where station is removed before removing path
-        passenger.last_station = self

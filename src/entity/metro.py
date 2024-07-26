@@ -13,6 +13,7 @@ from src.geometry.rect import Rect
 
 from .holder import Holder
 from .ids import EntityId, create_new_metro_id
+from .passenger import Passenger
 from .segment import Segment
 from .station import Station
 
@@ -46,3 +47,7 @@ class Metro(Holder):
         self.game_speed = metro_speed_per_ms
         self.is_forward = True
         self.passengers_per_row = metro_passengers_per_row
+
+    def passenger_arrives(self, passenger: Passenger) -> None:
+        assert self.mediator
+        self.mediator.passenger_arrives(self, passenger)

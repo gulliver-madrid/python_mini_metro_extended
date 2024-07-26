@@ -19,14 +19,14 @@ class PassengerMover:
         station = metro.current_station
         assert station
 
-        to_remove: list[Passenger] = []
+        to_arrive: list[Passenger] = []
         from_metro_to_station: list[Passenger] = []
         from_station_to_metro: list[Passenger] = []
 
         # queue
         for passenger in metro.passengers:
             if have_same_shape_type(station, passenger):
-                to_remove.append(passenger)
+                to_arrive.append(passenger)
             elif self._is_next_planned_station(station, passenger):
                 from_metro_to_station.append(passenger)
 
@@ -35,7 +35,7 @@ class PassengerMover:
                 from_station_to_metro.append(passenger)
 
         # process
-        self._remove_passengers_from_metro(to_remove, metro)
+        self._make_passengers_arrive(to_arrive, metro)
         self._transfer_passengers_from_metro_to_station(
             metro, station, from_metro_to_station
         )
@@ -60,12 +60,12 @@ class PassengerMover:
             return False
         return next_path.id == metro.path_id
 
-    def _remove_passengers_from_metro(
-        self, to_remove: Sequence[Passenger], metro: Metro
+    def _make_passengers_arrive(
+        self, to_arrive: Sequence[Passenger], metro: Metro
     ) -> None:
-        for passenger in to_remove:
+        for passenger in to_arrive:
             passenger.is_at_destination = True
-            metro.remove_passenger(passenger)
+            metro.passenger_arrives(passenger)
             del passenger.travel_plan
             self._components.status.score += 1
 

@@ -55,7 +55,7 @@ class Holder(Entity):
         gap: Final = passenger_size / 2 + passenger_display_buffer
         row = 0
         col = 0
-        for passenger in self.mediator.get_passengers(self):
+        for passenger in self.mediator.get_passengers_in_holder(self):
             rel_offset = Point(col * gap, row * gap)
             passenger.position = base_position + rel_offset
             passenger.draw(surface)
@@ -71,15 +71,11 @@ class Holder(Entity):
 
     def has_room(self) -> bool:
         assert self.mediator
-        return self.capacity > self.mediator.get_num_passengers(self)
+        return self.capacity > self.occupation
 
-    def add_passenger(self, passenger: Passenger) -> None:
+    def add_new_passenger(self, passenger: Passenger) -> None:
         assert self.mediator
-        self.mediator.add_passenger_to_holder(self, passenger)
-
-    def remove_passenger(self, passenger: Passenger) -> None:
-        assert self.mediator
-        self.mediator.remove_passenger_from_holder(self, passenger)
+        self.mediator.add_new_passenger_to_holder(self, passenger)
 
     def move_passenger(self, passenger: Passenger, dest: Holder) -> None:
         assert self.mediator
@@ -88,4 +84,9 @@ class Holder(Entity):
     @property
     def passengers(self) -> Sequence[Passenger]:
         assert self.mediator, self
-        return self.mediator.get_passengers(self)
+        return self.mediator.get_passengers_in_holder(self)
+
+    @property
+    def occupation(self) -> int:
+        assert self.mediator
+        return self.mediator.get_holder_occupation(self)

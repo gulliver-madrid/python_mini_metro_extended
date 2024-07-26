@@ -55,7 +55,7 @@ class PassengerSpawner:
             if not station.has_room():
                 continue
             passenger = passenger_creator.create_passenger(station)
-            station.add_passenger(passenger)
+            station.add_new_passenger(passenger)
 
     def _get_station_shape_types(self) -> list[ShapeType]:
         station_shape_types: list[ShapeType] = []
