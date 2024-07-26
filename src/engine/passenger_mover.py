@@ -31,7 +31,7 @@ class PassengerMover:
                 from_metro_to_station.append(passenger)
 
         for passenger in station.passengers:
-            if self._metro_is_in_next_passenger_path(passenger, metro):
+            if self._metro_is_in_passenger_next_path(passenger, metro):
                 from_station_to_metro.append(passenger)
 
         # process
@@ -50,7 +50,7 @@ class PassengerMover:
         assert travel_plan
         return travel_plan.get_next_station() == station
 
-    def _metro_is_in_next_passenger_path(
+    def _metro_is_in_passenger_next_path(
         self, passenger: Passenger, metro: Metro
     ) -> bool:
         travel_plan = passenger.travel_plan
