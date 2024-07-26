@@ -32,8 +32,8 @@ class Metro(Holder):
     )
 
     def __init__(self, mediator: Mediator | None = None) -> None:
-        self.size = metro_size
-        metro_shape = Rect(color=metro_color, width=2 * self.size, height=self.size)
+        self._size = metro_size
+        metro_shape = Rect(color=metro_color, width=2 * self._size, height=self._size)
         super().__init__(
             shape=metro_shape,
             capacity=metro_capacity,

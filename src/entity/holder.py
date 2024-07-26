@@ -21,13 +21,13 @@ class Holder(Entity):
         "shape",
         "_capacity",
         "passengers_per_row",
-        "size",
+        "_size",
         "position",
         "mediator",
     )
 
     passengers_per_row: int
-    size: int
+    _size: int
     position: Point
     mediator: Mediator | None
 
@@ -87,7 +87,7 @@ class Holder(Entity):
     def _draw_passengers(self, surface: pygame.surface.Surface) -> None:
         assert self.mediator
         abs_offset: Final = Point(
-            (-passenger_size - passenger_display_buffer), 0.75 * self.size
+            (-passenger_size - passenger_display_buffer), 0.75 * self._size
         )
         base_position = self.position + abs_offset
         gap: Final = passenger_size / 2 + passenger_display_buffer

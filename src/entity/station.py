@@ -15,7 +15,7 @@ class Station(Holder):
             capacity=station_capacity,
             id=create_new_station_id(shape.type),
         )
-        self.size = station_size
+        self._size = station_size
         self.position = position
         self.passengers_per_row = station_passengers_per_row
 
