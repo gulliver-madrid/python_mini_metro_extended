@@ -4,6 +4,7 @@ from typing import Final
 import pygame
 
 from src.config import Config
+from src.engine.path_being_edited import PathBeingEdited
 from src.entity import Passenger, Path
 from src.geometry.point import Point
 from src.ui.ui import UI
@@ -26,6 +27,7 @@ class GameRenderer:
         gui_height: float,
         main_surface_height: float,
         paths: Sequence[Path],
+        path_being_edited: PathBeingEdited | None,
         max_num_paths: int,
         travel_plans: TravelPlansMapping,
         ui: UI,
@@ -39,6 +41,8 @@ class GameRenderer:
         )
         main_surface.fill((180, 180, 120))
         self._draw_paths(screen, paths, max_num_paths)
+        if path_being_edited:
+            path_being_edited.draw(screen)
         for station in self._components.stations:
             station.draw(screen)
         for metro in self._components.metros:

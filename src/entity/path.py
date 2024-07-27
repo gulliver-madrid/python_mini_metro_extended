@@ -202,6 +202,9 @@ class Path(Entity):
                 return segment
         return None
 
+    def get_path_segments(self) -> list[PathSegment]:
+        return [seg for seg in self._segments if isinstance(seg, PathSegment)]
+
 
 def get_sign(s1: Station, s2: Station) -> int:
     assert s1.num_id != s2.num_id

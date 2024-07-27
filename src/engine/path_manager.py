@@ -2,6 +2,7 @@ import random
 from typing import Final, Mapping
 
 from src.config import max_num_metros, max_num_paths
+from src.engine.path_being_edited import PathBeingEdited
 from src.entity import Metro, Passenger, Path, Station
 from src.entity.path_segment import PathSegment
 from src.geometry.point import Point
@@ -28,6 +29,7 @@ class PathManager:
         "max_num_metros",
         "_ui",
         "path_being_created",
+        "path_being_edited",
     )
 
     def __init__(
@@ -42,6 +44,7 @@ class PathManager:
         self._components: Final = components
         self._ui: Final = ui
         self.path_being_created: PathBeingCreated | None = None
+        self.path_being_edited: PathBeingEdited | None = None
 
     ######################
     ### public methods ###
@@ -137,6 +140,27 @@ class PathManager:
                 break
         else:
             print("no segment selected")
+            return
+        assert segment
+        assert path
+        self.path_being_edited = PathBeingEdited(path, segment)
+
+    def touch(self, entity: Station) -> None:
+        assert self.path_being_edited
+        assert entity not in self.path_being_edited.path.stations
+        segment = self.path_being_edited.segment
+        path_segments = self.path_being_edited.path.get_path_segments()
+
+        for path_segment in path_segments:
+            if segment.points == path_segment.points:
+                break
+        else:
+            assert False
+
+        index = path_segments.index(path_segment)
+
+        self.path_being_edited.path.stations.insert(index + 1, entity)
+        self.path_being_edited = None
 
     #######################
     ### private methods ###

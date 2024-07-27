@@ -2,6 +2,7 @@ import queue
 
 import pygame
 
+from src.config import Config
 from src.console import Console
 from src.engine.engine import Engine
 from src.entity.station import Station
@@ -92,7 +93,11 @@ class UI_Reactor:
     ) -> None:
         if isinstance(entity, Station):
             self.engine.path_manager.start_path_on_station(entity)
-        if not entity:
+        if (
+            not entity
+            and self.engine.is_paused
+            and not Config.allow_self_crossing_lines
+        ):
             self.engine.try_starting_path_edition(position)
 
     def _on_mouse_up(self, entity: Station | PathButton | None) -> None:
@@ -101,6 +106,8 @@ class UI_Reactor:
                 self.engine.path_manager.end_path_on_station(entity)
             else:
                 self.engine.path_manager.end_path_on_last_station()
+        elif self.engine.path_manager.path_being_edited:
+            self.engine.path_manager.path_being_edited = None
         elif isinstance(entity, PathButton) and entity.path:
             self.engine.path_manager.remove_path(entity.path)
 
@@ -112,3 +119,7 @@ class UI_Reactor:
                 self.engine.path_manager.add_station_to_path(entity)
             else:
                 self.engine.path_manager.set_temporary_point(position)
+        elif self.engine.path_manager.path_being_edited:
+            self.engine.path_manager.path_being_edited.set_temporary_point(position)
+            if isinstance(entity, Station):
+                self.engine.path_manager.touch(entity)

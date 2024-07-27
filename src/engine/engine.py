@@ -118,6 +118,7 @@ class Engine:
             paths=self.paths,
             max_num_paths=self.path_manager.max_num_paths,
             travel_plans=self.travel_plans,
+            path_being_edited=self.path_manager.path_being_edited,
             ui=self.ui,
             is_creating_path=self.path_manager.path_being_created is not None,
             ms_until_next_spawn=self._passenger_spawner.ms_until_next_spawn,
@@ -128,6 +129,9 @@ class Engine:
     def toggle_pause(self) -> None:
         if self.is_paused:
             self.steps_allowed = None
+        if self.path_manager.path_being_edited:
+            assert self.is_paused
+            return
         self._components.status.is_paused = not self._components.status.is_paused
 
     def exit(self) -> NoReturn:
