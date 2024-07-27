@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Final
 
+from src.config import Config
 from src.entity import Path, Station
 
 
@@ -23,9 +24,11 @@ class PathBeingCreated:
         if self.can_make_loop(station):
             self.path.set_loop()
         # non-loop
-        else:
-            assert not self._is_first_station(station)
+        elif Config.allow_self_crossing_lines or station not in self.path.stations:
             self.path.add_station(station)
+        # forbidden
+        else:
+            return
 
     def can_end_with(self, station: Station) -> bool:
         return self._num_stations_in_this_path() > 1 and self._is_last_station(station)

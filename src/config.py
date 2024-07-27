@@ -77,3 +77,5 @@ class Config:
     # debug
     unfilled_shapes = _unfilled_shapes
     padding_segments_color = _padding_segments_color
+    # rules
+    allow_self_crossing_lines = False
