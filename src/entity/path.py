@@ -166,8 +166,6 @@ class Path(Entity):
         else:
             if metro.current_station != dst_station:
                 metro.current_station = dst_station
-                for passenger in metro.passengers:
-                    passenger.last_station = dst_station
             if len(self._segments) == 1:
                 metro.is_forward = not metro.is_forward
             elif metro.current_segment_idx == len(self._segments) - 1:
