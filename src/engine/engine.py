@@ -106,6 +106,10 @@ class Engine:
                     self.toggle_pause()
                     self.steps_allowed = None
 
+    def try_starting_path_edition(self, position: Point) -> None:
+        assert not self.path_manager.path_being_created
+        self.path_manager.try_starting_path_edition(position)
+
     def render(self, screen: pygame.surface.Surface) -> None:
         self._game_renderer.render_game(
             screen,

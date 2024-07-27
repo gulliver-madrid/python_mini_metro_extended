@@ -45,7 +45,7 @@ class UI_Reactor:
 
         if event.event_type == MouseEventType.MOUSE_DOWN:
             self.is_mouse_down = True
-            self._on_mouse_down(entity)
+            self._on_mouse_down(entity, event.position)
 
         elif event.event_type == MouseEventType.MOUSE_UP:
             self.is_mouse_down = False
@@ -87,9 +87,13 @@ class UI_Reactor:
         else:
             self.engine.ui.exit_buttons()
 
-    def _on_mouse_down(self, entity: Station | PathButton | None) -> None:
+    def _on_mouse_down(
+        self, entity: Station | PathButton | None, position: Point
+    ) -> None:
         if isinstance(entity, Station):
             self.engine.path_manager.start_path_on_station(entity)
+        if not entity:
+            self.engine.try_starting_path_edition(position)
 
     def _on_mouse_up(self, entity: Station | PathButton | None) -> None:
         if self.engine.path_manager.path_being_created:

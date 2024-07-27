@@ -194,6 +194,14 @@ class Path(Entity):
 
             metro.current_segment = self._segments[metro.current_segment_idx]
 
+    def get_containing_segment(self, position: Point) -> PathSegment | None:
+        for segment in self._segments:
+            if not isinstance(segment, PathSegment):
+                continue
+            if segment.points.includes(position):
+                return segment
+        return None
+
 
 def get_sign(s1: Station, s2: Station) -> int:
     assert s1.num_id != s2.num_id

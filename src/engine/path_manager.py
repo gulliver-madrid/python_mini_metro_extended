@@ -3,6 +3,7 @@ from typing import Final, Mapping
 
 from src.config import max_num_metros, max_num_paths
 from src.entity import Metro, Passenger, Path, Station
+from src.entity.path_segment import PathSegment
 from src.geometry.point import Point
 from src.geometry.type import ShapeType
 from src.graph.graph_algo import bfs, build_station_nodes_dict
@@ -125,6 +126,17 @@ class PathManager:
     def set_temporary_point(self, position: Point) -> None:
         assert self.path_being_created
         self.path_being_created.path.set_temporary_point(position)
+
+    def try_starting_path_edition(self, position: Point) -> None:
+        assert not self.path_being_created
+        segment: PathSegment | None = None
+        for path in self._components.paths:
+            segment = path.get_containing_segment(position)
+            if segment:
+                print("segment selected")
+                break
+        else:
+            print("no segment selected")
 
     #######################
     ### private methods ###
