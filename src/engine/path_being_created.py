@@ -33,7 +33,7 @@ class PathBeingCreated:
         return self._num_stations_in_this_path() > 1 and self._is_last_station(station)
 
     def can_make_loop(self, station: Station) -> bool:
-        return self._num_stations_in_this_path() > 1 and self._is_first_station(station)
+        return self._num_stations_in_this_path() > 2 and self._is_first_station(station)
 
     #######################
     ### private methods ###
