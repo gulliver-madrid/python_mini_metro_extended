@@ -23,12 +23,11 @@ class PathBeingCreated:
         # loop
         if self.can_make_loop(station):
             self.path.set_loop()
-        # non-loop
-        elif Config.allow_self_crossing_lines or station not in self.path.stations:
-            self.path.add_station(station)
-        # forbidden
-        else:
             return
+        # non-loop
+        allowed = Config.allow_self_crossing_lines or station not in self.path.stations
+        if allowed:
+            self.path.add_station(station)
 
     def can_end_with(self, station: Station) -> bool:
         return self._num_stations_in_this_path() > 1 and self._is_last_station(station)
