@@ -6,6 +6,8 @@ from typing import Any
 
 from shortuuid import uuid
 
+from src.geometry.types import Degrees
+
 Number = int | float
 NumberType = (int, float)
 
@@ -57,7 +59,7 @@ class Point:
             and self.top == other.top
         )
 
-    def rotate(self, degrees: float) -> Point:
+    def rotate(self, degrees: Degrees) -> Point:
         # Rotate around the origin.
         # A point is also a vector from the origin.
         radians = math.radians(degrees)

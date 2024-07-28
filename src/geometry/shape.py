@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
+from typing import final
 
 import pygame
 from shortuuid import uuid
 
 from src.geometry.point import Point
 from src.geometry.type import ShapeType
+from src.geometry.types import Degrees
 from src.type import Color
 
 
@@ -19,14 +21,16 @@ class Shape(ABC):
 
     @abstractmethod
     def draw(self, surface: pygame.surface.Surface, position: Point) -> None:
-        self.position = position
+        raise NotImplementedError
 
     @abstractmethod
     def contains(self, point: Point) -> bool:
-        pass
+        raise NotImplementedError
 
-    def rotate(self, degree_diff: float) -> None:
-        pass
+    @abstractmethod
+    def set_degrees(self, degrees: Degrees) -> None:
+        raise NotImplementedError
 
-    def set_degrees(self, degrees: float) -> None:
-        pass
+    @final
+    def _set_position(self, position: Point) -> None:
+        self.position = position

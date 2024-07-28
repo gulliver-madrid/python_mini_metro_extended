@@ -14,6 +14,7 @@ from src.geometry.circle import Circle
 from src.geometry.cross import Cross
 from src.geometry.point import Point
 from src.geometry.shape import Shape
+from src.geometry.types import Degrees
 from src.ui.button import Button
 
 
@@ -32,7 +33,7 @@ class PathButton(Button):
 
     def assign_path(self, path: Path) -> None:
         self.cross = Cross((0, 0, 0), path_button_cross_size, path_button_cross_width)
-        self.cross.set_degrees(45)
+        self.cross.set_degrees(Degrees(45))
         self.path = path
         self.shape.color = path.color
 

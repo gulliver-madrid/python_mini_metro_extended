@@ -6,11 +6,13 @@ from shapely.geometry.polygon import (  # type: ignore [import-untyped]
     Polygon as ShapelyPolygon,
 )
 from shortuuid import uuid
+from typing_extensions import override
 
 from src.config import Config
 from src.geometry.point import Point
 from src.geometry.shape import Shape
 from src.geometry.type import ShapeType
+from src.geometry.types import Degrees
 from src.type import Color
 
 
@@ -21,10 +23,11 @@ class Polygon(Shape):
         super().__init__(shape_type, color)
         self.id = f"Polygon-{uuid()}"
         self.points = points
-        self.degrees: float = 0
+        self.degrees: Degrees = Degrees(0)
 
+    @override
     def draw(self, surface: pygame.surface.Surface, position: Point) -> None:
-        super().draw(surface, position)
+        super()._set_position(position)
         tuples: List[tuple[float, float]] = []
         for point in self.points:
             rotated_point = point.rotate(self.degrees)
@@ -41,8 +44,9 @@ class Polygon(Shape):
         assert isinstance(result, bool)
         return result
 
-    def set_degrees(self, degrees: float) -> None:
+    @override
+    def set_degrees(self, degrees: Degrees) -> None:
         self.degrees = degrees
 
-    def rotate(self, degree_diff: float) -> None:
-        self.degrees += degree_diff
+    def rotate(self, degree_diff: Degrees) -> None:
+        self.degrees = Degrees(self.degrees + degree_diff)

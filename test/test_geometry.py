@@ -10,6 +10,7 @@ from src.geometry.line import Line
 from src.geometry.point import Point
 from src.geometry.rect import Rect
 from src.geometry.triangle import Triangle
+from src.geometry.types import Degrees
 from src.utils import get_random_color, get_random_position
 
 from test.base_test import BaseTestCase
@@ -86,20 +87,20 @@ class TestGeometry(BaseTestCase):
         rect = self.init_rect()
         rect.draw(self.screen, self.position)
         rect_points = deepcopy(rect.points)
-        rect.rotate(180)
+        rect.rotate(Degrees(180))
         for point in rect.points:
             self.assertIn(point, rect_points)
-        rect.rotate(180)
+        rect.rotate(Degrees(180))
         self.assertSequenceEqual(rect.points, rect_points)
 
     def test_rect_set_degrees(self) -> None:
         rect = self.init_rect()
         rect.draw(self.screen, self.position)
         rect_points = deepcopy(rect.points)
-        rect.set_degrees(180)
+        rect.set_degrees(Degrees(180))
         for point in rect.points:
             self.assertIn(point, rect_points)
-        rect.set_degrees(360)
+        rect.set_degrees(Degrees(360))
         self.assertSequenceEqual(rect.points, rect_points)
 
     def test_line_init(self) -> None:

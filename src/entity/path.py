@@ -12,6 +12,7 @@ from src.entity.end_segment_behaviour import (
 )
 from src.geometry.line import Line
 from src.geometry.point import Point
+from src.geometry.types import Degrees
 from src.geometry.utils import get_direction, get_distance
 from src.type import Color
 
@@ -195,8 +196,8 @@ class Path(Entity):
 
     def _set_rotation_angle(self, metro: Metro, direct: Point) -> None:
         radians = math.atan2(direct.top, direct.left)
-        degrees = math.degrees(radians)
-        metro.shape.set_degrees(degrees)
+        degrees = Degrees(math.degrees(radians))
+        metro.shape.set_degrees((degrees))
 
     def _handle_segment_end(self, metro: Metro, dst_station: Station | None) -> None:
         """Handle metro movement at the end of the segment"""

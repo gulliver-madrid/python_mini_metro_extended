@@ -1,6 +1,7 @@
 from src.config import path_order_shift, path_width
 from src.geometry.line import Line
 from src.geometry.point import Point
+from src.geometry.types import Degrees
 from src.geometry.utils import get_direction
 from src.type import Color
 
@@ -42,5 +43,5 @@ def _get_offset_vector(stations: StationPair, path_order: int) -> Point:
     start_point = stations.start.position
     end_point = stations.end.position
     direct = get_direction(start_point, end_point)
-    buffer_vector = (direct * path_order_shift).rotate(90)
+    buffer_vector = (direct * path_order_shift).rotate(Degrees(90))
     return buffer_vector * path_order

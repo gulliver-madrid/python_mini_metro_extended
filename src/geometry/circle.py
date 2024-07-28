@@ -1,10 +1,12 @@
 import pygame
 from shortuuid import uuid
+from typing_extensions import override
 
 from src.config import Config
 from src.geometry.point import Point
 from src.geometry.shape import Shape
 from src.geometry.type import ShapeType
+from src.geometry.types import Degrees
 from src.type import Color
 
 
@@ -14,8 +16,9 @@ class Circle(Shape):
         self.id = f"Circle-{uuid()}"
         self.radius = radius
 
+    @override
     def draw(self, surface: pygame.surface.Surface, position: Point) -> None:
-        super().draw(surface, position)
+        super()._set_position(position)
         center = (position.left, position.top)
         radius = self.radius
         pygame.draw.circle(
@@ -30,3 +33,7 @@ class Circle(Shape):
         return (point.left - self.position.left) ** 2 + (
             point.top - self.position.top
         ) ** 2 <= self.radius**2
+
+    @override
+    def set_degrees(self, degrees: Degrees) -> None:
+        pass
