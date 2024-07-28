@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import math
 from itertools import pairwise
 from typing import Final
@@ -7,7 +8,7 @@ import pygame
 from src.config import path_width
 from src.geometry.line import Line
 from src.geometry.point import Point
-from src.geometry.utils import direction, distance
+from src.geometry.utils import get_direction, get_distance
 from src.type import Color
 
 from .entity import Entity
@@ -133,64 +134,26 @@ class Path(Entity):
         self.metros.append(metro)
 
     def move_metro(self, metro: Metro, dt_ms: int) -> None:
-        segment = metro.current_segment
-        assert segment is not None
+        dst_position, dst_station = self._determine_destination(metro)
 
-        if metro.is_forward:
-            dst_position = segment.points.end
-        else:
-            dst_position = segment.points.start
+        # Calculate the distance and direction to the destination point
+        dist, direction = self._calculate_direction_and_distance(
+            metro.position, dst_position
+        )
 
-        if isinstance(segment, PathSegment):
-            assert segment.stations
-            if metro.is_forward:
-                dst_station = segment.stations.end
-            else:
-                dst_station = segment.stations.start
-        else:
-            dst_station = None
+        # Calculate and set the rotation angle of the metro
+        self._set_rotation_angle(metro, direction)
 
-        start_point = metro.position
-        end_point = dst_position
-        dist = distance(start_point, end_point)
-        direct = direction(start_point, end_point)
-        radians = math.atan2(direct.top, direct.left)
-        degrees = math.degrees(radians)
-        metro.shape.set_degrees(degrees)
+        # Calculate the distance the metro can travel in this time step
         travel_dist_in_dt = metro.game_speed * dt_ms
-        # metro is not at one end of segment
-        if dist > travel_dist_in_dt:
-            metro.current_station = None
-            metro.position += direct * travel_dist_in_dt
-        # metro is at one end of segment
-        else:
-            if metro.current_station != dst_station:
-                metro.current_station = dst_station
-            if len(self._segments) == 1:
-                metro.is_forward = not metro.is_forward
-            elif metro.current_segment_idx == len(self._segments) - 1:
-                if self.is_looped:
-                    metro.current_segment_idx = 0
-                else:
-                    if metro.is_forward:
-                        metro.is_forward = False
-                    else:
-                        metro.current_segment_idx -= 1
-            elif metro.current_segment_idx == 0:
-                if metro.is_forward:
-                    metro.current_segment_idx += 1
-                else:
-                    if self.is_looped:
-                        metro.current_segment_idx = len(self._segments) - 1
-                    else:
-                        metro.is_forward = True
-            else:
-                if metro.is_forward:
-                    metro.current_segment_idx += 1
-                else:
-                    metro.current_segment_idx -= 1
 
-            metro.current_segment = self._segments[metro.current_segment_idx]
+        # If the metro has not reached the end of the segment
+        if travel_dist_in_dt < dist:
+            metro.current_station = None
+            metro.position += direction * travel_dist_in_dt
+        # If the metro has reached the end of the segment
+        else:
+            self._handle_segment_end(metro, dst_station)
 
     def get_containing_segment(self, position: Point) -> PathSegment | None:
         for segment in self._segments:
@@ -202,6 +165,108 @@ class Path(Entity):
 
     def get_path_segments(self) -> list[PathSegment]:
         return [seg for seg in self._segments if isinstance(seg, PathSegment)]
+
+    def _determine_destination(self, metro: Metro) -> tuple[Point, Station | None]:
+        segment = metro.current_segment
+        assert segment is not None
+
+        if metro.is_forward:
+            dst_position = segment.points.end
+        else:
+            dst_position = segment.points.start
+
+        if isinstance(segment, PathSegment):
+            assert segment.stations
+            stations = segment.stations
+            dst_station = stations.end if metro.is_forward else stations.start
+        else:
+            dst_station = None
+
+        return dst_position, dst_station
+
+    def _calculate_direction_and_distance(
+        self, start_point: Point, end_point: Point
+    ) -> tuple[float, Point]:
+        dist = get_distance(start_point, end_point)
+        direction = get_direction(start_point, end_point)
+        return dist, direction
+
+    def _set_rotation_angle(self, metro: Metro, direct: Point) -> None:
+        radians = math.atan2(direct.top, direct.left)
+        degrees = math.degrees(radians)
+        metro.shape.set_degrees(degrees)
+
+    def _handle_segment_end(self, metro: Metro, dst_station: Station | None) -> None:
+        """Handle metro movement at the end of the segment"""
+        # Update the current station if necessary
+        if metro.current_station != dst_station:
+            metro.current_station = dst_station
+
+        result = get_segment_end_result(
+            len(self._segments),
+            metro.current_segment_idx,
+            metro.is_forward,
+            self.is_looped,
+        )
+        if isinstance(result, Index):
+            metro.current_segment_idx = result.value
+            metro.current_segment = self._segments[metro.current_segment_idx]
+        else:
+            assert isinstance(result, Direction)
+            metro.is_forward = result.is_forward
+
+
+@dataclass
+class Index:
+    value: int
+
+
+@dataclass
+class Direction:
+    is_forward: bool
+
+
+def get_segment_end_result(
+    num_segments: int, current_idx: int, is_forward: bool, loop: bool
+) -> Index | Direction:
+
+    if num_segments == 1:
+        # Reverse direction
+        return Direction(not is_forward)
+    assert num_segments > 1
+
+    last_idx = num_segments - 1
+    if is_forward:
+        return get_segment_end_result_forward(last_idx, current_idx, loop)
+    return get_segment_end_result_backward(last_idx, current_idx, loop)
+
+
+def get_segment_end_result_forward(
+    last_idx: int, current_idx: int, loop: bool
+) -> Index | Direction:
+
+    is_last_segment = current_idx == last_idx
+
+    if not is_last_segment:
+        return Index(current_idx + 1)
+    assert is_last_segment
+    if loop:
+        return Index(0)
+    return Direction(False)
+
+
+def get_segment_end_result_backward(
+    last_idx: int, current_idx: int, loop: bool
+) -> Index | Direction:
+
+    is_first_segment = current_idx == 0
+
+    if not is_first_segment:
+        return Index(current_idx - 1)
+    assert is_first_segment
+    if loop:
+        return Index(last_idx)
+    return Direction(True)
 
 
 def get_sign(s1: Station, s2: Station) -> int:
