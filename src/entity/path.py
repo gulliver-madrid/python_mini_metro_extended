@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 import math
 from itertools import pairwise
 from typing import Final
@@ -6,6 +5,11 @@ from typing import Final
 import pygame
 
 from src.config import path_width
+from src.entity.end_segment_behaviour import (
+    ChangeIndex,
+    ReverseDirection,
+    get_segment_end_behaviour,
+)
 from src.geometry.line import Line
 from src.geometry.point import Point
 from src.geometry.utils import get_direction, get_distance
@@ -200,71 +204,18 @@ class Path(Entity):
         if metro.current_station != dst_station:
             metro.current_station = dst_station
 
-        result = get_segment_end_result(
+        behaviour = get_segment_end_behaviour(
             len(self._segments),
             metro.current_segment_idx,
             metro.is_forward,
             self.is_looped,
         )
-        if isinstance(result, Index):
-            metro.current_segment_idx = result.value
-            metro.current_segment = self._segments[metro.current_segment_idx]
-        else:
-            assert isinstance(result, Direction)
-            metro.is_forward = result.is_forward
-
-
-@dataclass
-class Index:
-    value: int
-
-
-@dataclass
-class Direction:
-    is_forward: bool
-
-
-def get_segment_end_result(
-    num_segments: int, current_idx: int, is_forward: bool, loop: bool
-) -> Index | Direction:
-
-    if num_segments == 1:
-        # Reverse direction
-        return Direction(not is_forward)
-    assert num_segments > 1
-
-    last_idx = num_segments - 1
-    if is_forward:
-        return get_segment_end_result_forward(last_idx, current_idx, loop)
-    return get_segment_end_result_backward(last_idx, current_idx, loop)
-
-
-def get_segment_end_result_forward(
-    last_idx: int, current_idx: int, loop: bool
-) -> Index | Direction:
-
-    is_last_segment = current_idx == last_idx
-
-    if not is_last_segment:
-        return Index(current_idx + 1)
-    assert is_last_segment
-    if loop:
-        return Index(0)
-    return Direction(False)
-
-
-def get_segment_end_result_backward(
-    last_idx: int, current_idx: int, loop: bool
-) -> Index | Direction:
-
-    is_first_segment = current_idx == 0
-
-    if not is_first_segment:
-        return Index(current_idx - 1)
-    assert is_first_segment
-    if loop:
-        return Index(last_idx)
-    return Direction(True)
+        match behaviour:
+            case ChangeIndex(value):
+                metro.current_segment_idx = value
+                metro.current_segment = self._segments[metro.current_segment_idx]
+            case ReverseDirection():
+                metro.is_forward = not metro.is_forward
 
 
 def get_sign(s1: Station, s2: Station) -> int:
