@@ -155,10 +155,8 @@ class Path(Entity):
         else:
             self._handle_segment_end(metro, dst_station)
 
-    def get_containing_segment(self, position: Point) -> PathSegment | None:
-        for segment in self._segments:
-            if not isinstance(segment, PathSegment):
-                continue
+    def get_containing_path_segment(self, position: Point) -> PathSegment | None:
+        for segment in self.get_path_segments():
             if segment.points.includes(position):
                 return segment
         return None

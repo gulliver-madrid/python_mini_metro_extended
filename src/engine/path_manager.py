@@ -135,7 +135,7 @@ class PathManager:
         assert not self.path_being_created
         segment: PathSegment | None = None
         for path in self._components.paths:
-            segment = path.get_containing_segment(position)
+            segment = path.get_containing_path_segment(position)
             if segment:
                 print("segment selected")
                 break
