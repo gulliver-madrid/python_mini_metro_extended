@@ -1,5 +1,5 @@
 import random
-from typing import Final, Mapping, Sequence
+from typing import Final, Iterable, Mapping, Sequence, TypeVar
 
 from src.config import max_num_metros, max_num_paths
 from src.engine.path_being_edited import PathBeingEdited
@@ -246,19 +246,15 @@ class PathManager:
         segment = self.path_being_edited.segment
         path_segments = self.path_being_edited.path.get_path_segments()
 
-        for path_segment in path_segments:
-            if segment == path_segment:
-                break
-        else:
-            assert False
+        path_segment = _find_equal_segment(segment, path_segments)
+        assert path_segment
 
         index = path_segments.index(path_segment)
 
         self.path_being_edited.path.stations.insert(index + 1, station)
-        # update idx of metros in path
-        for metro in self.path_being_edited.path.metros:
-            if metro.current_segment_idx > index:
-                metro.current_segment_idx += 1
+        _update_metros_segment_idx(
+            self.path_being_edited.path.metros, after_index=index, change=1
+        )
         self.path_being_edited = None
 
     def _remove_station(self, station: Station) -> None:
@@ -266,19 +262,16 @@ class PathManager:
         segment = self.path_being_edited.segment
         path_segments = self.path_being_edited.path.get_path_segments()
 
-        for path_segment in path_segments:
-            if segment == path_segment:
-                break
-        else:
-            assert False
+        path_segment = _find_equal_segment(segment, path_segments)
+        assert path_segment
 
         index = path_segments.index(path_segment)
 
         self.path_being_edited.path.stations.remove(station)
-        # update idx of metros in path
-        for metro in self.path_being_edited.path.metros:
-            if metro.current_segment_idx > index:
-                metro.current_segment_idx -= 1
+        _update_metros_segment_idx(
+            self.path_being_edited.path.metros, after_index=index, change=-1
+        )
+
         self.path_being_edited.path.update_segments()
         self.path_being_edited = None
 
@@ -292,3 +285,21 @@ def _segment_has_metros(segment: Segment, metros: Sequence[Metro]) -> bool:
     return any(
         metro.current_segment == segment for metro in metros if metro.current_segment
     )
+
+
+T = TypeVar("T", bound=Segment)
+
+
+def _find_equal_segment(segment: T, segments: Iterable[T]) -> T | None:
+    for s in segments:
+        if segment == s:
+            return s
+    return None
+
+
+def _update_metros_segment_idx(
+    metros: Iterable[Metro], *, after_index: int, change: int
+) -> None:
+    for metro in metros:
+        if metro.current_segment_idx > after_index:
+            metro.current_segment_idx += change
