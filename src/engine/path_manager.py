@@ -148,9 +148,9 @@ class PathManager:
             return
         self.path_being_edited = PathBeingEdited(path, segment)
 
-    def touch(self, entity: Station) -> None:
+    def touch(self, station: Station) -> None:
         assert self.path_being_edited
-        if entity in self.path_being_edited.path.stations:
+        if station in self.path_being_edited.path.stations:
             raise NotImplementedError(
                 "Station already in path, station removal still not implemented"
             )
@@ -158,23 +158,7 @@ class PathManager:
             self.path_being_edited.segment, self.path_being_edited.path.metros
         ):
             raise NotImplementedError("Segment with metros still can't be edited")
-        segment = self.path_being_edited.segment
-        path_segments = self.path_being_edited.path.get_path_segments()
-
-        for path_segment in path_segments:
-            if segment == path_segment:
-                break
-        else:
-            assert False
-
-        index = path_segments.index(path_segment)
-
-        self.path_being_edited.path.stations.insert(index + 1, entity)
-        # update idx of metros in path
-        for metro in self.path_being_edited.path.metros:
-            if metro.current_segment_idx > index:
-                metro.current_segment_idx += 1
-        self.path_being_edited = None
+        self._insert_station(station)
 
     #######################
     ### private methods ###
@@ -257,6 +241,26 @@ class PathManager:
         find_next_path_for_passenger_at_station(
             self._components.paths, passenger.travel_plan, station
         )
+
+    def _insert_station(self, station: Station) -> None:
+        assert self.path_being_edited
+        segment = self.path_being_edited.segment
+        path_segments = self.path_being_edited.path.get_path_segments()
+
+        for path_segment in path_segments:
+            if segment == path_segment:
+                break
+        else:
+            assert False
+
+        index = path_segments.index(path_segment)
+
+        self.path_being_edited.path.stations.insert(index + 1, station)
+        # update idx of metros in path
+        for metro in self.path_being_edited.path.metros:
+            if metro.current_segment_idx > index:
+                metro.current_segment_idx += 1
+        self.path_being_edited = None
 
 
 ################################
