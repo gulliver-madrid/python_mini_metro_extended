@@ -12,6 +12,7 @@ from src.entity.end_segment_behaviour import (
 )
 from src.geometry.line import Line
 from src.geometry.point import Point
+from src.geometry.polygon import Polygon
 from src.geometry.types import Degrees
 from src.geometry.utils import get_direction, get_distance
 from src.type import Color
@@ -147,7 +148,8 @@ class Path(Entity):
         )
 
         # Calculate and set the rotation angle of the metro
-        self._set_rotation_angle(metro, direction)
+        if isinstance(metro.shape, Polygon):
+            _set_rotation_angle(metro.shape, direction)
 
         # Calculate the distance the metro can travel in this time step
         travel_dist_in_dt = metro.game_speed * dt_ms
@@ -194,11 +196,6 @@ class Path(Entity):
         direction = get_direction(start_point, end_point)
         return dist, direction
 
-    def _set_rotation_angle(self, metro: Metro, direct: Point) -> None:
-        radians = math.atan2(direct.top, direct.left)
-        degrees = Degrees(math.degrees(radians))
-        metro.shape.set_degrees((degrees))
-
     def _handle_segment_end(self, metro: Metro, dst_station: Station | None) -> None:
         """Handle metro movement at the end of the segment"""
         # Update the current station if necessary
@@ -217,6 +214,12 @@ class Path(Entity):
                 metro.current_segment = self._segments[metro.current_segment_idx]
             case ReverseDirection():
                 metro.is_forward = not metro.is_forward
+
+
+def _set_rotation_angle(polygon: Polygon, direct: Point) -> None:
+    radians = math.atan2(direct.top, direct.left)
+    degrees = Degrees(math.degrees(radians))
+    polygon.set_degrees((degrees))
 
 
 def get_sign(s1: Station, s2: Station) -> int:

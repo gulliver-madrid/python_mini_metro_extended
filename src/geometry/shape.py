@@ -6,7 +6,6 @@ from shortuuid import uuid
 
 from src.geometry.point import Point
 from src.geometry.type import ShapeType
-from src.geometry.types import Degrees
 from src.type import Color
 
 
@@ -25,10 +24,6 @@ class Shape(ABC):
 
     @abstractmethod
     def contains(self, point: Point) -> bool:
-        raise NotImplementedError
-
-    @abstractmethod
-    def set_degrees(self, degrees: Degrees) -> None:
         raise NotImplementedError
 
     @final

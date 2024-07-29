@@ -44,7 +44,6 @@ class Polygon(Shape):
         assert isinstance(result, bool)
         return result
 
-    @override
     def set_degrees(self, degrees: Degrees) -> None:
         self.degrees = degrees
 
