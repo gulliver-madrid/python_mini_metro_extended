@@ -42,8 +42,8 @@ metro_passengers_per_row = 3
 
 # path
 max_num_paths = 5
-path_width = 10
-path_order_shift = path_width
+_path_width = 10
+path_order_shift = _path_width
 
 # button
 button_color = (180, 180, 180)
@@ -74,6 +74,8 @@ class Config:
     screen_height = 840
     # components
     passenger_spawning = _PassengerSpawningConfig
+    # path
+    path_width = _path_width
     # debug
     unfilled_shapes = _unfilled_shapes
     padding_segments_color = _padding_segments_color

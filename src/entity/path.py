@@ -4,7 +4,7 @@ from typing import Final
 
 import pygame
 
-from src.config import path_width
+from src.config import Config
 from src.entity.end_segment_behaviour import (
     ChangeIndex,
     ReverseDirection,
@@ -111,7 +111,7 @@ class Path(Entity):
                 color=self.color,
                 start=self.stations[-1].position,
                 end=self.temp_point,
-                width=path_width,
+                width=Config.path_width,
             )
             temp_line.draw(surface)
 

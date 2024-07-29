@@ -1,4 +1,4 @@
-from src.config import path_order_shift, path_width
+from src.config import Config, path_order_shift
 from src.geometry.line import Line
 from src.geometry.point import Point
 from src.geometry.types import Degrees
@@ -28,7 +28,7 @@ class PathSegment(Segment):
             color=self.color,
             start=self.points.start,
             end=self.points.end,
-            width=path_width,
+            width=Config.path_width,
         )
 
 

@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 import pygame
 
+from src.config import Config
 from src.geometry.line import Line
 from src.geometry.point import Point
 from src.type import Color
@@ -32,7 +33,7 @@ class PointPair:
             position.left,
             position.top,
         )
-        return dist is not None and dist < 10
+        return dist is not None and dist < Config.path_width
 
 
 class Segment(Entity):

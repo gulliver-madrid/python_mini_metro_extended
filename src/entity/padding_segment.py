@@ -1,4 +1,4 @@
-from src.config import Config, path_width
+from src.config import Config
 from src.geometry.line import Line
 from src.geometry.point import Point
 from src.type import Color
@@ -17,5 +17,5 @@ class PaddingSegment(Segment):
             color=Config.padding_segments_color or self.color,
             start=self.points.start,
             end=self.points.end,
-            width=path_width,
+            width=Config.path_width,
         )
