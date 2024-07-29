@@ -53,7 +53,7 @@ class Segment(Entity):
         self.stations = None
 
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, Segment) and self.id == other.id
+        return isinstance(other, Segment) and (self.edges == other.edges)
 
     def draw(self, surface: pygame.surface.Surface) -> None:
         self.line.draw(surface)

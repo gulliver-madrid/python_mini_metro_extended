@@ -5,7 +5,6 @@ from src.config import max_num_metros, max_num_paths
 from src.engine.path_being_edited import PathBeingEdited
 from src.entity import Metro, Passenger, Path, Station
 from src.entity.path_segment import PathSegment
-from src.entity.segment import Segment
 from src.geometry.point import Point
 from src.geometry.type import ShapeType
 from src.graph.graph_algo import bfs, build_station_nodes_dict
@@ -153,7 +152,7 @@ class PathManager:
         ), "Station already in path"
         # assert no metros in edited segment
         assert all(
-            not equal_segment(metro.current_segment, self.path_being_edited.segment)
+            metro.current_segment != self.path_being_edited.segment
             for metro in self.path_being_edited.path.metros
             if metro.current_segment
         )
@@ -161,7 +160,7 @@ class PathManager:
         path_segments = self.path_being_edited.path.get_path_segments()
 
         for path_segment in path_segments:
-            if equal_segment(segment, path_segment):
+            if segment == path_segment:
                 break
         else:
             assert False
@@ -256,7 +255,3 @@ class PathManager:
         find_next_path_for_passenger_at_station(
             self._components.paths, passenger.travel_plan, station
         )
-
-
-def equal_segment(s1: Segment, s2: Segment) -> bool:
-    return bool(s1.edges == s2.edges)
