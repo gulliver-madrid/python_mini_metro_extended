@@ -151,14 +151,13 @@ class PathManager:
     def touch(self, station: Station) -> None:
         assert self.path_being_edited
         if station in self.path_being_edited.path.stations:
-            raise NotImplementedError(
-                "Station already in path, station removal still not implemented"
-            )
-        if _segment_has_metros(
+            self._remove_station(station)
+        elif _segment_has_metros(
             self.path_being_edited.segment, self.path_being_edited.path.metros
         ):
             raise NotImplementedError("Segment with metros still can't be edited")
-        self._insert_station(station)
+        else:
+            self._insert_station(station)
 
     #######################
     ### private methods ###
@@ -260,6 +259,27 @@ class PathManager:
         for metro in self.path_being_edited.path.metros:
             if metro.current_segment_idx > index:
                 metro.current_segment_idx += 1
+        self.path_being_edited = None
+
+    def _remove_station(self, station: Station) -> None:
+        assert self.path_being_edited
+        segment = self.path_being_edited.segment
+        path_segments = self.path_being_edited.path.get_path_segments()
+
+        for path_segment in path_segments:
+            if segment == path_segment:
+                break
+        else:
+            assert False
+
+        index = path_segments.index(path_segment)
+
+        self.path_being_edited.path.stations.remove(station)
+        # update idx of metros in path
+        for metro in self.path_being_edited.path.metros:
+            if metro.current_segment_idx > index:
+                metro.current_segment_idx -= 1
+        self.path_being_edited.path.update_segments()
         self.path_being_edited = None
 
 
