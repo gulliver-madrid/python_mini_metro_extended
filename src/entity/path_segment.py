@@ -6,7 +6,7 @@ from src.geometry.utils import get_direction
 from src.type import Color
 
 from .ids import create_new_path_segment_id
-from .segment import PointPair, Segment, StationPair
+from .segment import Segment, SegmentEdges, StationPair
 from .station import Station
 
 
@@ -23,20 +23,20 @@ class PathSegment(Segment):
         super().__init__(color, create_new_path_segment_id())
         self.stations = StationPair(start_station, end_station)
         self._path_order = path_order
-        self.points = _get_segment_edges(self.stations, self._path_order)
+        self.edges = _get_segment_edges(self.stations, self._path_order)
         self.line = Line(
             color=self.color,
-            start=self.points.start,
-            end=self.points.end,
+            start=self.edges.start,
+            end=self.edges.end,
             width=Config.path_width,
         )
 
 
-def _get_segment_edges(stations: StationPair, path_order: int) -> PointPair:
+def _get_segment_edges(stations: StationPair, path_order: int) -> SegmentEdges:
     offset_vector = _get_offset_vector(stations, path_order)
     start = stations.start.position + offset_vector
     end = stations.end.position + offset_vector
-    return PointPair(start, end)
+    return SegmentEdges(start, end)
 
 
 def _get_offset_vector(stations: StationPair, path_order: int) -> Point:

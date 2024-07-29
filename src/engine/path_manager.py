@@ -259,4 +259,4 @@ class PathManager:
 
 
 def equal_segment(s1: Segment, s2: Segment) -> bool:
-    return bool(s1.points == s2.points)
+    return bool(s1.edges == s2.edges)

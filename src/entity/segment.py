@@ -20,7 +20,7 @@ class StationPair:
 
 
 @dataclass
-class PointPair:
+class SegmentEdges:
     start: Point
     end: Point
 
@@ -40,11 +40,11 @@ class Segment(Entity):
     __slots__ = (
         "color",
         "stations",
-        "points",
+        "edges",
         "line",
     )
     stations: StationPair | None
-    points: PointPair
+    edges: SegmentEdges
     line: Line
 
     def __init__(self, color: Color, id: EntityId) -> None:

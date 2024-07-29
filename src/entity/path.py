@@ -81,8 +81,8 @@ class Path(Entity):
         for current_segment, next_segment in pairwise(path_segments):
             padding_segment = PaddingSegment(
                 self.color,
-                current_segment.points.end,
-                next_segment.points.start,
+                current_segment.edges.end,
+                next_segment.edges.start,
             )
             self._segments.append(current_segment)
             self._segments.append(padding_segment)
@@ -93,8 +93,8 @@ class Path(Entity):
         if self.is_looped:
             padding_segment = PaddingSegment(
                 self.color,
-                path_segments[-1].points.end,
-                path_segments[0].points.start,
+                path_segments[-1].edges.end,
+                path_segments[0].edges.start,
             )
             self._segments.append(padding_segment)
 
@@ -132,7 +132,7 @@ class Path(Entity):
     def add_metro(self, metro: Metro) -> None:
         metro.shape.color = self.color
         metro.current_segment = self._segments[metro.current_segment_idx]
-        metro.position = metro.current_segment.points.start
+        metro.position = metro.current_segment.edges.start
         metro.path_id = self.id
         # TODO: review this
         assert metro.current_segment.stations
@@ -164,7 +164,7 @@ class Path(Entity):
 
     def get_containing_path_segment(self, position: Point) -> PathSegment | None:
         for segment in self.get_path_segments():
-            if segment.points.includes(position):
+            if segment.edges.includes(position):
                 return segment
         return None
 
@@ -176,9 +176,9 @@ class Path(Entity):
         assert segment is not None
 
         if metro.is_forward:
-            dst_position = segment.points.end
+            dst_position = segment.edges.end
         else:
-            dst_position = segment.points.start
+            dst_position = segment.edges.start
 
         if isinstance(segment, PathSegment):
             assert segment.stations
