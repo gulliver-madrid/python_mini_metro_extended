@@ -144,6 +144,8 @@ class PathManager:
             return
         assert segment
         assert path
+        if _segment_has_metros(segment, path.metros):
+            return
         self.path_being_edited = PathBeingEdited(path, segment)
 
     def touch(self, entity: Station) -> None:
