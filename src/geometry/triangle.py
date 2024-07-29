@@ -10,6 +10,8 @@ COS_30_DEGREES = math.cos(math.radians(30))
 
 class Triangle(Polygon):
     # Equilateral triangle
+    __slots__ = ()
+
     def __init__(self, color: Color, size: int) -> None:
         half_size = round(size / 2)
         points = [

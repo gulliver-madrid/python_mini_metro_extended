@@ -13,6 +13,8 @@ NumberType = (int, float)
 
 
 class Point:
+    __slots__ = ("left", "top", "id")
+
     def __init__(self, left: Number, top: Number) -> None:
         self.left = left
         self.top = top
@@ -76,8 +78,9 @@ class Point:
         cls = self.__class__
         result = cls.__new__(cls)
         memo[id(self)] = result
-        for k, v in self.__dict__.items():
-            setattr(result, k, deepcopy(v, memo))
+        for attr_name in self.__slots__:
+            attr_value = getattr(self, attr_name)
+            setattr(result, attr_name, deepcopy(attr_value, memo))
         return result
 
     def to_tuple(self) -> tuple[Number, Number]:

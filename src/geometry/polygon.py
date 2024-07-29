@@ -17,6 +17,8 @@ from src.type import Color
 
 
 class Polygon(Shape):
+    __slots__ = ("points", "degrees")
+
     def __init__(
         self, shape_type: ShapeType, color: Color, points: Sequence[Point]
     ) -> None:

@@ -6,6 +6,14 @@ from src.type import Color
 
 
 class Line:
+    __slots__ = (
+        "id",
+        "color",
+        "start",
+        "end",
+        "width",
+    )
+
     def __init__(self, color: Color, start: Point, end: Point, width: int) -> None:
         self.id = f"Line-{uuid()}"
         self.color = color

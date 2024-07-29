@@ -5,13 +5,14 @@ from src.type import Color
 
 
 class Cross(Polygon):
+    __slots__ = ()
+
     def __init__(self, color: Color, size: int, width: int = 0) -> None:
         half_size = round(size / 2)
         if width == 0:
-            self.width = round(2 * half_size / 3)
-        else:
-            self.width = width
-        W = self.width
+            width = round(2 * half_size / 3)
+
+        W = width
         L = round(0.5 * (2 * half_size - W))
         points = [
             Point(L, 0),

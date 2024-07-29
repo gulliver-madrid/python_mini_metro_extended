@@ -10,6 +10,13 @@ from src.type import Color
 
 
 class Shape(ABC):
+    __slots__ = (
+        "type",
+        "color",
+        "id",
+        "position",
+    )
+
     def __init__(self, type: ShapeType, color: Color):
         self.type = type
         self.color = color

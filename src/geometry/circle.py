@@ -10,6 +10,8 @@ from src.type import Color
 
 
 class Circle(Shape):
+    __slots__ = ("radius",)
+
     def __init__(self, color: Color, radius: int) -> None:
         super().__init__(ShapeType.CIRCLE, color)
         self.id = f"Circle-{uuid()}"

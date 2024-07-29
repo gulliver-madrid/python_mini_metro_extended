@@ -7,6 +7,8 @@ from src.type import Color
 
 
 class Rect(Polygon):
+    __slots__ = ("width", "height")
+
     def __init__(self, color: Color, width: int, height: int) -> None:
         left = round(-width * 0.5)
         right = round(width * 0.5)
