@@ -77,16 +77,11 @@ class PathManager:
     def end_path_on_station(self, station: Station) -> None:
         assert self.path_being_created
         path = self.path_being_created.path
+        # the loop should have been detected in `add_station_to_path` method
+        assert not self.path_being_created.can_make_loop(station)
+        assert station in path.stations
         # current station de-dupe
         if self.path_being_created.can_end_with(station):
-            self._finish_path_creation()
-        # loop
-        elif self.path_being_created.can_make_loop(station):
-            path.set_loop()
-            self._finish_path_creation()
-        # non-loop
-        elif path.stations[0] != station:
-            path.add_station(station)
             self._finish_path_creation()
         else:
             self.abort_path_creation()

@@ -81,11 +81,12 @@ class TestGameplay(BaseTestCase):
                 self.engine.stations[0].position + Point(1, 1),
             )
         )
-        self.reactor.react(MouseEvent(MouseEventType.MOUSE_MOTION, Point(2, 2)))
+        new_position = self.engine.stations[1].position + Point(2, 2)
+        self.reactor.react(MouseEvent(MouseEventType.MOUSE_MOTION, new_position))
         self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP,
-                self.engine.stations[1].position + Point(1, 1),
+                new_position,
             )
         )
 
