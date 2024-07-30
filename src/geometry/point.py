@@ -63,12 +63,12 @@ class Point:
     def rotate(self, degrees: Degrees) -> Point:
         """Returns a point result of rotate this around the origin. Note: a point is also a vector from the origin."""
         radians = math.radians(degrees)
-        s = math.sin(radians)
-        c = math.cos(radians)
+        sin = math.sin(radians)
+        cos = math.cos(radians)
         x = self.left
         y = self.top
-        new_left = round(c * x - s * y)
-        new_top = round(s * x + c * y)
+        new_left = round(x * cos - y * sin)
+        new_top = round(x * sin + y * cos)
 
         return Point(new_left, new_top)
 
