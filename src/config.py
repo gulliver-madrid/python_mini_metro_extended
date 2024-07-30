@@ -74,6 +74,8 @@ class Config:
     screen_height = 840
     # components
     passenger_spawning = _PassengerSpawningConfig
+    # stations
+    min_distance = station_size * 3
     # path
     path_width = _path_width
     # debug
