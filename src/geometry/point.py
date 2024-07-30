@@ -1,69 +1,67 @@
 from __future__ import annotations
 
 import math
-from copy import deepcopy
+from dataclasses import dataclass, field
 from typing import Any
 
 from shortuuid import uuid
 
 from src.geometry.types import Degrees
 
-Number = int | float
-NumberType = (int, float)
+FloatOrInt = (int, float)
 
 
+def create_point_id() -> str:
+    return f"Point-{uuid()}"
+
+
+@dataclass(frozen=True, slots=True)
 class Point:
-    __slots__ = ("left", "top", "id")
+    left: float
+    top: float
+    id: str = field(
+        init=False,
+        default_factory=create_point_id,
+        compare=False,
+        repr=False,
+    )
 
-    def __init__(self, left: Number, top: Number) -> None:
-        self.left = left
-        self.top = top
-        self.id = f"Point-{uuid()}"
-
-    def __repr__(self) -> str:
-        return f"Point(left = {self.left}, top = {self.top})"
-
-    def __add__(self, other: Point | Number) -> Point:
+    def __add__(self, other: Point | float) -> Point:
         if isinstance(other, Point):
             return Point(self.left + other.left, self.top + other.top)
         else:
-            assert isinstance(other, NumberType)
+            assert isinstance(other, FloatOrInt)
             return Point(self.left + other, self.top + other)
 
-    def __radd__(self, other: Point | Number) -> Point:
+    def __radd__(self, other: Point | float) -> Point:
         return self.__add__(other)
 
-    def __sub__(self, other: Point | Number) -> Point:
+    def __sub__(self, other: Point | float) -> Point:
         if isinstance(other, Point):
             return Point(self.left - other.left, self.top - other.top)
         else:
-            assert isinstance(other, NumberType)
+            assert isinstance(other, FloatOrInt)
             return Point(self.left - other, self.top - other)
 
-    def __rsub__(self, other: Point | Number) -> Point:
+    def __rsub__(self, other: Point | float) -> Point:
         if isinstance(other, Point):
             return Point(other.left - self.left, other.top - self.top)
         else:
-            assert isinstance(other, NumberType)
+            assert isinstance(other, FloatOrInt)
             return Point(other - self.left, other - self.top)
 
-    def __mul__(self, other: Number) -> Point:
-        assert isinstance(other, NumberType)
+    def __mul__(self, other: float) -> Point:
+        assert isinstance(other, FloatOrInt)
         return Point(other * self.left, other * self.top)
 
-    def __rmul__(self, other: Number) -> Point:
+    def __rmul__(self, other: float) -> Point:
         return self.__mul__(other)
 
-    def __eq__(self, other: object) -> bool:
-        return (
-            isinstance(other, Point)
-            and self.left == other.left
-            and self.top == other.top
-        )
+    def __deepcopy__(self, memo: Any) -> "Point":
+        return Point(self.left, self.top)
 
     def rotate(self, degrees: Degrees) -> Point:
-        # Rotate around the origin.
-        # A point is also a vector from the origin.
+        """Returns a point result of rotate this around the origin. Note: a point is also a vector from the origin."""
         radians = math.radians(degrees)
         s = math.sin(radians)
         c = math.cos(radians)
@@ -74,14 +72,5 @@ class Point:
 
         return Point(new_left, new_top)
 
-    def __deepcopy__(self, memo: dict[int, Any]) -> "Point":
-        cls = self.__class__
-        result = cls.__new__(cls)
-        memo[id(self)] = result
-        for attr_name in self.__slots__:
-            attr_value = getattr(self, attr_name)
-            setattr(result, attr_name, deepcopy(attr_value, memo))
-        return result
-
-    def to_tuple(self) -> tuple[Number, Number]:
+    def to_tuple(self) -> tuple[float, float]:
         return (self.left, self.top)

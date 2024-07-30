@@ -88,6 +88,8 @@ class TestGeometry(BaseTestCase):
         rect.draw(self.screen, self.position)
         rect_points = deepcopy(rect.points)
         rect.rotate(Degrees(180))
+        # this do nothing to points because the rotation logic
+        # is actually inside `Rect.draw` method
         for point in rect.points:
             self.assertIn(point, rect_points)
         rect.rotate(Degrees(180))
@@ -98,6 +100,8 @@ class TestGeometry(BaseTestCase):
         rect.draw(self.screen, self.position)
         rect_points = deepcopy(rect.points)
         rect.set_degrees(Degrees(180))
+        # this do nothing to points because the rotation logic
+        # is actually inside `Rect.draw` method
         for point in rect.points:
             self.assertIn(point, rect_points)
         rect.set_degrees(Degrees(360))
