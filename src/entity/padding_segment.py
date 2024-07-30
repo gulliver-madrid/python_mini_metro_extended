@@ -11,8 +11,11 @@ class PaddingSegment(Segment):
     __slots__ = ()
 
     def __init__(self, color: Color, start_point: Point, end_point: Point) -> None:
-        super().__init__(color, create_new_padding_segment_id())
-        self.edges = SegmentEdges(start_point, end_point)
+        super().__init__(
+            color,
+            create_new_padding_segment_id(),
+            edges=SegmentEdges(start_point, end_point),
+        )
         self.line = Line(
             color=Config.padding_segments_color or self.color,
             start=self.edges.start,

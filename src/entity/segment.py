@@ -1,5 +1,6 @@
 import math
 from dataclasses import dataclass
+from typing import Final
 
 import pygame
 
@@ -13,13 +14,13 @@ from .ids import EntityId
 from .station import Station
 
 
-@dataclass
+@dataclass(frozen=True)
 class StationPair:
     start: Station
     end: Station
 
 
-@dataclass
+@dataclass(frozen=True)
 class SegmentEdges:
     start: Point
     end: Point
@@ -43,14 +44,22 @@ class Segment(Entity):
         "edges",
         "line",
     )
-    stations: StationPair | None
-    edges: SegmentEdges
+    stations: Final[StationPair | None]
+    edges: Final[SegmentEdges]
     line: Line
 
-    def __init__(self, color: Color, id: EntityId) -> None:
+    def __init__(
+        self,
+        color: Color,
+        id: EntityId,
+        *,
+        edges: SegmentEdges,
+        stations: StationPair | None = None,
+    ) -> None:
         super().__init__(id)
         self.color = color
-        self.stations = None
+        self.stations = stations
+        self.edges = edges
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Segment) and (self.edges == other.edges)

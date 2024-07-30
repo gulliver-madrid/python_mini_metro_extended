@@ -20,10 +20,12 @@ class PathSegment(Segment):
         end_station: Station,
         path_order: int,
     ) -> None:
-        super().__init__(color, create_new_path_segment_id())
-        self.stations = StationPair(start_station, end_station)
+        stations = StationPair(start_station, end_station)
+        edges = _get_segment_edges(stations, path_order)
+        super().__init__(
+            color, create_new_path_segment_id(), edges=edges, stations=stations
+        )
         self._path_order = path_order
-        self.edges = _get_segment_edges(self.stations, self._path_order)
         self.line = Line(
             color=self.color,
             start=self.edges.start,
