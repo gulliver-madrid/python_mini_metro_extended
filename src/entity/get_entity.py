@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Iterator
 
 from src.config import Config
 from src.geometry.point import Point
-from src.geometry.utils import get_distance
 from src.ui.ui import get_gui_height, get_main_surface_height
 from src.utils import get_random_position, get_random_station_shape
 
@@ -30,7 +29,7 @@ def generate_stations(
     while True:
         new_station = get_random_station(mediator)
         if all(
-            get_distance(station.position, new_station.position) >= Config.min_distance
+            station.get_distance_to(new_station) >= Config.min_distance
             for station in previous
         ):
             yield new_station

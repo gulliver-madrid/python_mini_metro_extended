@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from src.config import station_capacity, station_passengers_per_row, station_size
 from src.geometry.point import Point
 from src.geometry.shape import Shape
+from src.geometry.utils import get_distance
 
 from .holder import Holder
 from .ids import create_new_station_id
@@ -32,3 +33,6 @@ class Station(Holder):
 
     def __hash__(self) -> int:
         return hash(self.id)
+
+    def get_distance_to(self, other: Station) -> float:
+        return get_distance(self.position, other.position)
