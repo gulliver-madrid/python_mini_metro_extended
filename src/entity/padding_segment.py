@@ -18,7 +18,7 @@ class PaddingSegment(Segment):
         )
         self.line = Line(
             color=Config.padding_segments_color or self.color,
-            start=self.edges.start,
-            end=self.edges.end,
+            start=self.start,
+            end=self.end,
             width=Config.path_width,
         )

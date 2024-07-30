@@ -25,27 +25,16 @@ class SegmentEdges:
     start: Point
     end: Point
 
-    def includes(self, position: Point) -> bool:
-        dist = distance_point_segment(
-            self.start.left,
-            self.start.top,
-            self.end.left,
-            self.end.top,
-            position.left,
-            position.top,
-        )
-        return dist is not None and dist < Config.path_width
-
 
 class Segment(Entity):
     __slots__ = (
         "color",
         "stations",
-        "edges",
+        "_edges",
         "line",
     )
     stations: Final[StationPair | None]
-    edges: Final[SegmentEdges]
+    _edges: Final[SegmentEdges]
     line: Line
 
     def __init__(
@@ -59,13 +48,32 @@ class Segment(Entity):
         super().__init__(id)
         self.color = color
         self.stations = stations
-        self.edges = edges
+        self._edges = edges
 
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, Segment) and (self.edges == other.edges)
+        return isinstance(other, Segment) and (self._edges == other._edges)
 
     def draw(self, surface: pygame.surface.Surface) -> None:
         self.line.draw(surface)
+
+    @property
+    def start(self) -> Point:
+        return self._edges.start
+
+    @property
+    def end(self) -> Point:
+        return self._edges.end
+
+    def includes(self, position: Point) -> bool:
+        dist = distance_point_segment(
+            self.start.left,
+            self.start.top,
+            self.end.left,
+            self.end.top,
+            position.left,
+            position.top,
+        )
+        return dist is not None and dist < Config.path_width
 
 
 def distance_point_segment(

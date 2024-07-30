@@ -28,8 +28,8 @@ class PathSegment(Segment):
         self._path_order = path_order
         self.line = Line(
             color=self.color,
-            start=self.edges.start,
-            end=self.edges.end,
+            start=self.start,
+            end=self.end,
             width=Config.path_width,
         )
 

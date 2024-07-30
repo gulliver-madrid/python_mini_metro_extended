@@ -23,7 +23,7 @@ class PathBeingEdited:
         if self.temp_point:
             temp_line1 = Line(
                 color=color,
-                start=self.segment.edges.start,
+                start=self.segment.start,
                 end=self.temp_point,
                 width=10,
             )
@@ -31,7 +31,7 @@ class PathBeingEdited:
             temp_line2 = Line(
                 color=color,
                 start=self.temp_point,
-                end=self.segment.edges.end,
+                end=self.segment.end,
                 width=10,
             )
             temp_line2.draw(surface)
