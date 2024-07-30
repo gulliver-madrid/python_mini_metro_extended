@@ -205,14 +205,12 @@ class PathManager:
             node_path = bfs(start, end)
             if len(node_path) == 0:
                 continue
-            if len(node_path) == 1:
-                raise RuntimeError("Trying to eliminate from station")
-            else:
-                assert len(node_path) > 1
-                node_path = skip_stations_on_same_path(node_path)
-                passenger.travel_plan = TravelPlan(node_path[1:], passenger.num_id)
-                self._find_next_path_for_passenger_at_station(passenger, station)
-                break
+
+            assert len(node_path) > 1, "The passenger should have already arrived"
+            node_path = skip_stations_on_same_path(node_path)
+            passenger.travel_plan = TravelPlan(node_path[1:], passenger.num_id)
+            self._find_next_path_for_passenger_at_station(passenger, station)
+            break
 
         else:
             travel_plan = TravelPlan([], passenger.num_id)
