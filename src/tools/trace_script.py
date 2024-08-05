@@ -24,7 +24,7 @@ project_directory_name = "python_mini_metro"
 
 
 def simplify_filename(co_filename: str) -> str:
-    return co_filename.split(project_directory_name)[1][1:]
+    return to_unix(co_filename.split(project_directory_name)[1][1:])
 
 
 def to_unix(filename: str) -> str:
@@ -83,10 +83,11 @@ def traceit(frame: Any, event: Any, arg: Any) -> Any:
         if last_function_name != co_name:
             strings.append(f"function: {co_name}")
 
-        if i % 10 == 0:
-            strings.append(f"\nStack ({len(stack)} items):")
-            for item in stack:
-                strings.append(str(item))
+            if i % 3 == 0:
+                strings.append(f"\nStack ({len(stack)} items):")
+                for item in stack:
+                    filename_, function_name = item
+                    strings.append(filename_ + ":" + function_name + "()")
 
         line = linecache.getline(co_filename, lineno)
         strings.append("line %d: %s" % (lineno, line.rstrip()))
@@ -101,11 +102,13 @@ def traceit(frame: Any, event: Any, arg: Any) -> Any:
 
 def write(text: str) -> None:
     with open(Path(get_main_directory() / ".trace"), "a") as file:
-        file.write(text)
+        file.write(text + "\n")
 
 
 if __name__ == "__main__":
-    write("*********")
+    write("")
+    write("******************")
     write(str(datetime.datetime.now()))
+    write("******************")
     sys.settrace(traceit)
     main()

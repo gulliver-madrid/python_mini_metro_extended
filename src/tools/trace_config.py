@@ -9,7 +9,9 @@ custom_exclude_patterns = (
     "src/geometry",
     "game_renderer",
     "graph",
+    "convert.py",
 )
+
 function_exclude_patterns = (
     "draw",
     "update_segments",
