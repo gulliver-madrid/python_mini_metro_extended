@@ -2,3 +2,4 @@
 .coverage
 myenv/
 .venv/
+.trace
