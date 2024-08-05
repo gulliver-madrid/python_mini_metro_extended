@@ -36,14 +36,15 @@ class UI_Reactor:
             self._on_mouse_event(event)
         elif isinstance(event, KeyboardEvent):
             self._on_keyboard_event(event)
-        # Process console commands
-        try:
-            cmd = self._console.console_queue.get_nowait()
-            if cmd == "resume":
-                if self.engine.is_paused:
-                    self.engine.toggle_pause()
-        except queue.Empty:
-            pass
+        self._try_process_console_commands()
+
+    def _try_process_console_commands(self) -> None:
+        cmd = self._console.try_get_command()
+        if cmd == "resume":
+            if self.engine.is_paused:
+                self.engine.toggle_pause()
+        else:
+            assert cmd is None, cmd
 
     def _on_mouse_event(self, event: MouseEvent) -> None:
         entity = self.engine.get_containing_entity(event.position)
