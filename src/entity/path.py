@@ -33,6 +33,7 @@ class Path(Entity):
         "metros",
         "is_looped",
         "is_being_created",
+        "selected",
         "temp_point",
         "_segments",
         "_path_order",
@@ -46,6 +47,7 @@ class Path(Entity):
         self.metros: list[Metro] = []
         self.is_looped = False
         self.is_being_created = False
+        self.selected = False
         self.temp_point: Point | None = None
         self._segments = []
         self._path_order = 0
@@ -99,6 +101,8 @@ class Path(Entity):
             self._segments.append(padding_segment)
 
     def draw(self, surface: pygame.surface.Surface, path_order: int) -> None:
+        if self.selected:
+            self._draw_highlighted_stations(surface)
 
         self._path_order = path_order
         self.update_segments()
@@ -214,6 +218,20 @@ class Path(Entity):
                 metro.current_segment = self._segments[metro.current_segment_idx]
             case ReverseDirection():
                 metro.is_forward = not metro.is_forward
+
+    def _draw_highlighted_stations(self, surface: pygame.surface.Surface) -> None:
+        surface_size = surface.get_size()
+        selected_surface = pygame.surface.Surface(surface_size, pygame.SRCALPHA)
+
+        for station in self.stations:
+            highlighted_shape = station.shape.get_scaled(1.2)
+            highlighted_shape.color = self.color
+            highlighted_shape.draw(
+                selected_surface,
+                station.position,
+            )
+
+        surface.blit(selected_surface, (0, 0))
 
 
 def _set_rotation_angle(polygon: Polygon, direct: Point) -> None:

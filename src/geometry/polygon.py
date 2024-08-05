@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any, List, Sequence
 
 import pygame
@@ -51,3 +53,8 @@ class Polygon(Shape):
 
     def rotate(self, degree_diff: Degrees) -> None:
         self.degrees = Degrees(self.degrees + degree_diff)
+
+    def get_scaled(self, f: float) -> Polygon:
+        return Polygon(
+            self.type, self.color, [Point(p.left * f, p.top * f) for p in self.points]
+        )

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import final
 
@@ -31,6 +33,10 @@ class Shape(ABC):
 
     @abstractmethod
     def contains(self, point: Point) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_scaled(self, f: float) -> Shape:
         raise NotImplementedError
 
     @final

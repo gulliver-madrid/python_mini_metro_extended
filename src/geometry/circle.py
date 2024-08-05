@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pygame
 from shortuuid import uuid
 from typing_extensions import override
@@ -34,3 +36,6 @@ class Circle(Shape):
         return (point.left - self.position.left) ** 2 + (
             point.top - self.position.top
         ) ** 2 <= self.radius**2
+
+    def get_scaled(self, f: float) -> Circle:
+        return Circle(self.color, round(self.radius * f))

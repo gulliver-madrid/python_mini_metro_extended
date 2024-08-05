@@ -59,6 +59,7 @@ class PathManager:
         assert color
         path = Path(color)
         path.is_being_created = True
+        path.selected = True
         self.path_being_created = PathBeingCreated(path)
         self._path_to_color[path] = color
         self._path_colors[color] = True
@@ -93,6 +94,7 @@ class PathManager:
         assert self.path_being_created
         self._release_color_for_path(self.path_being_created.path)
         self._components.paths.remove(self.path_being_created.path)
+        self.path_being_created.path.selected = False
         self.path_being_created = None
 
     def remove_path(self, path: Path) -> None:
@@ -180,6 +182,7 @@ class PathManager:
             metro = Metro(self._components.mediator)
             self.path_being_created.path.add_metro(metro)
             self._components.metros.append(metro)
+        self.path_being_created.path.selected = False
         self.path_being_created = None
         self._assign_paths_to_buttons()
 
