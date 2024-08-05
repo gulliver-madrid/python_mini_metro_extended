@@ -11,6 +11,7 @@ from src.geometry.type import ShapeType
 from src.graph.graph_algo import bfs, build_station_nodes_dict
 from src.graph.node import Node
 from src.graph.skip_intermediate import skip_stations_on_same_path
+from src.tools.setup_logging import configure_logger
 from src.travel_plan import TravelPlan
 from src.type import Color
 from src.ui.ui import UI
@@ -19,6 +20,8 @@ from src.utils import hue_to_rgb
 from .game_components import GameComponents
 from .path_being_created import PathBeingCreated
 from .path_finder import find_next_path_for_passenger_at_station
+
+logger = configure_logger(__name__)
 
 
 class PathManager:
@@ -29,7 +32,7 @@ class PathManager:
         "_path_to_color",
         "max_num_metros",
         "_ui",
-        "path_being_created",
+        "_path_being_created",
         "path_being_edited",
     )
 
@@ -44,7 +47,7 @@ class PathManager:
         self.max_num_metros: Final = max_num_metros
         self._components: Final = components
         self._ui: Final = ui
-        self.path_being_created: PathBeingCreated | None = None
+        self._path_being_created: PathBeingCreated | None = None
         self.path_being_edited: PathBeingEdited | None = None
 
     ######################
@@ -105,7 +108,11 @@ class PathManager:
     def end_path_on_station(self, station: Station) -> None:
         assert self.path_being_created
         if self.path_being_created.is_edition:
-            raise AssertionError("Logic should be done when mouse move to station")
+            assert (
+                station in self.path_being_created.path.stations
+            ), "The logic should have been executed when the mouse moved into the station."
+            return
+
         path = self.path_being_created.path
         # the loop should have been detected in `add_station_to_path` method
         assert not self.path_being_created.can_make_loop(station)
@@ -200,6 +207,25 @@ class PathManager:
 
     def get_paths_with_station(self, station: Station) -> list[Path]:
         return [path for path in self._components.paths if station in path.stations]
+
+    @property
+    def path_being_created(self) -> PathBeingCreated | None:
+        return self._path_being_created
+
+    @path_being_created.setter
+    def path_being_created(self, value: PathBeingCreated | None) -> None:
+        self._path_being_created = value
+        repr_value = (
+            None
+            if self.path_being_created is None
+            else (
+                "PathBeingCreated with path"
+                + str(self.path_being_created.path)
+                + " and id:"
+                + str(id(self.path_being_created))
+            )
+        )
+        logger.info(f"path_being_created: {repr_value}")
 
     #######################
     ### private methods ###

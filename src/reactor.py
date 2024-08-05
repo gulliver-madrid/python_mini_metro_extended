@@ -126,7 +126,6 @@ class UI_Reactor:
     def _on_mouse_up(self, entity: Station | PathButton | None) -> None:
         path_manager = self.engine.path_manager
         if path_manager.path_being_created:
-
             if isinstance(entity, Station):
                 path_manager.end_path_on_station(entity)
             else:
