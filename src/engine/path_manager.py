@@ -54,19 +54,17 @@ class PathManager:
     def start_path_on_station(self, station: Station) -> None:
         if len(self._components.paths) >= self.max_num_paths:
             return
-        assigned_color = (0, 0, 0)
-        for path_color, taken in self._path_colors.items():
-            if taken:
-                continue
-            assigned_color = path_color
-            self._path_colors[path_color] = True
-            break
-        path = Path(assigned_color)
-        self._path_to_color[path] = assigned_color
-        path.add_station(station)
+
+        color = self._get_first_path_color_available()
+        assert color
+        path = Path(color)
         path.is_being_created = True
         self.path_being_created = PathBeingCreated(path)
+        self._path_to_color[path] = color
+        self._path_colors[color] = True
         self._components.paths.append(path)
+
+        path.add_station(station)
 
     def add_station_to_path(self, station: Station) -> None:
         assert self.path_being_created
@@ -164,6 +162,15 @@ class PathManager:
             color = hue_to_rgb(i / (max_num_paths + 1))
             path_colors[color] = False  # not taken
         return path_colors
+
+    def _get_first_path_color_available(self) -> Color | None:
+        assigned_color: Color | None = None
+        for path_color, taken in self._path_colors.items():
+            if taken:
+                continue
+            assigned_color = path_color
+            break
+        return assigned_color
 
     def _finish_path_creation(self) -> None:
         assert self.path_being_created
