@@ -63,7 +63,7 @@ class PathManager:
         path = Path(color)
         path.is_being_created = True
         path.selected = True
-        # todo: add: assert not self.path_being_created
+        assert not self.path_being_created
         self.path_being_created = PathBeingCreated(path)
         self._path_to_color[path] = color
         self._path_colors[color] = True
@@ -97,8 +97,7 @@ class PathManager:
                 assert self.path_being_created
                 assert self.path_being_created.is_edition
                 self.path_being_created.path.remove_temporary_point()
-                self.path_being_created.path.selected = False
-                self.path_being_created = None
+                self._stop_creating_or_expanding()
                 # TODO: allow adding more than one station when expanding
             return
         self.path_being_created.add_station_to_path(station)
@@ -106,14 +105,16 @@ class PathManager:
             self._finish_path_creation()
 
     def end_path_on_station(self, station: Station) -> None:
+        """We don't know if this station is already in the path"""
         assert self.path_being_created
+        path = self.path_being_created.path
         if self.path_being_created.is_edition:
             assert (
-                station in self.path_being_created.path.stations
+                station in path.stations
             ), "The logic should have been executed when the mouse moved into the station."
+            self._stop_creating_or_expanding()
             return
 
-        path = self.path_being_created.path
         # the loop should have been detected in `add_station_to_path` method
         assert not self.path_being_created.can_make_loop(station)
         assert station in path.stations
@@ -133,8 +134,7 @@ class PathManager:
         if not self.path_being_created.is_edition:
             self._release_color_for_path(self.path_being_created.path)
             self._components.paths.remove(self.path_being_created.path)
-        self.path_being_created.path.selected = False
-        self.path_being_created = None
+        self._stop_creating_or_expanding()
 
     def remove_path(self, path: Path) -> None:
         self._ui.path_to_button[path].remove_path()
@@ -202,8 +202,6 @@ class PathManager:
             assert self.path_being_created
             assert self.path_being_created.is_edition
             pass
-            # self.path_being_created.path.selected = False
-            # self.path_being_created = None
 
     def get_paths_with_station(self, station: Station) -> list[Path]:
         return [path for path in self._components.paths if station in path.stations]
@@ -255,9 +253,13 @@ class PathManager:
             metro = Metro(self._components.mediator)
             self.path_being_created.path.add_metro(metro)
             self._components.metros.append(metro)
+        self._stop_creating_or_expanding()
+        self._assign_paths_to_buttons()
+
+    def _stop_creating_or_expanding(self) -> None:
+        assert self.path_being_created
         self.path_being_created.path.selected = False
         self.path_being_created = None
-        self._assign_paths_to_buttons()
 
     def _assign_paths_to_buttons(self) -> None:
         self._ui.assign_paths_to_buttons(self._components.paths)

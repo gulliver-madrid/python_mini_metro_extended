@@ -97,6 +97,8 @@ class UI_Reactor:
     def _on_mouse_down(
         self, entity: Station | PathButton | None, position: Point
     ) -> None:
+        if self.engine.path_manager.path_being_created:
+            self.engine.path_manager.abort_path_creation_or_expanding()
         if isinstance(entity, Station):
             if self._last_clicked == entity:
                 self._index_clicked += 1
