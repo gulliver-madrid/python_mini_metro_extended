@@ -108,7 +108,7 @@ class UI_Reactor:
             else:
                 path_manager.end_path_on_last_station()
         elif path_manager.path_being_edited:
-            path_manager.path_being_edited = None
+            path_manager.stop_edition()
         elif isinstance(entity, PathButton) and entity.path:
             path_manager.remove_path(entity.path)
 

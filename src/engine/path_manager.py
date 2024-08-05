@@ -142,6 +142,7 @@ class PathManager:
         if _segment_has_metros(segment, path.metros):
             return
         self.path_being_edited = PathBeingEdited(path, segment)
+        path.selected = True
 
     def touch(self, station: Station) -> None:
         assert self.path_being_edited
@@ -153,6 +154,11 @@ class PathManager:
             raise NotImplementedError("Segment with metros still can't be edited")
         else:
             self._insert_station(station)
+
+    def stop_edition(self) -> None:
+        assert self.path_being_edited
+        self.path_being_edited.path.selected = False
+        self.path_being_edited = None
 
     #######################
     ### private methods ###
@@ -258,7 +264,7 @@ class PathManager:
         _update_metros_segment_idx(
             self.path_being_edited.path.metros, after_index=index, change=1
         )
-        self.path_being_edited = None
+        self.stop_edition()
 
     def _remove_station(self, station: Station) -> None:
         assert self.path_being_edited
@@ -276,7 +282,7 @@ class PathManager:
         )
 
         self.path_being_edited.path.update_segments()
-        self.path_being_edited = None
+        self.stop_edition()
 
 
 ################################
