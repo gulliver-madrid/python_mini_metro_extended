@@ -83,17 +83,18 @@ class PathManager:
         if self.path_being_created.can_end_with(station):
             self._finish_path_creation()
         else:
-            self.abort_path_creation()
+            self.abort_path_creation_or_expanding()
 
     def end_path_on_last_station(self) -> None:
         assert self.path_being_created
         last = self.path_being_created.path.stations[-1]
         self.end_path_on_station(last)
 
-    def abort_path_creation(self) -> None:
+    def abort_path_creation_or_expanding(self) -> None:
         assert self.path_being_created
-        self._release_color_for_path(self.path_being_created.path)
-        self._components.paths.remove(self.path_being_created.path)
+        if not self.path_being_created.is_edition:
+            self._release_color_for_path(self.path_being_created.path)
+            self._components.paths.remove(self.path_being_created.path)
         self.path_being_created.path.selected = False
         self.path_being_created = None
 
@@ -159,6 +160,9 @@ class PathManager:
         assert self.path_being_edited
         self.path_being_edited.path.selected = False
         self.path_being_edited = None
+
+    def get_paths_with_station(self, station: Station) -> list[Path]:
+        return [path for path in self._components.paths if station in path.stations]
 
     #######################
     ### private methods ###

@@ -20,12 +20,16 @@ class UI_Reactor:
         "engine",
         "is_mouse_down",
         "_console",
+        "_last_clicked",
+        "_index_clicked",
     )
 
     def __init__(self, engine: Engine) -> None:
         self.engine = engine
         self._console = Console()
         self.is_mouse_down: bool = False
+        self._last_clicked: Station | None = None
+        self._index_clicked = 0
 
     def react(self, event: Event | None) -> None:
         if isinstance(event, MouseEvent):
@@ -80,6 +84,8 @@ class UI_Reactor:
     def _on_mouse_motion(
         self, entity: Station | PathButton | None, position: Point
     ) -> None:
+        if self._last_clicked:
+            self._last_clicked = None
         self.engine.ui.last_pos = position
         if self.is_mouse_down:
             self._on_mouse_motion_with_mouse_down(entity, position)
@@ -92,7 +98,22 @@ class UI_Reactor:
         self, entity: Station | PathButton | None, position: Point
     ) -> None:
         if isinstance(entity, Station):
-            self.engine.path_manager.start_path_on_station(entity)
+            if self._last_clicked == entity:
+                self._index_clicked += 1
+            else:
+                self._index_clicked = 0
+                self._last_clicked = entity
+
+            paths = self.engine.path_manager.get_paths_with_station(entity)
+
+            num_possible_targets = len(paths) + 1
+            index_clicked = self._index_clicked % num_possible_targets
+
+            if index_clicked == 0:
+                self.engine.path_manager.start_path_on_station(entity)
+            else:
+                raise NotImplementedError("Can'n select more paths yet")
+
         if (
             not entity
             and self.engine.is_paused

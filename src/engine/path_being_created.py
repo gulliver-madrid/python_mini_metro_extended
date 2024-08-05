@@ -7,10 +7,16 @@ from src.entity import Path, Station
 
 
 class PathBeingCreated:
-    __slots__ = ("path",)
+    """Created or expanding"""
 
-    def __init__(self, path: Path):
+    __slots__ = (
+        "path",
+        "is_edition",
+    )
+
+    def __init__(self, path: Path, *, is_edition: bool = False):
         self.path: Final = path
+        self.is_edition = is_edition
 
     ######################
     ### public methods ###
