@@ -60,6 +60,7 @@ class PathManager:
         path = Path(color)
         path.is_being_created = True
         path.selected = True
+        # todo: add: assert not self.path_being_created
         self.path_being_created = PathBeingCreated(path)
         self._path_to_color[path] = color
         self._path_colors[color] = True
@@ -67,14 +68,44 @@ class PathManager:
 
         path.add_station(station)
 
+    def start_expanding_path_on_station(self, station: Station, index: int) -> None:
+        if len(self._components.paths) >= self.max_num_paths:
+            return
+        path = self.get_paths_with_station(station)[index]
+        path.selected = True
+        assert not self.path_being_created
+        self.path_being_created = PathBeingCreated(path, is_edition=True)
+        if self.path_being_created._is_first_station(
+            station
+        ):  # TODO: fix private access
+            self.path_being_created.from_end = False
+            self.path_being_created.path.temp_point_is_from_end = False
+        else:
+            self.path_being_created.from_end = True
+            self.path_being_created.path.temp_point_is_from_end = True
+
     def add_station_to_path(self, station: Station) -> None:
         assert self.path_being_created
+        if self.path_being_created.is_edition:
+            if station not in self.path_being_created.path.stations:
+                should_insert = self.path_being_created.add_station_to_path(station)
+                if should_insert:
+                    self._insert_station(station, 0)
+                assert self.path_being_created
+                assert self.path_being_created.is_edition
+                self.path_being_created.path.remove_temporary_point()
+                self.path_being_created.path.selected = False
+                self.path_being_created = None
+                # TODO: allow adding more than one station when expanding
+            return
         self.path_being_created.add_station_to_path(station)
         if self.path_being_created.path.is_looped:
             self._finish_path_creation()
 
     def end_path_on_station(self, station: Station) -> None:
         assert self.path_being_created
+        if self.path_being_created.is_edition:
+            raise AssertionError("Logic should be done when mouse move to station")
         path = self.path_being_created.path
         # the loop should have been detected in `add_station_to_path` method
         assert not self.path_being_created.can_make_loop(station)
@@ -157,9 +188,15 @@ class PathManager:
             self._insert_station(station)
 
     def stop_edition(self) -> None:
-        assert self.path_being_edited
-        self.path_being_edited.path.selected = False
-        self.path_being_edited = None
+        if self.path_being_edited:
+            self.path_being_edited.path.selected = False
+            self.path_being_edited = None
+        else:
+            assert self.path_being_created
+            assert self.path_being_created.is_edition
+            pass
+            # self.path_being_created.path.selected = False
+            # self.path_being_created = None
 
     def get_paths_with_station(self, station: Station) -> list[Path]:
         return [path for path in self._components.paths if station in path.stations]
@@ -254,20 +291,25 @@ class PathManager:
             self._components.paths, passenger.travel_plan, station
         )
 
-    def _insert_station(self, station: Station) -> None:
-        assert self.path_being_edited
-        segment = self.path_being_edited.segment
-        path_segments = self.path_being_edited.path.get_path_segments()
+    def _insert_station(self, station: Station, index: int | None = None) -> None:
+        if index is None:
+            assert self.path_being_edited
+            segment = self.path_being_edited.segment
+            path_segments = self.path_being_edited.path.get_path_segments()
 
-        path_segment = _find_equal_segment(segment, path_segments)
-        assert path_segment
+            path_segment = _find_equal_segment(segment, path_segments)
+            assert path_segment
 
-        index = path_segments.index(path_segment)
+            index = path_segments.index(path_segment)
+            path = self.path_being_edited.path
+        else:
+            assert self.path_being_created
+            path = self.path_being_created.path
+            index = index - 1
 
-        self.path_being_edited.path.stations.insert(index + 1, station)
-        _update_metros_segment_idx(
-            self.path_being_edited.path.metros, after_index=index, change=1
-        )
+        # we insert the station *after* that index
+        path.stations.insert(index + 1, station)
+        _update_metros_segment_idx(path.metros, after_index=index, change=1)
         self.stop_edition()
 
     def _remove_station(self, station: Station) -> None:

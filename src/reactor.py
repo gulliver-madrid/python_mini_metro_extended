@@ -112,7 +112,9 @@ class UI_Reactor:
             if index_clicked == 0:
                 self.engine.path_manager.start_path_on_station(entity)
             else:
-                raise NotImplementedError("Can'n select more paths yet")
+                self.engine.path_manager.start_expanding_path_on_station(
+                    entity, index_clicked - 1
+                )
 
         if (
             not entity
@@ -124,10 +126,12 @@ class UI_Reactor:
     def _on_mouse_up(self, entity: Station | PathButton | None) -> None:
         path_manager = self.engine.path_manager
         if path_manager.path_being_created:
+
             if isinstance(entity, Station):
                 path_manager.end_path_on_station(entity)
             else:
                 path_manager.end_path_on_last_station()
+
         elif path_manager.path_being_edited:
             path_manager.stop_edition()
         elif isinstance(entity, PathButton) and entity.path:

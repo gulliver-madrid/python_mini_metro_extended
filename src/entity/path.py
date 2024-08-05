@@ -37,6 +37,7 @@ class Path(Entity):
         "temp_point",
         "_segments",
         "_path_order",
+        "temp_point_is_from_end",
     )
     _segments: Final[list[Segment]]
 
@@ -49,6 +50,7 @@ class Path(Entity):
         self.is_being_created = False
         self.selected = False
         self.temp_point: Point | None = None
+        self.temp_point_is_from_end = True
         self._segments = []
         self._path_order = 0
 
@@ -111,9 +113,10 @@ class Path(Entity):
             segment.draw(surface)
 
         if self.temp_point:
+            start_line_station_index = -1 if self.temp_point_is_from_end else 0
             temp_line = Line(
                 color=self.color,
-                start=self.stations[-1].position,
+                start=self.stations[start_line_station_index].position,
                 end=self.temp_point,
                 width=Config.path_width,
             )
