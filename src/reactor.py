@@ -101,15 +101,16 @@ class UI_Reactor:
             self.engine.try_starting_path_edition(position)
 
     def _on_mouse_up(self, entity: Station | PathButton | None) -> None:
-        if self.engine.path_manager.path_being_created:
+        path_manager = self.engine.path_manager
+        if path_manager.path_being_created:
             if isinstance(entity, Station):
-                self.engine.path_manager.end_path_on_station(entity)
+                path_manager.end_path_on_station(entity)
             else:
-                self.engine.path_manager.end_path_on_last_station()
-        elif self.engine.path_manager.path_being_edited:
-            self.engine.path_manager.path_being_edited = None
+                path_manager.end_path_on_last_station()
+        elif path_manager.path_being_edited:
+            path_manager.path_being_edited = None
         elif isinstance(entity, PathButton) and entity.path:
-            self.engine.path_manager.remove_path(entity.path)
+            path_manager.remove_path(entity.path)
 
     def _on_mouse_motion_with_mouse_down(
         self, entity: Station | PathButton | None, position: Point
