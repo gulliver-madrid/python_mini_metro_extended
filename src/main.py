@@ -4,7 +4,7 @@ import sys
 import numpy as np
 import pygame
 
-from src.config import Config, framerate, screen_color
+from src.config import Config, screen_color
 from src.engine.engine import Engine
 from src.event.convert import convert_pygame_event
 from src.reactor import UI_Reactor
@@ -37,7 +37,7 @@ def main() -> None:
     reactor = UI_Reactor(engine)
 
     while True:
-        dt_ms = clock.tick(framerate)
+        dt_ms = clock.tick(Config.framerate)
         engine.increment_time(dt_ms)
         screen.fill(screen_color)
         engine.render(screen)

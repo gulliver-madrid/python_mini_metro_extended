@@ -2,9 +2,6 @@ from typing import Final
 
 from src.geometry.type import ShapeType
 
-# game
-framerate = 60
-
 # screen
 screen_color = (255, 255, 255)
 
@@ -72,6 +69,8 @@ class Config:
     # screen
     screen_width = 1600
     screen_height = 840
+    # game
+    framerate = 60
     # components
     passenger_spawning = _PassengerSpawningConfig
     # stations
