@@ -39,20 +39,16 @@ def traceit(frame: Any, event: Any, arg: Any) -> Any:
         co_filename = to_unix(co.co_filename)
         co_name = co.co_name
         del co
-        for pattern in exclude_patterns:
-            if pattern in co_filename:
-                jump = True
-                return traceit
-        for pattern in config.function_exclude_patterns:
-            if pattern in co_name:
-                jump = True
-                return traceit
+        if any(pattern in co_filename for pattern in exclude_patterns) or any(
+            pattern in co_name for pattern in config.function_exclude_patterns
+        ):
+            jump = True
+            return traceit
         assert "src" in co_filename, co_filename
-
-        filename = simplify_filename(co_filename)
 
         # get the stack and remove if we are under custom-excluded function or filename
         stack_frame = frame
+        del frame
         stack: list[tuple[str, str]] = []
         while stack_frame:
             stack_frame_co_filename = stack_frame.f_code.co_filename
@@ -77,17 +73,13 @@ def traceit(frame: Any, event: Any, arg: Any) -> Any:
         if jump:
             strings.append("*")
             jump = False
-        i += 1
-        if last != co_filename:
-            strings.append(f"\nfilename: {filename}")
-        if last_function_name != co_name:
-            strings.append(f"function: {co_name}")
 
-            if i % 3 == 0:
-                strings.append(f"\nStack ({len(stack)} items):")
-                for item in stack:
-                    filename_, function_name = item
-                    strings.append(filename_ + ":" + function_name + "()")
+        i += 1
+        if last != co_filename or last_function_name != co_name:
+            strings.append("")
+            for item in reversed(stack):
+                filename_, function_name = item
+                strings.append(filename_ + ":" + function_name + "()")
 
         line = linecache.getline(co_filename, lineno)
         strings.append("line %d: %s" % (lineno, line.rstrip()))

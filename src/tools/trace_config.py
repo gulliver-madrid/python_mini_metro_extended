@@ -17,4 +17,8 @@ function_exclude_patterns = (
     "update_segments",
     "render",
     "increment_time",
+    "get_containing_entity",
+    "exit_buttons",
+    "get_random_stations",
+    "_try_process_console_commands",
 )
