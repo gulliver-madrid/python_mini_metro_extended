@@ -1,5 +1,3 @@
-import queue
-
 import pygame
 
 from src.config import Config
