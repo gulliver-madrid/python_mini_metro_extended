@@ -3,7 +3,7 @@ import datetime
 import linecache
 import sys
 from pathlib import Path
-from typing import Any, Final
+from typing import Any, Final, Iterable
 
 from src.main import main
 from src.tools import trace_config as config
@@ -12,7 +12,7 @@ from src.tools.setup_logging import get_main_directory
 exclude_patterns = config.exclude_patterns + config.custom_exclude_patterns
 
 
-@dataclass
+@dataclass(frozen=True)
 class View:
     _strings: list[str] = field(init=False, default_factory=list)
 
@@ -54,6 +54,10 @@ def to_unix(filename: str) -> str:
     return filename.replace("\\", "/")
 
 
+def any_match(patterns: Iterable[str], *, target: str) -> bool:
+    return any(pattern in target for pattern in patterns)
+
+
 def traceit(frame: Any, event: Any, arg: Any) -> Any:
     global i, last, last_function_name, jump
     if event == "line":
@@ -62,8 +66,8 @@ def traceit(frame: Any, event: Any, arg: Any) -> Any:
         co_filename = to_unix(co.co_filename)
         co_name = co.co_name
         del co
-        if any(pattern in co_filename for pattern in exclude_patterns) or any(
-            pattern in co_name for pattern in config.function_exclude_patterns
+        if any_match(exclude_patterns, target=co_filename) or any_match(
+            config.function_exclude_patterns, target=co_name
         ):
             jump = True
             return traceit
@@ -81,12 +85,10 @@ def traceit(frame: Any, event: Any, arg: Any) -> Any:
             stack.append(
                 (simplify_filename(stack_frame_co_filename), stack_frame_co_name)
             )
-            if any(
-                pattern in stack_frame_co_filename
-                for pattern in config.custom_exclude_patterns
-            ) or any(
-                pattern in stack_frame_co_name  # fmt
-                for pattern in config.function_exclude_patterns
+            if any_match(
+                config.custom_exclude_patterns, target=stack_frame_co_filename
+            ) or any_match(
+                config.function_exclude_patterns, target=stack_frame_co_name
             ):
                 jump = True
                 return traceit
