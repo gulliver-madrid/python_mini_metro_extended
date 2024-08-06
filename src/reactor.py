@@ -130,9 +130,9 @@ class UI_Reactor:
         path_manager = self.engine.path_manager
         if path_manager.path_being_created:
             if isinstance(entity, Station):
-                path_manager.end_path_on_station(entity)
+                path_manager.try_to_end_path_on_station(entity)
             else:
-                path_manager.end_path_on_last_station()
+                path_manager.try_to_end_path_on_last_station()
 
         elif path_manager.path_being_edited:
             path_manager.stop_edition()

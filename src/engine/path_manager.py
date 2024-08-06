@@ -104,30 +104,34 @@ class PathManager:
         if self.path_being_created.path.is_looped:
             self._finish_path_creation()
 
-    def end_path_on_station(self, station: Station) -> None:
-        """We don't know if this station is already in the path"""
+    def try_to_end_path_on_station(self, station: Station) -> None:
+        """
+        The station should be in the path already, we are going to end path creation.
+        """
         assert self.path_being_created
         path = self.path_being_created.path
+        assert (
+            station in path.stations
+        ), "The logic should have been executed when the mouse moved into the station."
         if self.path_being_created.is_edition:
-            assert (
-                station in path.stations
-            ), "The logic should have been executed when the mouse moved into the station."
             self._stop_creating_or_expanding()
             return
 
         # the loop should have been detected in `add_station_to_path` method
         assert not self.path_being_created.can_make_loop(station)
-        assert station in path.stations
-        # current station de-dupe
+
+        assert self.path_being_created._is_last_station(
+            station
+        )  # TODO: fix private access  # test
         if self.path_being_created.can_end_with(station):
             self._finish_path_creation()
         else:
             self.abort_path_creation_or_expanding()
 
-    def end_path_on_last_station(self) -> None:
+    def try_to_end_path_on_last_station(self) -> None:
         assert self.path_being_created
         last = self.path_being_created.path.stations[-1]
-        self.end_path_on_station(last)
+        self.try_to_end_path_on_station(last)
 
     def abort_path_creation_or_expanding(self) -> None:
         assert self.path_being_created
