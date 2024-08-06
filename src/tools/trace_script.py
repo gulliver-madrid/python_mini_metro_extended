@@ -14,7 +14,24 @@ exclude_patterns = config.exclude_patterns + config.custom_exclude_patterns
 
 @dataclass
 class View:
-    strings: list[str] = field(init=False, default_factory=list)
+    _strings: list[str] = field(init=False, default_factory=list)
+
+    def start_stack(self) -> None:
+        self._strings.append("")
+
+    def add_stack_line(self, filename: str, *, function_name: str) -> None:
+        self._strings.append(filename + ":" + function_name + "()")
+
+    def add_jump(self) -> None:
+        self._strings.append("*")
+
+    def add_line(self, line: str, lineno: int) -> None:
+        self._strings.append("line %d: %s" % (lineno, line.rstrip()))
+
+    def allow_flush(self) -> None:
+        if len(self._strings) > 100:
+            write("\n".join(self._strings))
+            self._strings.clear()
 
 
 i = 0
@@ -77,22 +94,21 @@ def traceit(frame: Any, event: Any, arg: Any) -> Any:
             stack_frame = stack_frame.f_back
 
         if jump:
-            view.strings.append("*")
+            view.add_jump()
             jump = False
 
         i += 1
         if last != co_filename or last_function_name != co_name:
-            view.strings.append("")
+            view.start_stack()
             for item in reversed(stack):
                 filename_, function_name = item
-                view.strings.append(filename_ + ":" + function_name + "()")
+                view.add_stack_line(filename_, function_name=function_name)
 
         line = linecache.getline(co_filename, lineno)
-        view.strings.append("line %d: %s" % (lineno, line.rstrip()))
+        view.add_line(line, lineno)
 
-        if len(view.strings) > 100:
-            write("\n".join(view.strings))
-            view.strings.clear()
+        view.allow_flush()
+
         last_function_name = co_name
         last = co_filename
     return traceit
