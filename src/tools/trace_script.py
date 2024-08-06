@@ -1,8 +1,9 @@
+from dataclasses import dataclass, field
 import datetime
 import linecache
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Final
 
 from src.main import main
 from src.tools import trace_config as config
@@ -11,9 +12,14 @@ from src.tools.setup_logging import get_main_directory
 exclude_patterns = config.exclude_patterns + config.custom_exclude_patterns
 
 
+@dataclass
+class View:
+    strings: list[str] = field(init=False, default_factory=list)
+
+
 i = 0
 last: str | None = None
-strings: list[str] = []
+view: Final = View()
 last_function_name: str | None = None
 jump = False
 
@@ -71,22 +77,22 @@ def traceit(frame: Any, event: Any, arg: Any) -> Any:
             stack_frame = stack_frame.f_back
 
         if jump:
-            strings.append("*")
+            view.strings.append("*")
             jump = False
 
         i += 1
         if last != co_filename or last_function_name != co_name:
-            strings.append("")
+            view.strings.append("")
             for item in reversed(stack):
                 filename_, function_name = item
-                strings.append(filename_ + ":" + function_name + "()")
+                view.strings.append(filename_ + ":" + function_name + "()")
 
         line = linecache.getline(co_filename, lineno)
-        strings.append("line %d: %s" % (lineno, line.rstrip()))
+        view.strings.append("line %d: %s" % (lineno, line.rstrip()))
 
-        if len(strings) > 100:
-            write("\n".join(strings))
-            strings.clear()
+        if len(view.strings) > 100:
+            write("\n".join(view.strings))
+            view.strings.clear()
         last_function_name = co_name
         last = co_filename
     return traceit
