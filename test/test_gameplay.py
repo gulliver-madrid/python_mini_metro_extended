@@ -228,3 +228,22 @@ class TestGameplay(BaseTestCase):
             MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
         )
         self.assertEqual(len(self.engine.paths), 0)
+
+    def test_the_program_doesnt_break_if_mouse_motion_is_skipped(self) -> None:
+        """
+        Tests that if pygame deliver a mouse click event without a previous mouse movement
+        to that position, the program doesn't break.
+        """
+
+        self.reactor.react(
+            MouseEvent(
+                MouseEventType.MOUSE_DOWN,
+                self.engine.stations[0].position,
+            )
+        )
+        self.reactor.react(
+            MouseEvent(
+                MouseEventType.MOUSE_UP,
+                self.engine.stations[1].position,
+            )
+        )

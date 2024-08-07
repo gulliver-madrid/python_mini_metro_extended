@@ -60,9 +60,9 @@ class PathBeingCreatedOrExpanding:
         """
         assert self.is_active
         path = self.path
-        assert (
-            station in path.stations
-        ), "The logic should have been executed when the mouse moved into the station."
+        if station not in path.stations:
+            return
+
         if self.is_expanding:
             self._stop_creating_or_expanding()
             return
