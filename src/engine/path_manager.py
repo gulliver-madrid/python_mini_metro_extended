@@ -130,13 +130,9 @@ class PathManager:
             self._insert_station(station)
 
     def stop_edition(self) -> None:
-        if self.editing_intermediate_stations:
-            self.editing_intermediate_stations.path.selected = False
-            self.editing_intermediate_stations = None
-        else:
-            assert self.path_being_created and self.path_being_created.is_active
-            assert self.path_being_created.is_expanding
-            pass
+        assert self.editing_intermediate_stations
+        self.editing_intermediate_stations.path.selected = False
+        self.editing_intermediate_stations = None
 
     def get_paths_with_station(self, station: Station) -> list[Path]:
         return [path for path in self._components.paths if station in path.stations]
