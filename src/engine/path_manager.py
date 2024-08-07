@@ -3,6 +3,7 @@ from typing import Final, Iterable, Mapping, Sequence, TypeVar
 
 from src.config import max_num_metros, max_num_paths
 from src.engine.path_being_edited import PathBeingEdited
+from src.engine.path_color_manager import PathColorManager
 from src.entity import Metro, Passenger, Path, Station
 from src.entity.path_segment import PathSegment
 from src.entity.segment import Segment
@@ -13,9 +14,7 @@ from src.graph.node import Node
 from src.graph.skip_intermediate import skip_stations_on_same_path
 from src.tools.setup_logging import configure_logger
 from src.travel_plan import TravelPlan
-from src.type import Color
 from src.ui.ui import UI
-from src.utils import hue_to_rgb
 
 from .game_components import GameComponents
 from .path_being_created import PathBeingCreated
@@ -28,12 +27,11 @@ class PathManager:
     __slots__ = (
         "_components",
         "max_num_paths",
-        "_path_colors",
-        "_path_to_color",
         "max_num_metros",
         "_ui",
         "_path_being_created",
         "path_being_edited",
+        "_path_color_manager",
     )
 
     def __init__(
@@ -42,13 +40,12 @@ class PathManager:
         ui: UI,
     ):
         self.max_num_paths: Final = max_num_paths
-        self._path_to_color: Final[dict[Path, Color]] = {}
-        self._path_colors: Final = self._get_initial_path_colors()
         self.max_num_metros: Final = max_num_metros
         self._components: Final = components
         self._ui: Final = ui
         self._path_being_created: PathBeingCreated | None = None
         self.path_being_edited: PathBeingEdited | None = None
+        self._path_color_manager: Final = PathColorManager()
 
     ######################
     ### public methods ###
@@ -58,15 +55,14 @@ class PathManager:
         if len(self._components.paths) >= self.max_num_paths:
             return
 
-        color = self._get_first_path_color_available()
+        color = self._path_color_manager.get_first_path_color_available()
         assert color
         path = Path(color)
         path.is_being_created = True
         path.selected = True
         assert not self.path_being_created
         self.path_being_created = PathBeingCreated(path)
-        self._path_to_color[path] = color
-        self._path_colors[color] = True
+        self._path_color_manager.assign_color_to_path(color, path)
         self._components.paths.append(path)
 
         path.add_station(station)
@@ -136,7 +132,9 @@ class PathManager:
     def abort_path_creation_or_expanding(self) -> None:
         assert self.path_being_created
         if not self.path_being_created.is_edition:
-            self._release_color_for_path(self.path_being_created.path)
+            self._path_color_manager.release_color_for_path(
+                self.path_being_created.path
+            )
             self._components.paths.remove(self.path_being_created.path)
         self._stop_creating_or_expanding()
 
@@ -148,7 +146,7 @@ class PathManager:
                 metro.move_passenger(passenger, passenger.last_station)
             assert not metro.passengers
             self._components.metros.remove(metro)
-        self._release_color_for_path(path)
+        self._path_color_manager.release_color_for_path(path)
         self._components.paths.remove(path)
         self._assign_paths_to_buttons()
         self.find_travel_plan_for_passengers()
@@ -233,22 +231,6 @@ class PathManager:
     ### private methods ###
     #######################
 
-    def _get_initial_path_colors(self) -> dict[Color, bool]:
-        path_colors: Final[dict[Color, bool]] = {}
-        for i in range(max_num_paths):
-            color = hue_to_rgb(i / (max_num_paths + 1))
-            path_colors[color] = False  # not taken
-        return path_colors
-
-    def _get_first_path_color_available(self) -> Color | None:
-        assigned_color: Color | None = None
-        for path_color, taken in self._path_colors.items():
-            if taken:
-                continue
-            assigned_color = path_color
-            break
-        return assigned_color
-
     def _finish_path_creation(self) -> None:
         assert self.path_being_created
         self.path_being_created.path.is_being_created = False
@@ -267,10 +249,6 @@ class PathManager:
 
     def _assign_paths_to_buttons(self) -> None:
         self._ui.assign_paths_to_buttons(self._components.paths)
-
-    def _release_color_for_path(self, path: Path) -> None:
-        self._path_colors[path.color] = False
-        del self._path_to_color[path]
 
     def _passenger_has_travel_plan(self, passenger: Passenger) -> bool:
         return (
