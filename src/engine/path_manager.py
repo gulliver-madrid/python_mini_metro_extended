@@ -91,9 +91,12 @@ class PathManager:
                     station_nodes_mapping, station, passenger
                 )
 
-    def set_temporary_point(self, position: Point) -> None:
-        assert self.path_being_created
-        self.path_being_created.path.set_temporary_point(position)
+    def try_to_set_temporary_point(self, position: Point) -> None:
+        if self.path_being_created:
+            assert not self.editing_intermediate_stations
+            self.path_being_created.path.set_temporary_point(position)
+        elif self.editing_intermediate_stations:
+            self.editing_intermediate_stations.set_temporary_point(position)
 
     def try_starting_path_edition(self, position: Point) -> None:
         assert not self.path_being_created

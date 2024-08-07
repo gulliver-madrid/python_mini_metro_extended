@@ -147,14 +147,11 @@ class UI_Reactor:
     def _on_mouse_motion_with_mouse_down(
         self, entity: Station | PathButton | None, position: Point
     ) -> None:
-        if self._engine.path_manager.path_being_created:
-            if isinstance(entity, Station):
-                self._engine.path_manager.path_being_created.add_station_to_path(entity)
-            else:
-                self._engine.path_manager.set_temporary_point(position)
-        elif self._engine.path_manager.editing_intermediate_stations:
-            self._engine.path_manager.editing_intermediate_stations.set_temporary_point(
-                position
-            )
-            if isinstance(entity, Station):
-                self._engine.path_manager.touch(entity)
+        path_manager = self._engine.path_manager
+        if isinstance(entity, Station):
+            if path_manager.path_being_created:
+                path_manager.path_being_created.add_station_to_path(entity)
+            elif path_manager.editing_intermediate_stations:
+                path_manager.touch(entity)
+        else:
+            path_manager.try_to_set_temporary_point(position)
