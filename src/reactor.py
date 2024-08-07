@@ -105,6 +105,7 @@ class UI_Reactor:
     ) -> None:
         if self._engine.path_manager.path_being_created:
             self._engine.path_manager.path_being_created.abort_path_creation_or_expanding()
+
         if isinstance(entity, Station):
             if self._last_clicked == entity:
                 self._index_clicked += 1
@@ -114,8 +115,15 @@ class UI_Reactor:
 
             paths = self._engine.path_manager.get_paths_with_station(entity)
 
-            num_possible_targets = len(paths) + 1
+            allow_creating_new_path = (
+                len(self._engine.paths) < self._engine.path_manager.max_num_paths
+            )
+
+            num_possible_targets = len(paths) + allow_creating_new_path
             index_clicked = self._index_clicked % num_possible_targets
+
+            if not allow_creating_new_path:
+                index_clicked += 1
 
             if index_clicked == 0:
                 self._engine.path_manager.start_path_on_station(entity)
