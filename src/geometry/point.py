@@ -67,8 +67,13 @@ class Point:
         cos = math.cos(radians)
         x = self.left
         y = self.top
-        new_left = round(x * cos - y * sin)
-        new_top = round(x * sin + y * cos)
+        try:
+            new_left = round(x * cos - y * sin)
+            new_top = round(x * sin + y * cos)
+        except ValueError as err:
+            raise RuntimeError(
+                f"radians: {radians}, x: {x}, y: {y}, cos: {cos}, sen: {sin}"
+            ) from err
 
         return Point(new_left, new_top)
 
