@@ -6,18 +6,18 @@ from src.config import Config
 from src.entity import Path, Station
 
 
-class PathBeingCreated:
+class PathBeingCreatedOrExpanding:
     """Created or expanding"""
 
     __slots__ = (
         "path",
-        "is_edition",  # it can be edition or creation
+        "is_expanding",  # it can be edition or creation
         "_from_end",
     )
 
     def __init__(self, path: Path, station: Station | None = None):
         self.path: Final = path
-        self.is_edition: Final = station is not None
+        self.is_expanding: Final = station is not None
         self.set_from_end_value(station is None or not self._is_first_station(station))
 
     ######################
@@ -27,7 +27,7 @@ class PathBeingCreated:
     def add_station_to_path(self, station: Station) -> bool:
         """Returns True if it should be inserted at start instead"""
         # TODO: improve this, avoid having to return a boolean
-        if self.is_edition and not self._from_end:
+        if self.is_expanding and not self._from_end:
             if self._is_first_station(station):
                 return False
             assert not self.path.is_looped

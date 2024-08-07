@@ -11,7 +11,7 @@ from src.geometry.point import Point
 
 
 @dataclass
-class PathBeingEdited:
+class EditingIntermediateStations:
     path: Path
     segment: PathSegment
     temp_point: Point | None = field(default=None)

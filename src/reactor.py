@@ -139,7 +139,7 @@ class UI_Reactor:
             else:
                 path_manager.try_to_end_path_on_last_station()
 
-        elif path_manager.path_being_edited:
+        elif path_manager.editing_intermediate_stations:
             path_manager.stop_edition()
         elif isinstance(entity, PathButton) and entity.path:
             path_manager.remove_path(entity.path)
@@ -152,7 +152,9 @@ class UI_Reactor:
                 self._engine.path_manager.add_station_to_path(entity)
             else:
                 self._engine.path_manager.set_temporary_point(position)
-        elif self._engine.path_manager.path_being_edited:
-            self._engine.path_manager.path_being_edited.set_temporary_point(position)
+        elif self._engine.path_manager.editing_intermediate_stations:
+            self._engine.path_manager.editing_intermediate_stations.set_temporary_point(
+                position
+            )
             if isinstance(entity, Station):
                 self._engine.path_manager.touch(entity)

@@ -2,7 +2,7 @@ import random
 from typing import Final, Iterable, Mapping, Sequence
 
 from src.config import max_num_metros, max_num_paths
-from src.engine.path_being_edited import PathBeingEdited
+from src.engine.editing_intermediate import EditingIntermediateStations
 from src.engine.path_color_manager import PathColorManager
 from src.entity import Metro, Passenger, Path, Station
 from src.entity.path_segment import PathSegment
@@ -17,7 +17,7 @@ from src.travel_plan import TravelPlan
 from src.ui.ui import UI
 
 from .game_components import GameComponents
-from .path_being_created import PathBeingCreated
+from .path_being_created import PathBeingCreatedOrExpanding
 from .path_finder import find_next_path_for_passenger_at_station
 
 logger = configure_logger(__name__)
@@ -30,7 +30,7 @@ class PathManager:
         "max_num_metros",
         "_ui",
         "_path_being_created",
-        "path_being_edited",
+        "editing_intermediate_stations",
         "_path_color_manager",
     )
 
@@ -43,8 +43,8 @@ class PathManager:
         self.max_num_metros: Final = max_num_metros
         self._components: Final = components
         self._ui: Final = ui
-        self._path_being_created: PathBeingCreated | None = None
-        self.path_being_edited: PathBeingEdited | None = None
+        self._path_being_created: PathBeingCreatedOrExpanding | None = None
+        self.editing_intermediate_stations: EditingIntermediateStations | None = None
         self._path_color_manager: Final = PathColorManager()
 
     ######################
@@ -61,7 +61,7 @@ class PathManager:
         path.is_being_created = True
         path.selected = True
         assert not self.path_being_created
-        self.path_being_created = PathBeingCreated(path)
+        self.path_being_created = PathBeingCreatedOrExpanding(path)
         self._path_color_manager.assign_color_to_path(color, path)
         self._components.paths.append(path)
 
@@ -73,17 +73,17 @@ class PathManager:
         path = self.get_paths_with_station(station)[index]
         path.selected = True
         assert not self.path_being_created
-        self.path_being_created = PathBeingCreated(path, station)
+        self.path_being_created = PathBeingCreatedOrExpanding(path, station)
 
     def add_station_to_path(self, station: Station) -> None:
         assert self.path_being_created
-        if self.path_being_created.is_edition:
+        if self.path_being_created.is_expanding:
             if station not in self.path_being_created.path.stations:
                 should_insert = self.path_being_created.add_station_to_path(station)
                 if should_insert:
                     self._insert_station(station, 0)
                 assert self.path_being_created
-                assert self.path_being_created.is_edition
+                assert self.path_being_created.is_expanding
                 self.path_being_created.path.remove_temporary_point()
                 self._stop_creating_or_expanding()
                 # TODO: allow adding more than one station when expanding
@@ -101,7 +101,7 @@ class PathManager:
         assert (
             station in path.stations
         ), "The logic should have been executed when the mouse moved into the station."
-        if self.path_being_created.is_edition:
+        if self.path_being_created.is_expanding:
             self._stop_creating_or_expanding()
             return
 
@@ -123,7 +123,7 @@ class PathManager:
 
     def abort_path_creation_or_expanding(self) -> None:
         assert self.path_being_created
-        if not self.path_being_created.is_edition:
+        if not self.path_being_created.is_expanding:
             self._path_color_manager.release_color_for_path(
                 self.path_being_created.path
             )
@@ -174,38 +174,39 @@ class PathManager:
         assert path
         if _segment_has_metros(segment, path.metros):
             return
-        self.path_being_edited = PathBeingEdited(path, segment)
+        self.editing_intermediate_stations = EditingIntermediateStations(path, segment)
         path.selected = True
 
     def touch(self, station: Station) -> None:
-        assert self.path_being_edited
-        if station in self.path_being_edited.path.stations:
+        assert self.editing_intermediate_stations
+        if station in self.editing_intermediate_stations.path.stations:
             self._remove_station(station)
         elif _segment_has_metros(
-            self.path_being_edited.segment, self.path_being_edited.path.metros
+            self.editing_intermediate_stations.segment,
+            self.editing_intermediate_stations.path.metros,
         ):
             raise NotImplementedError("Segment with metros still can't be edited")
         else:
             self._insert_station(station)
 
     def stop_edition(self) -> None:
-        if self.path_being_edited:
-            self.path_being_edited.path.selected = False
-            self.path_being_edited = None
+        if self.editing_intermediate_stations:
+            self.editing_intermediate_stations.path.selected = False
+            self.editing_intermediate_stations = None
         else:
             assert self.path_being_created
-            assert self.path_being_created.is_edition
+            assert self.path_being_created.is_expanding
             pass
 
     def get_paths_with_station(self, station: Station) -> list[Path]:
         return [path for path in self._components.paths if station in path.stations]
 
     @property
-    def path_being_created(self) -> PathBeingCreated | None:
+    def path_being_created(self) -> PathBeingCreatedOrExpanding | None:
         return self._path_being_created
 
     @path_being_created.setter
-    def path_being_created(self, value: PathBeingCreated | None) -> None:
+    def path_being_created(self, value: PathBeingCreatedOrExpanding | None) -> None:
         self._path_being_created = value
         repr_value = (
             None
@@ -295,12 +296,14 @@ class PathManager:
 
     def _insert_station(self, station: Station, index: int | None = None) -> None:
         if index is None:
-            assert self.path_being_edited
+            assert self.editing_intermediate_stations
             # get index before insertion
-            path, index = self.path_being_edited.get_path_and_index_before_insertion()
+            path, index = (
+                self.editing_intermediate_stations.get_path_and_index_before_insertion()
+            )
         else:
             assert self.path_being_created
-            assert self.path_being_created.is_edition
+            assert self.path_being_created.is_expanding
             path = self.path_being_created.path
             index = index - 1
 
@@ -310,21 +313,21 @@ class PathManager:
         self.stop_edition()
 
     def _remove_station(self, station: Station) -> None:
-        assert self.path_being_edited
-        segment = self.path_being_edited.segment
-        path_segments = self.path_being_edited.path.get_path_segments()
+        assert self.editing_intermediate_stations
+        segment = self.editing_intermediate_stations.segment
+        path_segments = self.editing_intermediate_stations.path.get_path_segments()
 
         path_segment = find_equal_segment(segment, path_segments)
         assert path_segment
 
         index = path_segments.index(path_segment)
 
-        self.path_being_edited.path.stations.remove(station)
+        self.editing_intermediate_stations.path.stations.remove(station)
         _update_metros_segment_idx(
-            self.path_being_edited.path.metros, after_index=index, change=-1
+            self.editing_intermediate_stations.path.metros, after_index=index, change=-1
         )
 
-        self.path_being_edited.path.update_segments()
+        self.editing_intermediate_stations.path.update_segments()
         self.stop_edition()
 
 
