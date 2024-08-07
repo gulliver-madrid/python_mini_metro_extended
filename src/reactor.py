@@ -59,26 +59,31 @@ class UI_Reactor:
             self._on_mouse_motion(entity, event.position)
 
     def _on_keyboard_event(self, event: KeyboardEvent) -> None:
-        if event.event_type == KeyboardEventType.KEY_DOWN:
-            if event.key == pygame.K_SPACE:
+        if event.event_type != KeyboardEventType.KEY_DOWN:
+            return
+
+        match event.key:
+            case pygame.K_SPACE:
                 self.engine.toggle_pause()
-            if event.key == pygame.K_t:
+            case pygame.K_t:
                 if self.engine.is_paused:
                     self.engine.toggle_pause()
                 self.engine.steps_allowed = 1
-            elif event.key == pygame.K_ESCAPE:
+            case pygame.K_ESCAPE:
                 self.engine.exit()
-            elif event.key == pygame.K_c:
+            case pygame.K_c:
                 if not self.engine.is_paused:
                     self.engine.toggle_pause()
                 self._console.launch_console(self.engine)
-            elif event.key == pygame.K_d:
+            case pygame.K_d:
                 self.engine.showing_debug = not self.engine.showing_debug
-            elif event.key == pygame.K_s:
+            case pygame.K_s:
                 if self.engine.game_speed == 1:
                     self.engine.game_speed = 5
                 else:
                     self.engine.game_speed = 1
+            case _:
+                pass
 
     def _on_mouse_motion(
         self, entity: Station | PathButton | None, position: Point
