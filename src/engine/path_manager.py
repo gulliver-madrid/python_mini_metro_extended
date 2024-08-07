@@ -144,17 +144,6 @@ class PathManager:
     @path_being_created.setter
     def path_being_created(self, value: PathBeingCreatedOrExpanding | None) -> None:
         self._path_being_created = value
-        repr_value = (
-            None
-            if self.path_being_created is None
-            else (
-                "PathBeingCreated with path"
-                + str(self.path_being_created.path)
-                + " and id:"
-                + str(id(self.path_being_created))
-            )
-        )
-        logger.info(f"path_being_created: {repr_value}")
 
     #######################
     ### private methods ###
