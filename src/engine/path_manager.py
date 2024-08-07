@@ -59,8 +59,6 @@ class PathManager:
         path.add_station(station)
 
     def start_expanding_path_on_station(self, station: Station, index: int) -> None:
-        if len(self._components.paths) >= self.max_num_paths:
-            return
         assert not self.path_being_created
         path = self.get_paths_with_station(station)[index]
         path.selected = True
