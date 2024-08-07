@@ -64,6 +64,7 @@ class PathBeingCreatedOrExpanding:
             return
 
         if self.is_expanding:
+            self.path.remove_temporary_point()
             self._stop_creating_or_expanding()
             return
 
