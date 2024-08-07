@@ -1,21 +1,16 @@
-import random
-from typing import Final, Mapping, Sequence
+from typing import Final, Sequence
 
 from src.config import max_num_metros, max_num_paths
 from src.entity import Metro, Passenger, Path, Station
 from src.entity.segments import PathSegment, Segment
 from src.geometry.point import Point
-from src.geometry.type import ShapeType
-from src.graph.graph_algo import bfs, build_station_nodes_dict
-from src.graph.node import Node
-from src.graph.skip_intermediate import skip_stations_on_same_path
+from src.graph.graph_algo import build_station_nodes_dict
 from src.tools.setup_logging import configure_logger
-from src.travel_plan import TravelPlan
 
 from .editing_intermediate import EditingIntermediateStations
 from .game_components import GameComponents
 from .path_being_created import PathBeingCreatedOrExpanding
-from .path_finder import find_next_path_for_passenger_at_station
+from .travel_plan_finder import TravelPlanFinder
 from .utils import update_metros_segment_idx
 
 logger = configure_logger(__name__)
@@ -28,6 +23,7 @@ class PathManager:
         "max_num_metros",
         "_path_being_created",
         "editing_intermediate_stations",
+        "_travel_plan_finder",
     )
 
     def __init__(
@@ -39,6 +35,7 @@ class PathManager:
         self._components: Final = components
         self._path_being_created: PathBeingCreatedOrExpanding | None = None
         self.editing_intermediate_stations: EditingIntermediateStations | None = None
+        self._travel_plan_finder = TravelPlanFinder(components)
 
     ######################
     ### public methods ###
@@ -91,7 +88,7 @@ class PathManager:
             for passenger in station.passengers:
                 if _passenger_has_travel_plan_with_next_path(passenger):
                     continue
-                self._find_travel_plan_for_passenger(
+                self._travel_plan_finder.find_travel_plan_for_passenger(
                     station_nodes_mapping, station, passenger
                 )
 
@@ -149,64 +146,12 @@ class PathManager:
     ### private methods ###
     #######################
 
-    def _find_travel_plan_for_passenger(
-        self,
-        station_nodes_mapping: Mapping[Station, Node],
-        station: Station,
-        passenger: Passenger,
-    ) -> None:
-        possible_dst_stations = self._get_stations_for_shape_type(
-            passenger.destination_shape.type
+    def _insert_station(self, station: Station) -> None:
+        assert self.editing_intermediate_stations
+        # get the index before insertion
+        path, index = (
+            self.editing_intermediate_stations.get_path_and_index_before_insertion()
         )
-
-        for possible_dst_station in possible_dst_stations:
-            start = station_nodes_mapping[station]
-            end = station_nodes_mapping[possible_dst_station]
-            node_path = bfs(start, end)
-            if len(node_path) == 0:
-                continue
-
-            assert len(node_path) > 1, "The passenger should have already arrived"
-            node_path = skip_stations_on_same_path(node_path)
-            passenger.travel_plan = TravelPlan(node_path[1:], passenger.num_id)
-            self._find_next_path_for_passenger_at_station(passenger, station)
-            break
-
-        else:
-            travel_plan = TravelPlan([], passenger.num_id)
-            if travel_plan != passenger.travel_plan:
-                passenger.travel_plan = travel_plan
-
-    def _get_stations_for_shape_type(self, shape_type: ShapeType) -> list[Station]:
-        stations = [
-            station
-            for station in self._components.stations
-            if station.shape.type == shape_type
-        ]
-        random.shuffle(stations)
-        return stations
-
-    def _find_next_path_for_passenger_at_station(
-        self, passenger: Passenger, station: Station
-    ) -> None:
-        assert passenger.travel_plan
-        find_next_path_for_passenger_at_station(
-            self._components.paths, passenger.travel_plan, station
-        )
-
-    def _insert_station(self, station: Station, index: int | None = None) -> None:
-        if index is None:
-            assert self.editing_intermediate_stations
-            # get index before insertion
-            path, index = (
-                self.editing_intermediate_stations.get_path_and_index_before_insertion()
-            )
-        else:
-            assert self.path_being_created
-            assert self.path_being_created.is_expanding
-            self.path_being_created.insert_station(station, index)
-            return
-
         # we insert the station *after* that index
         path.stations.insert(index + 1, station)
         update_metros_segment_idx(path.metros, after_index=index, change=1)

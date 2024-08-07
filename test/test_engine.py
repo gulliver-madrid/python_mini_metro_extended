@@ -228,13 +228,13 @@ class TestEngine(BaseTestCase):
                 ),
             ]
         )
-        rect_stations = self.engine.path_manager._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
+        rect_stations = self.engine.path_manager._travel_plan_finder._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
             ShapeType.RECT
         )
-        circle_stations = self.engine.path_manager._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
+        circle_stations = self.engine.path_manager._travel_plan_finder._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
             ShapeType.CIRCLE
         )
-        triangle_stations = self.engine.path_manager._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
+        triangle_stations = self.engine.path_manager._travel_plan_finder._get_stations_for_shape_type(  # pyright: ignore [reportPrivateUsage]
             ShapeType.TRIANGLE
         )
 
