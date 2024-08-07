@@ -149,7 +149,7 @@ class PathManager:
         )
         for station in self._components.stations:
             for passenger in station.passengers:
-                if self._passenger_has_travel_plan(passenger):
+                if _passenger_has_travel_plan_with_next_path(passenger):
                     continue
                 self._find_travel_plan_for_passenger(
                     station_nodes_mapping, station, passenger
@@ -243,12 +243,6 @@ class PathManager:
     def _assign_paths_to_buttons(self) -> None:
         self._ui.assign_paths_to_buttons(self._components.paths)
 
-    def _passenger_has_travel_plan(self, passenger: Passenger) -> bool:
-        return (
-            passenger.travel_plan is not None
-            and passenger.travel_plan.next_path is not None
-        )
-
     def _find_travel_plan_for_passenger(
         self,
         station_nodes_mapping: Mapping[Station, Node],
@@ -326,4 +320,11 @@ class PathManager:
 def _segment_has_metros(segment: Segment, metros: Sequence[Metro]) -> bool:
     return any(
         metro.current_segment == segment for metro in metros if metro.current_segment
+    )
+
+
+def _passenger_has_travel_plan_with_next_path(passenger: Passenger) -> bool:
+    return (
+        passenger.travel_plan is not None
+        and passenger.travel_plan.next_path is not None
     )
