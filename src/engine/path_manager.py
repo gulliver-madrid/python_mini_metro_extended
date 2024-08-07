@@ -42,6 +42,8 @@ class PathManager:
     ######################
 
     def start_path_on_station(self, station: Station) -> None:
+        assert not self.path_being_created
+
         if len(self._components.paths) >= self.max_num_paths:
             return
 
@@ -50,7 +52,6 @@ class PathManager:
         path = Path(color)
         path.is_being_created = True
         path.selected = True
-        assert not self.path_being_created
         self.path_being_created = PathBeingCreatedOrExpanding(self._components, path)
         self._components.path_color_manager.assign_color_to_path(color, path)
         self._components.paths.append(path)
@@ -60,9 +61,9 @@ class PathManager:
     def start_expanding_path_on_station(self, station: Station, index: int) -> None:
         if len(self._components.paths) >= self.max_num_paths:
             return
+        assert not self.path_being_created
         path = self.get_paths_with_station(station)[index]
         path.selected = True
-        assert not self.path_being_created
         self.path_being_created = PathBeingCreatedOrExpanding(
             self._components, path, station
         )
