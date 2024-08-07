@@ -1,12 +1,12 @@
 import random
-from typing import Final, Iterable, Mapping, Sequence, TypeVar
+from typing import Final, Iterable, Mapping, Sequence
 
 from src.config import max_num_metros, max_num_paths
 from src.engine.path_being_edited import PathBeingEdited
 from src.engine.path_color_manager import PathColorManager
 from src.entity import Metro, Passenger, Path, Station
 from src.entity.path_segment import PathSegment
-from src.entity.segment import Segment
+from src.entity.segment import Segment, find_equal_segment
 from src.geometry.point import Point
 from src.geometry.type import ShapeType
 from src.graph.graph_algo import bfs, build_station_nodes_dict
@@ -296,16 +296,11 @@ class PathManager:
     def _insert_station(self, station: Station, index: int | None = None) -> None:
         if index is None:
             assert self.path_being_edited
-            segment = self.path_being_edited.segment
-            path_segments = self.path_being_edited.path.get_path_segments()
-
-            path_segment = _find_equal_segment(segment, path_segments)
-            assert path_segment
-
-            index = path_segments.index(path_segment)
-            path = self.path_being_edited.path
+            # get index before insertion
+            path, index = self.path_being_edited.get_path_and_index_before_insertion()
         else:
             assert self.path_being_created
+            assert self.path_being_created.is_edition
             path = self.path_being_created.path
             index = index - 1
 
@@ -319,7 +314,7 @@ class PathManager:
         segment = self.path_being_edited.segment
         path_segments = self.path_being_edited.path.get_path_segments()
 
-        path_segment = _find_equal_segment(segment, path_segments)
+        path_segment = find_equal_segment(segment, path_segments)
         assert path_segment
 
         index = path_segments.index(path_segment)
@@ -342,16 +337,6 @@ def _segment_has_metros(segment: Segment, metros: Sequence[Metro]) -> bool:
     return any(
         metro.current_segment == segment for metro in metros if metro.current_segment
     )
-
-
-T = TypeVar("T", bound=Segment)
-
-
-def _find_equal_segment(segment: T, segments: Iterable[T]) -> T | None:
-    for s in segments:
-        if segment == s:
-            return s
-    return None
 
 
 def _update_metros_segment_idx(

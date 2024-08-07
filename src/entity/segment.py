@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass
-from typing import Final
+from typing import Final, Iterable, TypeVar
 
 import pygame
 
@@ -104,3 +104,13 @@ def distance_point_segment(
         proj_x = Ax + proj * ABx
         proj_y = Ay + proj * ABy
         return math.sqrt((Cx - proj_x) ** 2 + (Cy - proj_y) ** 2)
+
+
+T = TypeVar("T", bound=Segment)
+
+
+def find_equal_segment(segment: T, segments: Iterable[T]) -> T | None:
+    for s in segments:
+        if segment == s:
+            return s
+    return None
