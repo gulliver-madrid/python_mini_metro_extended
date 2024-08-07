@@ -47,16 +47,17 @@ class UI_Reactor:
     def _on_mouse_event(self, event: MouseEvent) -> None:
         entity = self._engine.get_containing_entity(event.position)
 
-        if event.event_type == MouseEventType.MOUSE_DOWN:
-            self.is_mouse_down = True
-            self._on_mouse_down(entity, event.position)
-
-        elif event.event_type == MouseEventType.MOUSE_UP:
-            self.is_mouse_down = False
-            self._on_mouse_up(entity)
-
-        elif event.event_type == MouseEventType.MOUSE_MOTION:
-            self._on_mouse_motion(entity, event.position)
+        match event.event_type:
+            case MouseEventType.MOUSE_DOWN:
+                self.is_mouse_down = True
+                self._on_mouse_down(entity, event.position)
+            case MouseEventType.MOUSE_UP:
+                self.is_mouse_down = False
+                self._on_mouse_up(entity)
+            case MouseEventType.MOUSE_MOTION:
+                self._on_mouse_motion(entity, event.position)
+            case _:
+                pass
 
     def _on_keyboard_event(self, event: KeyboardEvent) -> None:
         if event.event_type != KeyboardEventType.KEY_DOWN:
@@ -66,6 +67,7 @@ class UI_Reactor:
             case pygame.K_SPACE:
                 self._engine.toggle_pause()
             case pygame.K_t:
+                # step by step
                 if self._engine.is_paused:
                     self._engine.toggle_pause()
                 self._engine.steps_allowed = 1
