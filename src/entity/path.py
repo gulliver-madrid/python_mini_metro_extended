@@ -52,6 +52,10 @@ class Path(Entity):
         self._segments = []
         self._path_order = 0
 
+    ########################
+    ### public interface ###
+    ########################
+
     def add_station(self, station: Station) -> None:
         self.stations.append(station)
         self.update_segments()
@@ -175,6 +179,10 @@ class Path(Entity):
 
     def get_path_segments(self) -> list[PathSegment]:
         return [seg for seg in self._segments if isinstance(seg, PathSegment)]
+
+    #########################
+    ### private interface ###
+    #########################
 
     def _determine_destination(self, metro: Metro) -> tuple[Point, Station | None]:
         segment = metro.current_segment
