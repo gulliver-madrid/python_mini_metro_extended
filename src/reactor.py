@@ -88,17 +88,17 @@ class UI_Reactor:
                 pass
 
     def _on_mouse_motion(
-        self, entity: Station | PathButton | None, position: Point
+        self,
+        entity: Station | PathButton | None,
+        position: Point,
     ) -> None:
         if self._last_clicked:
             self._last_clicked = None
         self._engine.ui.last_pos = position
         if self.is_mouse_down:
             self._on_mouse_motion_with_mouse_down(entity, position)
-        elif isinstance(entity, Button):
-            entity.on_hover()
         else:
-            self._engine.ui.exit_buttons()
+            self._on_mouse_motion_with_mouse_up(entity)
 
     def _on_mouse_down(
         self, entity: Station | PathButton | None, position: Point
@@ -145,7 +145,9 @@ class UI_Reactor:
             path_manager.remove_path(entity.path)
 
     def _on_mouse_motion_with_mouse_down(
-        self, entity: Station | PathButton | None, position: Point
+        self,
+        entity: Station | PathButton | None,
+        position: Point,
     ) -> None:
         path_manager = self._engine.path_manager
         if isinstance(entity, Station):
@@ -155,3 +157,11 @@ class UI_Reactor:
                 path_manager.touch(entity)
         else:
             path_manager.try_to_set_temporary_point(position)
+
+    def _on_mouse_motion_with_mouse_up(
+        self, entity: Station | PathButton | None
+    ) -> None:
+        if isinstance(entity, Button):
+            entity.on_hover()
+        else:
+            self._engine.ui.exit_buttons()
