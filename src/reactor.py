@@ -120,6 +120,8 @@ class UI_Reactor:
             )
 
             num_possible_targets = len(paths) + allow_creating_new_path
+            if not num_possible_targets:
+                return
             index_clicked = self._index_clicked % num_possible_targets
 
             if not allow_creating_new_path:
@@ -132,7 +134,7 @@ class UI_Reactor:
                     entity, index_clicked - 1
                 )
 
-        if (
+        elif (
             not entity
             and self._engine.is_paused
             and not Config.allow_self_crossing_lines
