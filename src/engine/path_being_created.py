@@ -28,11 +28,12 @@ class PathBeingCreatedOrExpanding:
         self.is_active = True
         self._components: Final = components
         self.is_expanding: Final = station is not None
-        self.set_from_end_value(station is None or not self._is_first_station(station))
+        self._set_from_end_value(station is None or not self._is_first_station(station))
 
     ######################
     ### public methods ###
     ######################
+
     def add_station_to_path(self, station: Station) -> None:
         assert self.is_active
         if self.is_expanding:
@@ -64,10 +65,10 @@ class PathBeingCreatedOrExpanding:
             return
 
         # the loop should have been detected in `add_station_to_path` method
-        assert not self.can_make_loop(station)
+        assert not self._can_make_loop(station)
 
         assert self._is_last_station(station)  # TODO: fix private access  # test
-        if self.can_end_with(station):
+        if self._can_end_with(station):
             self._finish_path_creation()
         else:
             self.abort_path_creation_or_expanding()
@@ -93,19 +94,10 @@ class PathBeingCreatedOrExpanding:
         path.stations.insert(index + 1, station)
         update_metros_segment_idx(path.metros, after_index=index, change=1)
 
-    def can_end_with(self, station: Station) -> bool:
-        return self._num_stations_in_this_path() > 1 and self._is_last_station(station)
-
-    def can_make_loop(self, station: Station) -> bool:
-        return self._num_stations_in_this_path() > 2 and self._is_first_station(station)
-
-    def set_from_end_value(self, value: bool) -> None:
-        self._from_end = value
-        self.path.temp_point_is_from_end = value
-
     #######################
     ### private methods ###
     #######################
+
     def _add_station_to_path(self, station: Station) -> bool:
         """Returns True if it should be inserted at start instead"""
         # TODO: improve this, avoid having to return a boolean
@@ -133,7 +125,7 @@ class PathBeingCreatedOrExpanding:
             return False
         assert not self.path.is_looped
         # loop
-        if self.can_make_loop(station):
+        if self._can_make_loop(station):
             self.path.set_loop()
             return False
         # non-loop
@@ -166,3 +158,13 @@ class PathBeingCreatedOrExpanding:
 
     def _is_last_station(self, station: Station) -> bool:
         return self.path.stations[-1] == station
+
+    def _can_end_with(self, station: Station) -> bool:
+        return self._num_stations_in_this_path() > 1 and self._is_last_station(station)
+
+    def _can_make_loop(self, station: Station) -> bool:
+        return self._num_stations_in_this_path() > 2 and self._is_first_station(station)
+
+    def _set_from_end_value(self, value: bool) -> None:
+        self._from_end = value
+        self.path.temp_point_is_from_end = value

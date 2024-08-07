@@ -134,7 +134,7 @@ class PathManager:
             self.editing_intermediate_stations.path.selected = False
             self.editing_intermediate_stations = None
         else:
-            assert self.path_being_created
+            assert self.path_being_created and self.path_being_created.is_active
             assert self.path_being_created.is_expanding
             pass
 
@@ -220,8 +220,8 @@ class PathManager:
             assert self.path_being_created
             assert self.path_being_created.is_expanding
             self.path_being_created.insert_station(station, index)
-            path = self.path_being_created.path
-            index = index - 1
+            return
+
         # we insert the station *after* that index
         path.stations.insert(index + 1, station)
         update_metros_segment_idx(path.metros, after_index=index, change=1)
