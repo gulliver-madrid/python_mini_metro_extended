@@ -1,9 +1,9 @@
 from src.config import Config
+from src.entity.ids import create_new_padding_segment_id
 from src.geometry.line import Line
 from src.geometry.point import Point
 from src.type import Color
 
-from .ids import create_new_padding_segment_id
 from .segment import Segment, SegmentEdges
 
 

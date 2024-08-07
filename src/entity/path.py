@@ -20,9 +20,7 @@ from src.type import Color
 from .entity import Entity
 from .ids import create_new_path_id
 from .metro import Metro
-from .padding_segment import PaddingSegment
-from .path_segment import PathSegment
-from .segment import Segment
+from .segments import PaddingSegment, PathSegment, Segment
 from .station import Station
 
 

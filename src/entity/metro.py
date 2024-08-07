@@ -14,7 +14,7 @@ from src.geometry.polygons import Rect
 from .holder import Holder
 from .ids import EntityId, create_new_metro_id
 from .passenger import Passenger
-from .segment import Segment
+from .segments import Segment
 from .station import Station
 
 if TYPE_CHECKING:

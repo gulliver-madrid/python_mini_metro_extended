@@ -5,8 +5,7 @@ import pygame
 from src.color import reduce_saturation
 from src.engine.utils import update_metros_segment_idx
 from src.entity.path import Path
-from src.entity.path_segment import PathSegment
-from src.entity.segment import find_equal_segment
+from src.entity.segments import PathSegment, find_equal_segment
 from src.entity.station import Station
 from src.geometry.line import Line
 from src.geometry.point import Point

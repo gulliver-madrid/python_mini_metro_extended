@@ -5,13 +5,12 @@ from typing import Final, Iterable, TypeVar
 import pygame
 
 from src.config import Config
+from src.entity.entity import Entity
+from src.entity.ids import EntityId
+from src.entity.station import Station
 from src.geometry.line import Line
 from src.geometry.point import Point
 from src.type import Color
-
-from .entity import Entity
-from .ids import EntityId
-from .station import Station
 
 
 @dataclass(frozen=True)

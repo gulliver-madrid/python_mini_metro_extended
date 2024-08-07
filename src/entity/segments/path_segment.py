@@ -1,13 +1,13 @@
 from src.config import Config, path_order_shift
+from src.entity.ids import create_new_path_segment_id
+from src.entity.station import Station
 from src.geometry.line import Line
 from src.geometry.point import Point
 from src.geometry.types import Degrees
 from src.geometry.utils import get_direction
 from src.type import Color
 
-from .ids import create_new_path_segment_id
 from .segment import Segment, SegmentEdges, StationPair
-from .station import Station
 
 
 class PathSegment(Segment):
