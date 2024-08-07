@@ -103,8 +103,11 @@ class UI_Reactor:
     def _on_mouse_down(
         self, entity: Station | PathButton | None, position: Point
     ) -> None:
-        if self._engine.path_manager.path_being_created:
-            self._engine.path_manager.abort_path_creation_or_expanding()
+        if (
+            self._engine.path_manager.path_being_created
+            and self._engine.path_manager.path_being_created.is_active
+        ):
+            self._engine.path_manager.path_being_created.abort_path_creation_or_expanding()
         if isinstance(entity, Station):
             if self._last_clicked == entity:
                 self._index_clicked += 1
@@ -133,11 +136,14 @@ class UI_Reactor:
 
     def _on_mouse_up(self, entity: Station | PathButton | None) -> None:
         path_manager = self._engine.path_manager
-        if path_manager.path_being_created:
+        if (
+            path_manager.path_being_created
+            and path_manager.path_being_created.is_active
+        ):
             if isinstance(entity, Station):
-                path_manager.try_to_end_path_on_station(entity)
+                path_manager.path_being_created.try_to_end_path_on_station(entity)
             else:
-                path_manager.try_to_end_path_on_last_station()
+                path_manager.path_being_created.try_to_end_path_on_last_station()
 
         elif path_manager.editing_intermediate_stations:
             path_manager.stop_edition()
@@ -147,9 +153,12 @@ class UI_Reactor:
     def _on_mouse_motion_with_mouse_down(
         self, entity: Station | PathButton | None, position: Point
     ) -> None:
-        if self._engine.path_manager.path_being_created:
+        if (
+            self._engine.path_manager.path_being_created
+            and self._engine.path_manager.path_being_created.is_active
+        ):
             if isinstance(entity, Station):
-                self._engine.path_manager.add_station_to_path(entity)
+                self._engine.path_manager.path_being_created.add_station_to_path(entity)
             else:
                 self._engine.path_manager.set_temporary_point(position)
         elif self._engine.path_manager.editing_intermediate_stations:

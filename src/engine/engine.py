@@ -23,7 +23,6 @@ pp = pprint.PrettyPrinter(indent=4)
 
 class Engine:
     __slots__ = (
-        "ui",
         "path_manager",
         "showing_debug",
         "game_speed",
@@ -56,7 +55,6 @@ class Engine:
         self.steps_allowed: int | None = None
 
         # UI
-        self.ui = UI()
         self._game_renderer = GameRenderer(self._components)
 
         # delegated classes
@@ -66,24 +64,23 @@ class Engine:
         )
         self.path_manager = PathManager(
             self._components,
-            self.ui,
         )
         self._passenger_mover = PassengerMover(self._components)
 
-        self.ui.init(self.path_manager.max_num_paths)
+        self._components.ui.init(self.path_manager.max_num_paths)
 
     ######################
     ### public methods ###
     ######################
 
     def set_clock(self, clock: pygame.time.Clock) -> None:
-        self.ui.clock = clock
+        self._components.ui.clock = clock
 
     def get_containing_entity(self, position: Point) -> Station | PathButton | None:
         for station in self._components.stations:
             if station.contains(position):
                 return station
-        return self.ui.get_containing_button(position) or None
+        return self._components.ui.get_containing_button(position) or None
 
     def increment_time(self, dt_ms: int) -> None:
         if self._components.status.is_paused:
@@ -107,7 +104,10 @@ class Engine:
                     self.steps_allowed = None
 
     def try_starting_path_edition(self, position: Point) -> None:
-        assert not self.path_manager.path_being_created
+        assert (
+            not self.path_manager.path_being_created
+            or not self.path_manager.path_being_created.is_active
+        )
         self.path_manager.try_starting_path_edition(position)
 
     def render(self, screen: pygame.surface.Surface) -> None:
@@ -119,7 +119,7 @@ class Engine:
             max_num_paths=self.path_manager.max_num_paths,
             travel_plans=self.travel_plans,
             editing_intermediate_stations=self.path_manager.editing_intermediate_stations,
-            ui=self.ui,
+            ui=self._components.ui,
             is_creating_path=self.path_manager.path_being_created is not None,
             ms_until_next_spawn=self._passenger_spawner.ms_until_next_spawn,
             showing_debug=self.showing_debug,
@@ -164,6 +164,10 @@ class Engine:
     def stations(self) -> list[Station]:
         # tests only
         return self._components.stations
+
+    @property
+    def ui(self) -> UI:
+        return self._components.ui
 
     @property
     def is_paused(self) -> bool:

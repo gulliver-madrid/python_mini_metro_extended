@@ -11,12 +11,10 @@ from src.graph.node import Node
 from src.graph.skip_intermediate import skip_stations_on_same_path
 from src.tools.setup_logging import configure_logger
 from src.travel_plan import TravelPlan
-from src.ui.ui import UI
 
 from .editing_intermediate import EditingIntermediateStations
 from .game_components import GameComponents
 from .path_being_created import PathBeingCreatedOrExpanding
-from .path_color_manager import PathColorManager
 from .path_finder import find_next_path_for_passenger_at_station
 from .utils import update_metros_segment_idx
 
@@ -28,24 +26,19 @@ class PathManager:
         "_components",
         "max_num_paths",
         "max_num_metros",
-        "_ui",
         "_path_being_created",
         "editing_intermediate_stations",
-        "_path_color_manager",
     )
 
     def __init__(
         self,
         components: GameComponents,
-        ui: UI,
     ):
         self.max_num_paths: Final = max_num_paths
         self.max_num_metros: Final = max_num_metros
         self._components: Final = components
-        self._ui: Final = ui
         self._path_being_created: PathBeingCreatedOrExpanding | None = None
         self.editing_intermediate_stations: EditingIntermediateStations | None = None
-        self._path_color_manager: Final = PathColorManager()
 
     ######################
     ### public methods ###
@@ -55,14 +48,14 @@ class PathManager:
         if len(self._components.paths) >= self.max_num_paths:
             return
 
-        color = self._path_color_manager.get_first_path_color_available()
+        color = self._components.path_color_manager.get_first_path_color_available()
         assert color
         path = Path(color)
         path.is_being_created = True
         path.selected = True
-        assert not self.path_being_created
-        self.path_being_created = PathBeingCreatedOrExpanding(path)
-        self._path_color_manager.assign_color_to_path(color, path)
+        assert not self.path_being_created or not self.path_being_created.is_active
+        self.path_being_created = PathBeingCreatedOrExpanding(self._components, path)
+        self._components.path_color_manager.assign_color_to_path(color, path)
         self._components.paths.append(path)
 
         path.add_station(station)
@@ -72,75 +65,22 @@ class PathManager:
             return
         path = self.get_paths_with_station(station)[index]
         path.selected = True
-        assert not self.path_being_created
-        self.path_being_created = PathBeingCreatedOrExpanding(path, station)
-
-    def add_station_to_path(self, station: Station) -> None:
-        assert self.path_being_created
-        if self.path_being_created.is_expanding:
-            if station not in self.path_being_created.path.stations:
-                should_insert = self.path_being_created.add_station_to_path(station)
-                if should_insert:
-                    self._insert_station(station, 0)
-                assert self.path_being_created
-                assert self.path_being_created.is_expanding
-                self.path_being_created.path.remove_temporary_point()
-                self._stop_creating_or_expanding()
-                # TODO: allow adding more than one station when expanding
-            return
-        self.path_being_created.add_station_to_path(station)
-        if self.path_being_created.path.is_looped:
-            self._finish_path_creation()
-
-    def try_to_end_path_on_station(self, station: Station) -> None:
-        """
-        The station should be in the path already, we are going to end path creation.
-        """
-        assert self.path_being_created
-        path = self.path_being_created.path
-        assert (
-            station in path.stations
-        ), "The logic should have been executed when the mouse moved into the station."
-        if self.path_being_created.is_expanding:
-            self._stop_creating_or_expanding()
-            return
-
-        # the loop should have been detected in `add_station_to_path` method
-        assert not self.path_being_created.can_make_loop(station)
-
-        assert self.path_being_created._is_last_station(
-            station
-        )  # TODO: fix private access  # test
-        if self.path_being_created.can_end_with(station):
-            self._finish_path_creation()
-        else:
-            self.abort_path_creation_or_expanding()
-
-    def try_to_end_path_on_last_station(self) -> None:
-        assert self.path_being_created
-        last = self.path_being_created.path.stations[-1]
-        self.try_to_end_path_on_station(last)
-
-    def abort_path_creation_or_expanding(self) -> None:
-        assert self.path_being_created
-        if not self.path_being_created.is_expanding:
-            self._path_color_manager.release_color_for_path(
-                self.path_being_created.path
-            )
-            self._components.paths.remove(self.path_being_created.path)
-        self._stop_creating_or_expanding()
+        assert not self.path_being_created or not self.path_being_created.is_active
+        self.path_being_created = PathBeingCreatedOrExpanding(
+            self._components, path, station
+        )
 
     def remove_path(self, path: Path) -> None:
-        self._ui.path_to_button[path].remove_path()
+        self._components.ui.path_to_button[path].remove_path()
         for metro in path.metros:
             for passenger in metro.passengers[:]:
                 assert passenger.last_station
                 metro.move_passenger(passenger, passenger.last_station)
             assert not metro.passengers
             self._components.metros.remove(metro)
-        self._path_color_manager.release_color_for_path(path)
+        self._components.path_color_manager.release_color_for_path(path)
         self._components.paths.remove(path)
-        self._assign_paths_to_buttons()
+        self._components.ui.assign_paths_to_buttons(self._components.paths)
         self.find_travel_plan_for_passengers()
 
     def find_travel_plan_for_passengers(self) -> None:
@@ -160,7 +100,7 @@ class PathManager:
         self.path_being_created.path.set_temporary_point(position)
 
     def try_starting_path_edition(self, position: Point) -> None:
-        assert not self.path_being_created
+        assert not self.path_being_created or not self.path_being_created.is_active
         segment: PathSegment | None = None
         for path in self._components.paths:
             segment = path.get_containing_path_segment(position)
@@ -224,25 +164,6 @@ class PathManager:
     ### private methods ###
     #######################
 
-    def _finish_path_creation(self) -> None:
-        assert self.path_being_created
-        self.path_being_created.path.is_being_created = False
-        self.path_being_created.path.remove_temporary_point()
-        if len(self._components.metros) < self.max_num_metros:
-            metro = Metro(self._components.passengers_mediator)
-            self.path_being_created.path.add_metro(metro)
-            self._components.metros.append(metro)
-        self._stop_creating_or_expanding()
-        self._assign_paths_to_buttons()
-
-    def _stop_creating_or_expanding(self) -> None:
-        assert self.path_being_created
-        self.path_being_created.path.selected = False
-        self.path_being_created = None
-
-    def _assign_paths_to_buttons(self) -> None:
-        self._ui.assign_paths_to_buttons(self._components.paths)
-
     def _find_travel_plan_for_passenger(
         self,
         station_nodes_mapping: Mapping[Station, Node],
@@ -298,9 +219,9 @@ class PathManager:
         else:
             assert self.path_being_created
             assert self.path_being_created.is_expanding
+            self.path_being_created.insert_station(station, index)
             path = self.path_being_created.path
             index = index - 1
-
         # we insert the station *after* that index
         path.stations.insert(index + 1, station)
         update_metros_segment_idx(path.metros, after_index=index, change=1)
