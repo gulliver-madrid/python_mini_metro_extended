@@ -1,12 +1,10 @@
 import random
-from typing import Final, Iterable, Mapping, Sequence
+from typing import Final, Mapping, Sequence
 
 from src.config import max_num_metros, max_num_paths
-from src.engine.editing_intermediate import EditingIntermediateStations
-from src.engine.path_color_manager import PathColorManager
 from src.entity import Metro, Passenger, Path, Station
 from src.entity.path_segment import PathSegment
-from src.entity.segment import Segment, find_equal_segment
+from src.entity.segment import Segment
 from src.geometry.point import Point
 from src.geometry.type import ShapeType
 from src.graph.graph_algo import bfs, build_station_nodes_dict
@@ -16,9 +14,12 @@ from src.tools.setup_logging import configure_logger
 from src.travel_plan import TravelPlan
 from src.ui.ui import UI
 
+from .editing_intermediate import EditingIntermediateStations
 from .game_components import GameComponents
 from .path_being_created import PathBeingCreatedOrExpanding
+from .path_color_manager import PathColorManager
 from .path_finder import find_next_path_for_passenger_at_station
+from .utils import update_metros_segment_idx
 
 logger = configure_logger(__name__)
 
@@ -309,25 +310,12 @@ class PathManager:
 
         # we insert the station *after* that index
         path.stations.insert(index + 1, station)
-        _update_metros_segment_idx(path.metros, after_index=index, change=1)
+        update_metros_segment_idx(path.metros, after_index=index, change=1)
         self.stop_edition()
 
     def _remove_station(self, station: Station) -> None:
         assert self.editing_intermediate_stations
-        segment = self.editing_intermediate_stations.segment
-        path_segments = self.editing_intermediate_stations.path.get_path_segments()
-
-        path_segment = find_equal_segment(segment, path_segments)
-        assert path_segment
-
-        index = path_segments.index(path_segment)
-
-        self.editing_intermediate_stations.path.stations.remove(station)
-        _update_metros_segment_idx(
-            self.editing_intermediate_stations.path.metros, after_index=index, change=-1
-        )
-
-        self.editing_intermediate_stations.path.update_segments()
+        self.editing_intermediate_stations.remove_station(station)
         self.stop_edition()
 
 
@@ -340,11 +328,3 @@ def _segment_has_metros(segment: Segment, metros: Sequence[Metro]) -> bool:
     return any(
         metro.current_segment == segment for metro in metros if metro.current_segment
     )
-
-
-def _update_metros_segment_idx(
-    metros: Iterable[Metro], *, after_index: int, change: int
-) -> None:
-    for metro in metros:
-        if metro.current_segment_idx > after_index:
-            metro.current_segment_idx += change

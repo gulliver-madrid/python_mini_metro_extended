@@ -3,9 +3,11 @@ from dataclasses import dataclass, field
 import pygame
 
 from src.color import reduce_saturation
+from src.engine.utils import update_metros_segment_idx
 from src.entity.path import Path
 from src.entity.path_segment import PathSegment
 from src.entity.segment import find_equal_segment
+from src.entity.station import Station
 from src.geometry.line import Line
 from src.geometry.point import Point
 
@@ -29,6 +31,20 @@ class EditingIntermediateStations:
         index = path_segments.index(path_segment)
         path = self.path
         return (path, index)
+
+    def remove_station(self, station: Station) -> None:
+        segment = self.segment
+        path_segments = self.path.get_path_segments()
+
+        path_segment = find_equal_segment(segment, path_segments)
+        assert path_segment
+
+        index = path_segments.index(path_segment)
+
+        self.path.stations.remove(station)
+        update_metros_segment_idx(self.path.metros, after_index=index, change=-1)
+
+        self.path.update_segments()
 
     def draw(self, surface: pygame.surface.Surface) -> None:
         color = reduce_saturation(self.path.color)
