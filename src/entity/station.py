@@ -11,18 +11,20 @@ from .holder import Holder
 from .ids import create_new_station_id
 
 if TYPE_CHECKING:
-    from src.mediator import Mediator
+    from src.passengers_mediator import PassengersMediator
 
 
 class Station(Holder):
     __slots__ = ()
 
-    def __init__(self, shape: Shape, position: Point, mediator: Mediator) -> None:
+    def __init__(
+        self, shape: Shape, position: Point, passengers_mediator: PassengersMediator
+    ) -> None:
         super().__init__(
             shape=shape,
             capacity=station_capacity,
             id=create_new_station_id(shape.type),
-            mediator=mediator,
+            mediator=passengers_mediator,
         )
         self._size = station_size
         self.position = position

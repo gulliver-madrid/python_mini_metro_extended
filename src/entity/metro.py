@@ -18,7 +18,7 @@ from .segment import Segment
 from .station import Station
 
 if TYPE_CHECKING:
-    from src.mediator import Mediator
+    from src.passengers_mediator import PassengersMediator
 
 
 class Metro(Holder):
@@ -31,14 +31,14 @@ class Metro(Holder):
         "is_forward",
     )
 
-    def __init__(self, mediator: Mediator) -> None:
+    def __init__(self, passengers_mediator: PassengersMediator) -> None:
         self._size = metro_size
         metro_shape = Rect(color=metro_color, width=2 * self._size, height=self._size)
         super().__init__(
             shape=metro_shape,
             capacity=metro_capacity,
             id=create_new_metro_id(),
-            mediator=mediator,
+            mediator=passengers_mediator,
         )
         self._current_station: Station | None = None
         self.current_segment: Segment | None = None

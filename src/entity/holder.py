@@ -13,7 +13,7 @@ from .ids import EntityId
 from .passenger import Passenger
 
 if TYPE_CHECKING:
-    from src.mediator import Mediator
+    from src.passengers_mediator import PassengersMediator
 
 
 class Holder(Entity):
@@ -29,14 +29,14 @@ class Holder(Entity):
     _passengers_per_row: int
     _size: int
     position: Point
-    mediator: Final[Mediator]
+    mediator: Final[PassengersMediator]
 
     def __init__(
         self,
         shape: Shape,
         capacity: int,
         id: EntityId,
-        mediator: Mediator,
+        mediator: PassengersMediator,
     ) -> None:
         super().__init__(id)
         self.shape: Final = shape

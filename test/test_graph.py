@@ -37,7 +37,7 @@ class TestGraph(BaseTestCase):
     def _replace_with_random_stations(self, n: int) -> None:
         self.engine.stations.clear()
         self.engine.stations.extend(
-            get_random_stations(n, mediator=self.engine.mediator)
+            get_random_stations(n, passengers_mediator=self.engine.passengers_mediator)
         )
 
     def connect_stations(self, station_idx: Sequence[int]) -> None:
@@ -71,7 +71,7 @@ class TestGraph(BaseTestCase):
                         height=station_size,
                     ),
                     get_random_position(self.width, self.height),
-                    self.engine.mediator,
+                    self.engine.passengers_mediator,
                 ),
                 Station(
                     Circle(
@@ -79,7 +79,7 @@ class TestGraph(BaseTestCase):
                         radius=round(station_size / 2),
                     ),
                     get_random_position(self.width, self.height),
-                    self.engine.mediator,
+                    self.engine.passengers_mediator,
                 ),
             ]
         )

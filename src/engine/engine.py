@@ -7,7 +7,7 @@ import pygame
 from src.config import Config, num_stations
 from src.entity import Passenger, Path, Station, get_random_stations
 from src.geometry.point import Point
-from src.mediator import Mediator
+from src.passengers_mediator import PassengersMediator
 from src.ui.path_button import PathButton
 from src.ui.ui import UI, get_gui_height, get_main_surface_height
 
@@ -39,15 +39,15 @@ class Engine:
 
     def __init__(self) -> None:
         pygame.font.init()
-        mediator = Mediator()
+        passengers_mediator = PassengersMediator()
 
         # components
         self._components: Final = GameComponents(
             paths=[],
-            stations=get_random_stations(num_stations, mediator),
+            stations=get_random_stations(num_stations, passengers_mediator),
             metros=[],
             status=MediatorStatus(),
-            mediator=mediator,
+            passengers_mediator=passengers_mediator,
         )
 
         # status
@@ -139,8 +139,8 @@ class Engine:
         sys.exit()
 
     @property
-    def mediator(self) -> Mediator:
-        return self._components.mediator
+    def passengers_mediator(self) -> PassengersMediator:
+        return self._components.passengers_mediator
 
     @property
     def passengers(self) -> list[Passenger]:

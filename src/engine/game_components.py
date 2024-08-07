@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from src.entity import Metro, Passenger, Path, Station
-from src.mediator import Mediator
+from src.passengers_mediator import PassengersMediator
 
 from .status import MediatorStatus
 
@@ -12,7 +12,7 @@ class GameComponents:
     stations: list[Station]
     metros: list[Metro]
     status: MediatorStatus
-    mediator: Mediator
+    passengers_mediator: PassengersMediator
 
     @property
     def passengers(self) -> list[Passenger]:

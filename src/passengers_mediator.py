@@ -7,7 +7,7 @@ from src.entity.passenger import Passenger
 from src.entity.station import Station
 
 
-class Mediator:
+class PassengersMediator:
     _passengers: Final[dict[HolderProtocol, list[Passenger]]]
 
     def __init__(self) -> None:

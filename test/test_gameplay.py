@@ -35,7 +35,7 @@ class TestGameplay(BaseTestCase):
     def _replace_with_random_stations(self, n: int) -> None:
         self.engine.stations.clear()
         self.engine.stations.extend(
-            get_random_stations(n, mediator=self.engine.mediator)
+            get_random_stations(n, passengers_mediator=self.engine.passengers_mediator)
         )
 
     def connect_stations(self, station_idx: Sequence[int]) -> None:

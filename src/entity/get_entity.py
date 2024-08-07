@@ -12,22 +12,24 @@ from .metro import Metro
 from .station import Station
 
 if TYPE_CHECKING:
-    from src.mediator import Mediator
+    from src.passengers_mediator import PassengersMediator
 
 
-def get_random_station(mediator: Mediator) -> Station:
+def get_random_station(passengers_mediator: PassengersMediator) -> Station:
     shape = get_random_station_shape()
     position = get_random_position(
         Config.screen_width, round(get_main_surface_height())
     )
-    return Station(shape, position + Point(0, round(get_gui_height())), mediator)
+    return Station(
+        shape, position + Point(0, round(get_gui_height())), passengers_mediator
+    )
 
 
 def generate_stations(
-    previous: Sequence[Station], mediator: Mediator
+    previous: Sequence[Station], passengers_mediator: PassengersMediator
 ) -> Iterator[Station]:
     while True:
-        new_station = get_random_station(mediator)
+        new_station = get_random_station(passengers_mediator)
         if all(
             station.get_distance_to(new_station) >= Config.min_distance
             for station in previous
@@ -35,16 +37,18 @@ def generate_stations(
             yield new_station
 
 
-def get_random_stations(num: int, mediator: Mediator) -> list[Station]:
+def get_random_stations(
+    num: int, passengers_mediator: PassengersMediator
+) -> list[Station]:
     stations: list[Station] = []
-    generator = generate_stations(stations, mediator)
+    generator = generate_stations(stations, passengers_mediator)
     for _ in range(num):
         stations.append(next(generator))
     return stations
 
 
-def get_metros(num: int, mediator: Mediator) -> list[Metro]:
+def get_metros(num: int, passengers_mediator: PassengersMediator) -> list[Metro]:
     metros: list[Metro] = []
     for _ in range(num):
-        metros.append(Metro(mediator))
+        metros.append(Metro(passengers_mediator))
     return metros
