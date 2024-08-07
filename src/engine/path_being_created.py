@@ -11,14 +11,14 @@ class PathBeingCreated:
 
     __slots__ = (
         "path",
-        "is_edition",
-        "from_end",
+        "is_edition",  # it can be edition or creation
+        "_from_end",
     )
 
-    def __init__(self, path: Path, *, is_edition: bool = False):
+    def __init__(self, path: Path, station: Station | None = None):
         self.path: Final = path
-        self.is_edition = is_edition
-        self.from_end = True
+        self.is_edition: Final = station is not None
+        self.set_from_end_value(station is None or not self._is_first_station(station))
 
     ######################
     ### public methods ###
@@ -27,7 +27,7 @@ class PathBeingCreated:
     def add_station_to_path(self, station: Station) -> bool:
         """Returns True if it should be inserted at start instead"""
         # TODO: improve this, avoid having to return a boolean
-        if self.is_edition and not self.from_end:
+        if self.is_edition and not self._from_end:
             if self._is_first_station(station):
                 return False
             assert not self.path.is_looped
@@ -36,7 +36,7 @@ class PathBeingCreated:
                 self._num_stations_in_this_path() > 2 and self._is_last_station(station)
             )
             if can_make_loop:
-                if not self.from_end:
+                if not self._from_end:
                     raise NotImplementedError
                 self.path.set_loop()  # TODO: adapt to expanding from start
                 return False
@@ -46,7 +46,7 @@ class PathBeingCreated:
                 return True
             return False
 
-        assert self.from_end
+        assert self._from_end
         if self._is_last_station(station):
             return False
         assert not self.path.is_looped
@@ -65,6 +65,10 @@ class PathBeingCreated:
 
     def can_make_loop(self, station: Station) -> bool:
         return self._num_stations_in_this_path() > 2 and self._is_first_station(station)
+
+    def set_from_end_value(self, value: bool) -> None:
+        self._from_end = value
+        self.path.temp_point_is_from_end = value
 
     #######################
     ### private methods ###

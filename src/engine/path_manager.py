@@ -73,15 +73,7 @@ class PathManager:
         path = self.get_paths_with_station(station)[index]
         path.selected = True
         assert not self.path_being_created
-        self.path_being_created = PathBeingCreated(path, is_edition=True)
-        if self.path_being_created._is_first_station(
-            station
-        ):  # TODO: fix private access
-            self.path_being_created.from_end = False
-            self.path_being_created.path.temp_point_is_from_end = False
-        else:
-            self.path_being_created.from_end = True
-            self.path_being_created.path.temp_point_is_from_end = True
+        self.path_being_created = PathBeingCreated(path, station)
 
     def add_station_to_path(self, station: Station) -> None:
         assert self.path_being_created
