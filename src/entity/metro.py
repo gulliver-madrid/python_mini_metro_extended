@@ -9,7 +9,7 @@ from src.config import (
     metro_size,
     metro_speed_per_ms,
 )
-from src.geometry.rect import Rect
+from src.geometry.polygons import Rect
 
 from .holder import Holder
 from .ids import EntityId, create_new_metro_id

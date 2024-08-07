@@ -1,9 +1,10 @@
 import math
 
 from src.geometry.point import Point
-from src.geometry.polygon import Polygon
 from src.geometry.type import ShapeType
 from src.type import Color
+
+from .polygon import Polygon
 
 COS_30_DEGREES = math.cos(math.radians(30))
 

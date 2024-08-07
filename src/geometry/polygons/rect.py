@@ -1,9 +1,10 @@
 from shortuuid import uuid
 
 from src.geometry.point import Point
-from src.geometry.polygon import Polygon
 from src.geometry.type import ShapeType
 from src.type import Color
+
+from .polygon import Polygon
 
 
 class Rect(Polygon):

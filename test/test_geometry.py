@@ -8,8 +8,7 @@ from src.config import Config
 from src.geometry.circle import Circle
 from src.geometry.line import Line
 from src.geometry.point import Point
-from src.geometry.rect import Rect
-from src.geometry.triangle import Triangle
+from src.geometry.polygons import Rect, Triangle
 from src.geometry.types import Degrees
 from src.utils import get_random_color, get_random_position
 

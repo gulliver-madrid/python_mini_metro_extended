@@ -10,7 +10,7 @@ from src.entity import Station, get_random_stations
 from src.event.mouse import MouseEvent
 from src.event.type import MouseEventType
 from src.geometry.circle import Circle
-from src.geometry.rect import Rect
+from src.geometry.polygons import Rect
 from src.graph.graph_algo import bfs, build_station_nodes_dict
 from src.graph.node import Node
 from src.reactor import UI_Reactor

@@ -14,8 +14,7 @@ from src.event.mouse import MouseEvent
 from src.event.type import MouseEventType
 from src.geometry.circle import Circle
 from src.geometry.point import Point
-from src.geometry.rect import Rect
-from src.geometry.triangle import Triangle
+from src.geometry.polygons import Rect, Triangle
 from src.geometry.type import ShapeType
 from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position

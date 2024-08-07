@@ -11,8 +11,8 @@ from src.config import (
 )
 from src.entity.path import Path
 from src.geometry.circle import Circle
-from src.geometry.cross import Cross
 from src.geometry.point import Point
+from src.geometry.polygons import Cross
 from src.geometry.shape import Shape
 from src.geometry.types import Degrees
 from src.ui.button import Button

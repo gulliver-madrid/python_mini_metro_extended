@@ -11,11 +11,9 @@ from src.config import (
     station_size,
 )
 from src.geometry.circle import Circle
-from src.geometry.cross import Cross
 from src.geometry.point import Point
-from src.geometry.rect import Rect
+from src.geometry.polygons import Cross, Rect, Triangle
 from src.geometry.shape import Shape
-from src.geometry.triangle import Triangle
 from src.geometry.type import ShapeType
 from src.type import Color
 
