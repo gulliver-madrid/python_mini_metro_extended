@@ -43,7 +43,7 @@ class PathBeingCreatedOrExpanding:
             if station not in self.path.stations:
                 should_insert = self._add_station_to_path(station)
                 if should_insert:
-                    self.insert_station(station, 0)
+                    self._insert_station(station, 0)
                 assert self.is_active
                 assert self.is_expanding
                 self.path.remove_temporary_point()
@@ -88,7 +88,11 @@ class PathBeingCreatedOrExpanding:
             self._components.paths.remove(self.path)
         self._stop_creating_or_expanding()
 
-    def insert_station(self, station: Station, index: int) -> None:
+    #######################
+    ### private methods ###
+    #######################
+
+    def _insert_station(self, station: Station, index: int) -> None:
         assert self.is_active
         assert self.is_expanding
         path = self.path
@@ -96,10 +100,6 @@ class PathBeingCreatedOrExpanding:
         # we insert the station *after* that index
         path.stations.insert(index + 1, station)
         update_metros_segment_idx(path.metros, after_index=index, change=1)
-
-    #######################
-    ### private methods ###
-    #######################
 
     def _add_station_to_path(self, station: Station) -> bool:
         """Returns True if it should be inserted at start instead"""
