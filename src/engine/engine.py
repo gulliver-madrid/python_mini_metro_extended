@@ -104,10 +104,7 @@ class Engine:
                     self.steps_allowed = None
 
     def try_starting_path_edition(self, position: Point) -> None:
-        assert (
-            not self.path_manager.path_being_created
-            or not self.path_manager.path_being_created.is_active
-        )
+        assert not self.path_manager.path_being_created
         self.path_manager.try_starting_path_edition(position)
 
     def render(self, screen: pygame.surface.Surface) -> None:
@@ -120,7 +117,7 @@ class Engine:
             travel_plans=self.travel_plans,
             editing_intermediate_stations=self.path_manager.editing_intermediate_stations,
             ui=self._components.ui,
-            is_creating_path=self.path_manager.path_being_created is not None,
+            is_creating_path=bool(self.path_manager.path_being_created),
             ms_until_next_spawn=self._passenger_spawner.ms_until_next_spawn,
             showing_debug=self.showing_debug,
             game_speed=self.game_speed,

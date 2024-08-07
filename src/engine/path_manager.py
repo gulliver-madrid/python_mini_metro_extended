@@ -53,7 +53,7 @@ class PathManager:
         path = Path(color)
         path.is_being_created = True
         path.selected = True
-        assert not self.path_being_created or not self.path_being_created.is_active
+        assert not self.path_being_created
         self.path_being_created = PathBeingCreatedOrExpanding(self._components, path)
         self._components.path_color_manager.assign_color_to_path(color, path)
         self._components.paths.append(path)
@@ -65,7 +65,7 @@ class PathManager:
             return
         path = self.get_paths_with_station(station)[index]
         path.selected = True
-        assert not self.path_being_created or not self.path_being_created.is_active
+        assert not self.path_being_created
         self.path_being_created = PathBeingCreatedOrExpanding(
             self._components, path, station
         )
@@ -100,7 +100,7 @@ class PathManager:
         self.path_being_created.path.set_temporary_point(position)
 
     def try_starting_path_edition(self, position: Point) -> None:
-        assert not self.path_being_created or not self.path_being_created.is_active
+        assert not self.path_being_created
         segment: PathSegment | None = None
         for path in self._components.paths:
             segment = path.get_containing_path_segment(position)

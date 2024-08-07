@@ -103,10 +103,7 @@ class UI_Reactor:
     def _on_mouse_down(
         self, entity: Station | PathButton | None, position: Point
     ) -> None:
-        if (
-            self._engine.path_manager.path_being_created
-            and self._engine.path_manager.path_being_created.is_active
-        ):
+        if self._engine.path_manager.path_being_created:
             self._engine.path_manager.path_being_created.abort_path_creation_or_expanding()
         if isinstance(entity, Station):
             if self._last_clicked == entity:
@@ -136,10 +133,7 @@ class UI_Reactor:
 
     def _on_mouse_up(self, entity: Station | PathButton | None) -> None:
         path_manager = self._engine.path_manager
-        if (
-            path_manager.path_being_created
-            and path_manager.path_being_created.is_active
-        ):
+        if path_manager.path_being_created:
             if isinstance(entity, Station):
                 path_manager.path_being_created.try_to_end_path_on_station(entity)
             else:
@@ -153,10 +147,7 @@ class UI_Reactor:
     def _on_mouse_motion_with_mouse_down(
         self, entity: Station | PathButton | None, position: Point
     ) -> None:
-        if (
-            self._engine.path_manager.path_being_created
-            and self._engine.path_manager.path_being_created.is_active
-        ):
+        if self._engine.path_manager.path_being_created:
             if isinstance(entity, Station):
                 self._engine.path_manager.path_being_created.add_station_to_path(entity)
             else:

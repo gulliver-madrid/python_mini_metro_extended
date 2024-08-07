@@ -30,6 +30,9 @@ class PathBeingCreatedOrExpanding:
         self.is_expanding: Final = station is not None
         self._set_from_end_value(station is None or not self._is_first_station(station))
 
+    def __bool__(self) -> bool:
+        return self.is_active
+
     ######################
     ### public methods ###
     ######################
