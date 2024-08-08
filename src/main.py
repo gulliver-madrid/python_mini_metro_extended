@@ -8,6 +8,9 @@ from src.config import Config, screen_color
 from src.engine.engine import Engine
 from src.event.convert import convert_pygame_event
 from src.reactor import UI_Reactor
+from src.tools.setup_logging import configure_logger
+
+logger = configure_logger("main")
 
 
 def main() -> None:
@@ -38,6 +41,8 @@ def main() -> None:
 
     while True:
         dt_ms = clock.tick(Config.framerate)
+        logger.info(f"{dt_ms=}")
+        logger.info(f"fps: {round(clock.get_fps(), 2)}\n")
         engine.increment_time(dt_ms)
         screen.fill(screen_color)
         engine.render(screen)
