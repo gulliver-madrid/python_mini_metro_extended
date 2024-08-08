@@ -41,25 +41,21 @@ class TestGameplay(BaseTestCase):
             get_random_stations(n, passengers_mediator=self.engine.passengers_mediator)
         )
 
-    def connect_stations(self, station_idx: Sequence[int]) -> None:
+    def _send_event_to_station(
+        self, event_type: MouseEventType, station_idx: int
+    ) -> None:
         self.reactor.react(
             MouseEvent(
-                MouseEventType.MOUSE_DOWN,
-                self.engine.stations[station_idx[0]].position,
+                event_type,
+                self.engine.stations[station_idx].position,
             )
         )
-        for idx in station_idx[1:]:
-            self.reactor.react(
-                MouseEvent(
-                    MouseEventType.MOUSE_MOTION, self.engine.stations[idx].position
-                )
-            )
-        self.reactor.react(
-            MouseEvent(
-                MouseEventType.MOUSE_UP,
-                self.engine.stations[station_idx[-1]].position,
-            )
-        )
+
+    def _connect_stations(self, station_indexes: Sequence[int]) -> None:
+        self._send_event_to_station(MouseEventType.MOUSE_DOWN, station_indexes[0])
+        for idx in station_indexes[1:]:
+            self._send_event_to_station(MouseEventType.MOUSE_MOTION, idx)
+        self._send_event_to_station(MouseEventType.MOUSE_UP, station_indexes[-1])
 
     @patch.object(PathManager, "start_path_on_station", return_value=iter([None]))
     def test_react_mouse_down_start_path(self, mock_start_path_on_station: Any) -> None:
@@ -123,25 +119,25 @@ class TestGameplay(BaseTestCase):
         self.assertEqual(len(self.engine.paths), 0)
 
     def test_mouse_dragged_between_3_stations_creates_looped_path(self) -> None:
-        self.connect_stations([0, 1, 2, 0])
+        self._connect_stations([0, 1, 2, 0])
 
         self.assertEqual(len(self.engine.paths), 1)
         self.assertTrue(self.engine.paths[0].is_looped)
 
     def test_mouse_dragged_between_4_stations_creates_looped_path(self) -> None:
-        self.connect_stations([0, 1, 2, 3, 0])
+        self._connect_stations([0, 1, 2, 3, 0])
         self.assertEqual(len(self.engine.paths), 1)
         self.assertTrue(self.engine.paths[0].is_looped)
 
     def test_path_between_2_stations_is_not_looped(self) -> None:
-        self.connect_stations([0, 1])
+        self._connect_stations([0, 1])
         self.assertEqual(len(self.engine.paths), 1)
         self.assertFalse(self.engine.paths[0].is_looped)
 
     def test_mouse_dragged_between_3_stations_without_coming_back_to_first_does_not_create_loop(
         self,
     ) -> None:
-        self.connect_stations([0, 1, 2])
+        self._connect_stations([0, 1, 2])
         self.assertEqual(len(self.engine.paths), 1)
         self.assertFalse(self.engine.paths[0].is_looped)
 
@@ -162,7 +158,7 @@ class TestGameplay(BaseTestCase):
         self._replace_with_random_stations(5)
         for station in self.engine.stations:
             station.draw(self.screen)
-        self.connect_stations([0, 1])
+        self._connect_stations([0, 1])
         self.reactor.react(
             MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
         )
@@ -173,14 +169,14 @@ class TestGameplay(BaseTestCase):
         self._replace_with_random_stations(5)
         for station in self.engine.stations:
             station.draw(self.screen)
-        self.connect_stations([0, 1])
+        self._connect_stations([0, 1])
         self.assertEqual(len(self.engine.ui.path_to_button.items()), 1)
         self.assertIn(self.engine.paths[0], self.engine.ui.path_to_button)
-        self.connect_stations([2, 3])
+        self._connect_stations([2, 3])
         self.assertEqual(len(self.engine.ui.path_to_button.items()), 2)
         self.assertIn(self.engine.paths[0], self.engine.ui.path_to_button)
         self.assertIn(self.engine.paths[1], self.engine.ui.path_to_button)
-        self.connect_stations([1, 3])
+        self._connect_stations([1, 3])
         self.assertEqual(len(self.engine.ui.path_to_button.items()), 3)
         self.assertIn(self.engine.paths[0], self.engine.ui.path_to_button)
         self.assertIn(self.engine.paths[1], self.engine.ui.path_to_button)
@@ -190,14 +186,14 @@ class TestGameplay(BaseTestCase):
         self._replace_with_random_stations(5)
         for station in self.engine.stations:
             station.draw(self.screen)
-        self.connect_stations([0, 1])
-        self.connect_stations([2, 3])
-        self.connect_stations([1, 4])
+        self._connect_stations([0, 1])
+        self._connect_stations([2, 3])
+        self._connect_stations([1, 4])
         self.reactor.react(
             MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
         )
         self.assertEqual(len(self.engine.paths), 2)
-        self.connect_stations([1, 3])
+        self._connect_stations([1, 3])
         self.assertEqual(len(self.engine.paths), 3)
 
     def test_assigned_path_buttons_bubble_to_left(self) -> None:
@@ -205,9 +201,9 @@ class TestGameplay(BaseTestCase):
 
         for station in self.engine.stations:
             station.draw(self.screen)
-        self.connect_stations([0, 1])
-        self.connect_stations([2, 3])
-        self.connect_stations([1, 4])
+        self._connect_stations([0, 1])
+        self._connect_stations([2, 3])
+        self._connect_stations([1, 4])
         self.reactor.react(
             MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
         )
@@ -256,7 +252,7 @@ class TestGameplay(BaseTestCase):
     ) -> None:
         framerate: Final = 60
         dt_ms: Final = ceil(1000 / framerate)
-        self.connect_stations([0, 1, 2, 3])
+        self._connect_stations([0, 1, 2, 3])
         metros = self.engine._components.metros  # pyright: ignore [reportPrivateUsage]
         paths = self.engine._components.paths  # pyright: ignore [reportPrivateUsage]
         assert len(metros) == 1
@@ -298,44 +294,25 @@ class TestGameplay(BaseTestCase):
     def _subtest_expanding_path(self, expansion_start: int) -> None:
         # Arrange
         paths = self.engine._components.paths  # pyright: ignore [reportPrivateUsage]
-        self.connect_stations([0, 1])
-        assert len(paths) == 1, paths
+        self._connect_stations([0, 1])
+        assert len(paths) == 1
         path = paths[0]
         assert len(path.stations) == 2
 
+        expansion_end: Final = 2
+
         # Act
         # first click is for starting a new path
-        self.reactor.react(
-            MouseEvent(
-                MouseEventType.MOUSE_DOWN,
-                self.engine.stations[expansion_start].position,
-            )
-        )
-        self.reactor.react(
-            MouseEvent(
-                MouseEventType.MOUSE_UP,
-                self.engine.stations[expansion_start].position,
-            )
-        )
+        self._send_event_to_station(MouseEventType.MOUSE_DOWN, expansion_start)
+        self._send_event_to_station(MouseEventType.MOUSE_UP, expansion_start)
         # second click for expanding current path
-        self.reactor.react(
-            MouseEvent(
-                MouseEventType.MOUSE_DOWN,
-                self.engine.stations[expansion_start].position,
-            )
-        )
-        self.reactor.react(
-            MouseEvent(MouseEventType.MOUSE_MOTION, self.engine.stations[2].position)
-        )
-
-        self.reactor.react(
-            MouseEvent(
-                MouseEventType.MOUSE_UP,
-                self.engine.stations[2].position,
-            )
-        )
+        self._send_event_to_station(MouseEventType.MOUSE_DOWN, expansion_start)
+        # movement to expand
+        self._send_event_to_station(MouseEventType.MOUSE_MOTION, expansion_end)
+        # release
+        self._send_event_to_station(MouseEventType.MOUSE_UP, expansion_end)
 
         # Assert
         assert len(paths) == 1
-        path = paths[0]
+        assert path is paths[0]
         assert len(path.stations) == 3
