@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Final, Sequence
 
 from src.config import max_num_metros, max_num_paths
@@ -12,6 +14,10 @@ from .game_components import GameComponents
 from .path_being_created import PathBeingCreatedOrExpanding
 from .travel_plan_finder import TravelPlanFinder
 from .utils import update_metros_segment_idx
+from .wrapper_path_being_created import (
+    WrapperCreatingOrExpanding,
+    gen_wrapper_creating_or_expanding,
+)
 
 logger = configure_logger(__name__)
 
@@ -41,11 +47,13 @@ class PathManager:
     ### public methods ###
     ######################
 
-    def start_path_on_station(self, station: Station) -> None:
+    def start_path_on_station(
+        self, station: Station
+    ) -> WrapperCreatingOrExpanding | None:
         assert not self.path_being_created
 
         if len(self._components.paths) >= self.max_num_paths:
-            return
+            return None
 
         color = self._components.path_color_manager.get_first_path_color_available()
         assert color
@@ -57,14 +65,18 @@ class PathManager:
         self._components.paths.append(path)
 
         path.add_station(station)
+        return gen_wrapper_creating_or_expanding(self.path_being_created)
 
-    def start_expanding_path_on_station(self, station: Station, index: int) -> None:
+    def start_expanding_path_on_station(
+        self, station: Station, index: int
+    ) -> WrapperCreatingOrExpanding | None:
         assert not self.path_being_created
         path = self.get_paths_with_station(station)[index]
         path.selected = True
         self.path_being_created = PathBeingCreatedOrExpanding(
             self._components, path, station
         )
+        return gen_wrapper_creating_or_expanding(self.path_being_created)
 
     def remove_path(self, path: Path) -> None:
         self._components.ui.path_to_button[path].remove_path()

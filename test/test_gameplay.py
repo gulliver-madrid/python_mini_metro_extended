@@ -58,7 +58,7 @@ class TestGameplay(BaseTestCase):
             )
         )
 
-    @patch.object(PathManager, "start_path_on_station", new_callable=Mock)
+    @patch.object(PathManager, "start_path_on_station", return_value=iter([None]))
     def test_react_mouse_down_start_path(self, mock_start_path_on_station: Any) -> None:
         self.reactor.react(
             MouseEvent(
@@ -66,7 +66,7 @@ class TestGameplay(BaseTestCase):
                 self.engine.stations[3].position + Point(1, 1),
             )
         )
-        self.engine.path_manager.start_path_on_station.assert_called_once()  # type: ignore
+        mock_start_path_on_station.assert_called_once()
 
     def test_mouse_down_and_up_at_the_same_point_does_not_create_path(self) -> None:
         self.reactor.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))

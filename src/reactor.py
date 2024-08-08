@@ -3,6 +3,7 @@ import pygame
 from src.config import Config
 from src.console import Console
 from src.engine.engine import Engine
+from src.engine.wrapper_path_being_created import WrapperCreatingOrExpanding
 from src.entity.station import Station
 from src.event.event import Event
 from src.event.keyboard import KeyboardEvent
@@ -20,6 +21,7 @@ class UI_Reactor:
         "_console",
         "_last_clicked",
         "_index_clicked",
+        "wrapper_creating_or_expanding",
     )
 
     def __init__(self, engine: Engine) -> None:
@@ -28,6 +30,7 @@ class UI_Reactor:
         self.is_mouse_down: bool = False
         self._last_clicked: Station | None = None
         self._index_clicked = 0
+        self.wrapper_creating_or_expanding: WrapperCreatingOrExpanding | None = None
 
     def react(self, event: Event | None) -> None:
         if isinstance(event, MouseEvent):
@@ -104,7 +107,10 @@ class UI_Reactor:
         self, entity: Station | PathButton | None, position: Point
     ) -> None:
         if self._engine.path_manager.path_being_created:
-            self._engine.path_manager.path_being_created.abort_path_creation_or_expanding()
+            assert self.wrapper_creating_or_expanding
+            result = self.wrapper_creating_or_expanding.send(("mouse_down", None))
+            if result == "exit":
+                self.wrapper_creating_or_expanding = None
 
         if isinstance(entity, Station):
             if self._last_clicked == entity:
@@ -128,11 +134,17 @@ class UI_Reactor:
                 index_clicked += 1
 
             if index_clicked == 0:
-                self._engine.path_manager.start_path_on_station(entity)
-            else:
-                self._engine.path_manager.start_expanding_path_on_station(
-                    entity, index_clicked - 1
+                self.wrapper_creating_or_expanding = (
+                    self._engine.path_manager.start_path_on_station(entity)
                 )
+            else:
+                self.wrapper_creating_or_expanding = (
+                    self._engine.path_manager.start_expanding_path_on_station(
+                        entity, index_clicked - 1
+                    )
+                )
+            assert self.wrapper_creating_or_expanding
+            next(self.wrapper_creating_or_expanding)
 
         elif (
             not entity
@@ -144,11 +156,11 @@ class UI_Reactor:
     def _on_mouse_up(self, entity: Station | PathButton | None) -> None:
         path_manager = self._engine.path_manager
         if path_manager.path_being_created:
-            if isinstance(entity, Station):
-                path_manager.path_being_created.try_to_end_path_on_station(entity)
-            else:
-                path_manager.path_being_created.try_to_end_path_on_last_station()
-
+            assert self.wrapper_creating_or_expanding
+            station = entity if isinstance(entity, Station) else None
+            result = self.wrapper_creating_or_expanding.send(("mouse_up", station))
+            if result == "exit":
+                self.wrapper_creating_or_expanding = None
         elif path_manager.editing_intermediate_stations:
             path_manager.stop_edition()
         elif isinstance(entity, PathButton) and entity.path:
@@ -162,7 +174,8 @@ class UI_Reactor:
         path_manager = self._engine.path_manager
         if isinstance(entity, Station):
             if path_manager.path_being_created:
-                path_manager.path_being_created.add_station_to_path(entity)
+                assert self.wrapper_creating_or_expanding
+                self.wrapper_creating_or_expanding.send(("mouse_motion", entity))
             elif path_manager.editing_intermediate_stations:
                 path_manager.touch(entity)
         else:

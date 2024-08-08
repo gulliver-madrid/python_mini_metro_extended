@@ -61,6 +61,7 @@ class PathBeingCreatedOrExpanding:
         assert self.is_active
         path = self.path
         if station not in path.stations:
+            self.abort_path_creation_or_expanding()
             return
 
         if self.is_expanding:
@@ -71,7 +72,7 @@ class PathBeingCreatedOrExpanding:
         # the loop should have been detected in `add_station_to_path` method
         assert not self._can_make_loop(station)
 
-        assert self._is_last_station(station)  # TODO: fix private access  # test
+        assert self._is_last_station(station)  # test
         if self._can_end_with(station):
             self._finish_path_creation()
         else:
