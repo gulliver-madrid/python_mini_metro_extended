@@ -1,3 +1,5 @@
+from typing_extensions import override
+
 from src.engine.game_components import GameComponents
 from src.engine.path_being_created_or_expanded_base import (
     PathBeingCreatedOrExpandedBase,
@@ -15,6 +17,7 @@ class PathBeingExpanded(PathBeingCreatedOrExpandedBase):
         super().__init__(components, path, station)
         assert self.is_expanding
 
+    @override
     def add_station_to_path(self, station: Station) -> None:
         assert self.is_active
 
@@ -28,6 +31,7 @@ class PathBeingExpanded(PathBeingCreatedOrExpandedBase):
         self._stop_creating_or_expanding()
         # TODO: allow adding more than one station when expanding
 
+    @override
     def try_to_end_path_on_station(self, station: Station) -> None:
         """
         The station should be in the path already, we are going to end path creation.
@@ -39,10 +43,12 @@ class PathBeingExpanded(PathBeingCreatedOrExpandedBase):
             return
         self._stop_creating_or_expanding()
 
+    @override
     def abort_path_creation_or_expanding(self) -> None:
         assert self.is_active
         self._stop_creating_or_expanding()
 
+    @override
     def _add_station_to_path(self, station: Station) -> bool:
         """Returns True if it should be inserted at start instead"""
         # TODO: improve this, avoid having to return a boolean
