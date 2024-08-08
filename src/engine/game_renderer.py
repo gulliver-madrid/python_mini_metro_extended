@@ -65,7 +65,8 @@ class GameRenderer:
     ) -> None:
         for idx, path in enumerate(paths):
             path_order = idx - round(max_num_paths / 2)
-            path.draw(screen, path_order)
+            path.set_path_order(path_order)
+            path.draw(screen)
 
 
 class DebugRenderer:

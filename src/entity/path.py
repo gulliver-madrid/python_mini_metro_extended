@@ -110,12 +110,18 @@ class Path(Entity):
             )
             self._segments.append(padding_segment)
 
-    def draw(self, surface: pygame.surface.Surface, path_order: int) -> None:
+    def set_path_order(self, path_order: int) -> None:
+        if path_order != self._path_order:
+            self.update_segments()
+            self._path_order = path_order
+
+    def draw_with_order(self, surface: pygame.surface.Surface, path_order: int) -> None:
+        self._path_order = path_order
+        self.draw(surface)
+
+    def draw(self, surface: pygame.surface.Surface) -> None:
         if self.selected:
             self._draw_highlighted_stations(surface)
-
-        self._path_order = path_order
-        self.update_segments()
 
         for segment in self._segments:
             segment.draw(surface)
