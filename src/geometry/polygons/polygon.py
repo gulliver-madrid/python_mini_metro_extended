@@ -14,7 +14,7 @@ from src.config import Config
 from src.geometry.point import Point
 from src.geometry.shape import Shape
 from src.geometry.type import ShapeType
-from src.geometry.types import Degrees
+from src.geometry.types import Degrees, create_degrees
 from src.type import Color
 
 
@@ -27,7 +27,7 @@ class Polygon(Shape):
         super().__init__(shape_type, color)
         self.id = f"Polygon-{uuid()}"
         self.points = points
-        self.degrees: Degrees = Degrees(0)
+        self.degrees: Degrees = create_degrees(0)
 
     @override
     def draw(self, surface: pygame.surface.Surface, position: Point) -> None:
@@ -52,7 +52,7 @@ class Polygon(Shape):
         self.degrees = degrees
 
     def rotate(self, degree_diff: Degrees) -> None:
-        self.degrees = Degrees(self.degrees + degree_diff)
+        self.degrees = create_degrees(self.degrees + degree_diff)
 
     def get_scaled(self, f: float) -> Polygon:
         return Polygon(

@@ -3,7 +3,7 @@ from src.entity.ids import create_new_path_segment_id
 from src.entity.station import Station
 from src.geometry.line import Line
 from src.geometry.point import Point
-from src.geometry.types import Degrees
+from src.geometry.types import create_degrees
 from src.geometry.utils import get_direction
 from src.type import Color
 
@@ -45,5 +45,5 @@ def _get_offset_vector(stations: StationPair, path_order: int) -> Point:
     start_point = stations.start.position
     end_point = stations.end.position
     direct = get_direction(start_point, end_point)
-    buffer_vector = (direct * path_order_shift).rotate(Degrees(90))
+    buffer_vector = (direct * path_order_shift).rotate(create_degrees(90))
     return buffer_vector * path_order

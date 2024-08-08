@@ -9,7 +9,7 @@ from src.geometry.circle import Circle
 from src.geometry.line import Line
 from src.geometry.point import Point
 from src.geometry.polygons import Rect, Triangle
-from src.geometry.types import Degrees
+from src.geometry.types import create_degrees
 from src.utils import get_random_color, get_random_position
 
 from test.base_test import BaseTestCase
@@ -86,24 +86,24 @@ class TestGeometry(BaseTestCase):
         rect = self.init_rect()
         rect.draw(self.screen, self.position)
         rect_points = deepcopy(rect.points)
-        rect.rotate(Degrees(180))
+        rect.rotate(create_degrees(180))
         # this do nothing to points because the rotation logic
         # is actually inside `Rect.draw` method
         for point in rect.points:
             self.assertIn(point, rect_points)
-        rect.rotate(Degrees(180))
+        rect.rotate(create_degrees(180))
         self.assertSequenceEqual(rect.points, rect_points)
 
     def test_rect_set_degrees(self) -> None:
         rect = self.init_rect()
         rect.draw(self.screen, self.position)
         rect_points = deepcopy(rect.points)
-        rect.set_degrees(Degrees(180))
+        rect.set_degrees(create_degrees(180))
         # this do nothing to points because the rotation logic
         # is actually inside `Rect.draw` method
         for point in rect.points:
             self.assertIn(point, rect_points)
-        rect.set_degrees(Degrees(360))
+        rect.set_degrees(create_degrees(360))
         self.assertSequenceEqual(rect.points, rect_points)
 
     def test_line_init(self) -> None:

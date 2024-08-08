@@ -13,7 +13,7 @@ from src.entity.end_segment_behaviour import (
 from src.geometry.line import Line
 from src.geometry.point import Point
 from src.geometry.polygons import Polygon
-from src.geometry.types import Degrees
+from src.geometry.types import radians_to_degrees
 from src.geometry.utils import get_direction, get_distance
 from src.type import Color
 
@@ -266,8 +266,8 @@ class Path(Entity):
 
 def _set_rotation_angle(polygon: Polygon, direct: Point) -> None:
     radians = math.atan2(direct.top, direct.left)
-    degrees = Degrees(math.degrees(radians))
-    polygon.set_degrees((degrees))
+    degrees = radians_to_degrees(radians)
+    polygon.set_degrees(degrees)
 
 
 def get_sign(s1: Station, s2: Station) -> int:
