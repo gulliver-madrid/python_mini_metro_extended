@@ -8,7 +8,7 @@ from src.config import Config
 from src.entity.end_segment_behaviour import (
     ChangeIndex,
     ReverseDirection,
-    get_segment_end_behaviour,
+    get_segment_behaviour_at_the_end_of_the_segment,
 )
 from src.geometry.line import Line
 from src.geometry.point import Point
@@ -41,7 +41,7 @@ class Path(Entity):
 
     def __init__(self, color: Color) -> None:
         super().__init__(create_new_path_id())
-        self.color = color
+        self.color: Final = color
         self.stations: list[Station] = []
         self.metros: list[Metro] = []
         self.is_looped = False
@@ -73,23 +73,21 @@ class Path(Entity):
         path_segments: list[Segment] = []
 
         # add path segments
-        s1 = s2 = None
         for i in range(len(self.stations) - 1):
             s1 = self.stations[i]
             s2 = self.stations[i + 1]
             path_segments.append(
                 PathSegment(self.color, s1, s2, self._path_order * get_sign(s1, s2))
             )
-        del s1, s2
+            del s1, s2
 
-        s1 = s2 = None
         if self.is_looped:
             s1 = self.last_station
             s2 = self.first_station
             path_segments.append(
                 PathSegment(self.color, s1, s2, self._path_order * get_sign(s1, s2))
             )
-        del s1, s2
+            del s1, s2
 
         # add padding segments
         for current_segment, next_segment in pairwise(path_segments):
@@ -160,7 +158,7 @@ class Path(Entity):
         dst_position, dst_station = self._determine_destination(metro)
 
         # Calculate the distance and direction to the destination point
-        dist, direction = self._calculate_direction_and_distance(
+        distance_to_destination, direction = self._calculate_direction_and_distance(
             metro.position, dst_position
         )
 
@@ -169,15 +167,14 @@ class Path(Entity):
             _set_rotation_angle(metro.shape, direction)
 
         # Calculate the distance the metro can travel in this time step
-        travel_dist_in_dt = metro.game_speed * dt_ms
+        distance_can_travel = metro.game_speed * dt_ms
 
-        # If the metro has not reached the end of the segment
-        if travel_dist_in_dt < dist:
-            metro.current_station = None
-            metro.position += direction * travel_dist_in_dt
-        # If the metro has reached the end of the segment
+        segment_end_reached = distance_can_travel >= distance_to_destination
+        if segment_end_reached:
+            self._handle_metro_movement_at_the_end_of_the_segment(metro, dst_station)
         else:
-            self._handle_segment_end(metro, dst_station)
+            metro.current_station = None
+            metro.position += direction * distance_can_travel
 
     def get_containing_path_segment(self, position: Point) -> PathSegment | None:
         for segment in self.get_path_segments():
@@ -193,6 +190,9 @@ class Path(Entity):
     #########################
 
     def _determine_destination(self, metro: Metro) -> tuple[Point, Station | None]:
+        """
+        Determine the position and the possible station at the end of current segment.
+        """
         segment = metro.current_segment
         assert segment is not None
 
@@ -213,17 +213,19 @@ class Path(Entity):
     def _calculate_direction_and_distance(
         self, start_point: Point, end_point: Point
     ) -> tuple[float, Point]:
-        dist = get_distance(start_point, end_point)
+        distance = get_distance(start_point, end_point)
         direction = get_direction(start_point, end_point)
-        return dist, direction
+        return distance, direction
 
-    def _handle_segment_end(self, metro: Metro, dst_station: Station | None) -> None:
+    def _handle_metro_movement_at_the_end_of_the_segment(
+        self, metro: Metro, possible_dest_station: Station | None
+    ) -> None:
         """Handle metro movement at the end of the segment"""
         # Update the current station if necessary
-        if metro.current_station != dst_station:
-            metro.current_station = dst_station
+        if metro.current_station != possible_dest_station:
+            metro.current_station = possible_dest_station
 
-        behaviour = get_segment_end_behaviour(
+        behaviour = get_segment_behaviour_at_the_end_of_the_segment(
             len(self._segments),
             metro.current_segment_idx,
             metro.is_forward,
