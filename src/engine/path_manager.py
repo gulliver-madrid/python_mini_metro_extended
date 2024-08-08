@@ -50,7 +50,7 @@ class PathManager:
     def start_path_on_station(
         self, station: Station
     ) -> WrapperCreatingOrExpanding | None:
-        assert not self.path_being_created
+        assert not self._path_being_created
 
         if len(self._components.paths) >= self.max_num_paths:
             return None
@@ -60,23 +60,23 @@ class PathManager:
         path = Path(color)
         path.is_being_created = True
         path.selected = True
-        self.path_being_created = PathBeingCreatedOrExpanding(self._components, path)
+        self._path_being_created = PathBeingCreatedOrExpanding(self._components, path)
         self._components.path_color_manager.assign_color_to_path(color, path)
         self._components.paths.append(path)
 
         path.add_station(station)
-        return gen_wrapper_creating_or_expanding(self.path_being_created)
+        return gen_wrapper_creating_or_expanding(self._path_being_created)
 
     def start_expanding_path_on_station(
         self, station: Station, index: int
     ) -> WrapperCreatingOrExpanding | None:
-        assert not self.path_being_created
+        assert not self._path_being_created
         path = self.get_paths_with_station(station)[index]
         path.selected = True
-        self.path_being_created = PathBeingCreatedOrExpanding(
+        self._path_being_created = PathBeingCreatedOrExpanding(
             self._components, path, station
         )
-        return gen_wrapper_creating_or_expanding(self.path_being_created)
+        return gen_wrapper_creating_or_expanding(self._path_being_created)
 
     def remove_path(self, path: Path) -> None:
         self._components.ui.path_to_button[path].remove_path()
@@ -104,14 +104,14 @@ class PathManager:
                 )
 
     def try_to_set_temporary_point(self, position: Point) -> None:
-        if self.path_being_created:
+        if self._path_being_created:
             assert not self.editing_intermediate_stations
-            self.path_being_created.path.set_temporary_point(position)
+            self._path_being_created.path.set_temporary_point(position)
         elif self.editing_intermediate_stations:
             self.editing_intermediate_stations.set_temporary_point(position)
 
     def try_starting_path_edition(self, position: Point) -> None:
-        assert not self.path_being_created
+        assert not self._path_being_created
         segment: PathSegment | None = None
         for path in self._components.paths:
             segment = path.get_containing_path_segment(position)
@@ -149,12 +149,8 @@ class PathManager:
         return [path for path in self._components.paths if station in path.stations]
 
     @property
-    def path_being_created(self) -> PathBeingCreatedOrExpanding | None:
-        return self._path_being_created
-
-    @path_being_created.setter
-    def path_being_created(self, value: PathBeingCreatedOrExpanding | None) -> None:
-        self._path_being_created = value
+    def is_creating_or_expanding(self) -> bool:
+        return bool(self._path_being_created)
 
     #######################
     ### private methods ###
