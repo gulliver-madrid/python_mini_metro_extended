@@ -1,5 +1,6 @@
 import random
 import sys
+import time
 
 import numpy as np
 import pygame
@@ -41,6 +42,7 @@ def main() -> None:
 
     while True:
         dt_ms = clock.tick(Config.framerate)
+        t = time.time()
         logger.info(f"{dt_ms=}")
         logger.info(f"fps: {round(clock.get_fps(), 2)}\n")
         engine.increment_time(dt_ms)
@@ -55,6 +57,10 @@ def main() -> None:
             reactor.react(event)
 
         pygame.display.flip()
+
+        tt = time.time() - t
+        if tt > 0.06:
+            print(f"{tt=}")
 
 
 if __name__ == "__main__":
