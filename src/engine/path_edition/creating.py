@@ -62,12 +62,8 @@ class CreatingPath(CreatingOrExpandingPathBase):
     #######################
 
     @override
-    def _add_station_to_path(self, station: Station) -> bool:
-        """
-        Returns True if it should be inserted at start instead
-        """
+    def _add_station_to_path(self, station: Station) -> None:
         self._add_station_to_path_from_end(station)
-        return False
 
     def _can_end_with(self, station: Station) -> bool:
         return self._num_stations_in_this_path() > 1 and self._is_last_station(station)

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Final
 
-from src.config import Config
+
 from src.entity import Path, Station
 
 from ..game_components import GameComponents
@@ -60,9 +60,7 @@ class CreatingOrExpandingPathBase(ABC):
     #######################
 
     @abstractmethod
-    def _add_station_to_path(self, station: Station) -> bool:
-        """Returns True if it should be inserted at start instead"""
-        # TODO: improve this, avoid having to return a boolean
+    def _add_station_to_path(self, station: Station) -> None:
         raise NotImplementedError
 
     def _add_station_to_path_from_end(self, station: Station) -> None:
@@ -75,7 +73,7 @@ class CreatingOrExpandingPathBase(ABC):
             self.path.set_loop()
             return
         # non-loop
-        allowed = Config.allow_self_crossing_lines or station not in self.path.stations
+        allowed = station not in self.path.stations
         if allowed:
             self.path.add_station(station)
         return

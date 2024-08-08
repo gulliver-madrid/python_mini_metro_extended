@@ -24,11 +24,7 @@ class ExpandingPath(CreatingOrExpandingPathBase):
     def add_station_to_path(self, station: Station) -> None:
         assert self.is_active
 
-        if station in self.path.stations:
-            return
-        should_insert = self._add_station_to_path(station)
-        if should_insert:
-            self._insert_station(station, 0)
+        self._add_station_to_path(station)
         assert self.is_active
         assert self.is_expanding
         self._stop_creating_or_expanding()
@@ -52,30 +48,29 @@ class ExpandingPath(CreatingOrExpandingPathBase):
         self._stop_creating_or_expanding()
 
     @override
-    def _add_station_to_path(self, station: Station) -> bool:
-        """Returns True if it should be inserted at start instead"""
-        # TODO: improve this, avoid having to return a boolean
+    def _add_station_to_path(self, station: Station) -> None:
+        # print(f"{station=}")
+        # print(f"{self._from_end=}")
+
         if not self._from_end:
             if self._is_first_station(station):
-                return False
+                return
             assert not self.path.is_looped
             # loop
             can_make_loop = (
                 self._num_stations_in_this_path() > 2 and self._is_last_station(station)
             )
             if can_make_loop:
-                if not self._from_end:
-                    raise NotImplementedError
-                self.path.set_loop()  # TODO: adapt to expanding from start
-                return False
-            # not allowing cross lines this way
-            # TODO: make consistent (allowing or not crossing lines when creating or expanding)
-            if station not in self.path.stations:
-                return True
-            return False
+                self.path.set_loop()
+                return
+
+            allowed = station not in self.path.stations
+            if allowed:
+                self._insert_station(station, 0)
+            return
 
         self._add_station_to_path_from_end(station)
-        return False
+        return
 
     #######################
     ### private methods ###
