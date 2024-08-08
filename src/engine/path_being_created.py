@@ -28,7 +28,8 @@ class PathBeingCreatedOrExpanding:
         self.is_active = True
         self._components: Final = components
         self.is_expanding: Final = station is not None
-        self._set_from_end_value(station is None or not self._is_first_station(station))
+        self._from_end: Final = station is None or not self._is_first_station(station)
+        self.path.temp_point_is_from_end = self._from_end
 
     def __bool__(self) -> bool:
         return self.is_active
@@ -169,7 +170,3 @@ class PathBeingCreatedOrExpanding:
 
     def _can_make_loop(self, station: Station) -> bool:
         return self._num_stations_in_this_path() > 2 and self._is_first_station(station)
-
-    def _set_from_end_value(self, value: bool) -> None:
-        self._from_end = value
-        self.path.temp_point_is_from_end = value
