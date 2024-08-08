@@ -56,6 +56,14 @@ class Path(Entity):
     ### public interface ###
     ########################
 
+    @property
+    def first_station(self) -> Station:
+        return self.stations[0]
+
+    @property
+    def last_station(self) -> Station:
+        return self.stations[-1]
+
     def add_station(self, station: Station) -> None:
         self.stations.append(station)
         self.update_segments()
@@ -76,8 +84,8 @@ class Path(Entity):
 
         s1 = s2 = None
         if self.is_looped:
-            s1 = self.stations[-1]
-            s2 = self.stations[0]
+            s1 = self.last_station
+            s2 = self.first_station
             path_segments.append(
                 PathSegment(self.color, s1, s2, self._path_order * get_sign(s1, s2))
             )

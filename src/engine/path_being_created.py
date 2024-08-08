@@ -155,10 +155,10 @@ class PathBeingCreatedOrExpanding:
         return len(self.path.stations)
 
     def _is_first_station(self, station: Station) -> bool:
-        return self.path.stations[0] == station
+        return station is self.path.first_station
 
     def _is_last_station(self, station: Station) -> bool:
-        return self.path.stations[-1] == station
+        return station is self.path.last_station
 
     def _can_end_with(self, station: Station) -> bool:
         return self._num_stations_in_this_path() > 1 and self._is_last_station(station)
