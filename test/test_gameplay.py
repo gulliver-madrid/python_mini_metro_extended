@@ -1,4 +1,3 @@
-from collections.abc import Sequence
 from math import ceil
 from typing import Any, Final
 from unittest.mock import create_autospec, patch
@@ -18,10 +17,10 @@ from src.geometry.point import Point
 from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 
-from test.base_test import BaseTestCase
+from test.base_test import GameplayBaseTestCase
 
 
-class TestGameplay(BaseTestCase):
+class TestGameplay(GameplayBaseTestCase):
     def setUp(self) -> None:
         super().setUp()
         self.width, self.height = Config.screen_width, Config.screen_height
@@ -40,22 +39,6 @@ class TestGameplay(BaseTestCase):
         self.engine.stations.extend(
             get_random_stations(n, passengers_mediator=self.engine.passengers_mediator)
         )
-
-    def _send_event_to_station(
-        self, event_type: MouseEventType, station_idx: int
-    ) -> None:
-        self.reactor.react(
-            MouseEvent(
-                event_type,
-                self.engine.stations[station_idx].position,
-            )
-        )
-
-    def _connect_stations(self, station_indexes: Sequence[int]) -> None:
-        self._send_event_to_station(MouseEventType.MOUSE_DOWN, station_indexes[0])
-        for idx in station_indexes[1:]:
-            self._send_event_to_station(MouseEventType.MOUSE_MOTION, idx)
-        self._send_event_to_station(MouseEventType.MOUSE_UP, station_indexes[-1])
 
     @patch.object(PathManager, "start_path_on_station", return_value=iter([None]))
     def test_react_mouse_down_start_path(self, mock_start_path_on_station: Any) -> None:

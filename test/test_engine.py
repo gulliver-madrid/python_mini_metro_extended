@@ -1,5 +1,4 @@
 import unittest
-from collections.abc import Sequence
 from math import ceil
 from typing import Any, Final
 from unittest.mock import Mock, create_autospec, patch
@@ -19,7 +18,7 @@ from src.geometry.type import ShapeType
 from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 
-from test.base_test import BaseTestCase
+from test.base_test import GameplayBaseTestCase
 
 # some tests break under lower/higher framerate
 # TODO: analize why
@@ -27,7 +26,7 @@ framerate: Final = 60
 dt_ms: Final = ceil(1000 / framerate)
 
 
-class TestEngine(BaseTestCase):
+class TestEngine(GameplayBaseTestCase):
     def setUp(self) -> None:
         super().setUp()
         self.width, self.height = Config.screen_width, Config.screen_height
@@ -40,26 +39,6 @@ class TestEngine(BaseTestCase):
 
     def tearDown(self) -> None:
         super().tearDown()
-
-    def connect_stations(self, station_idx: Sequence[int]) -> None:
-        self.reactor.react(
-            MouseEvent(
-                MouseEventType.MOUSE_DOWN,
-                self.engine.stations[station_idx[0]].position,
-            )
-        )
-        for idx in station_idx[1:]:
-            self.reactor.react(
-                MouseEvent(
-                    MouseEventType.MOUSE_MOTION, self.engine.stations[idx].position
-                )
-            )
-        self.reactor.react(
-            MouseEvent(
-                MouseEventType.MOUSE_UP,
-                self.engine.stations[station_idx[-1]].position,
-            )
-        )
 
     def test_react_mouse_down(self) -> None:
         for station in self.engine.stations:
@@ -151,7 +130,7 @@ class TestEngine(BaseTestCase):
         for _ in range(Config.passenger_spawning.interval_step):
             self.engine.increment_time(dt_ms)
 
-        self.connect_stations([0, 1])
+        self._connect_stations([0, 1])
         self.engine.increment_time(dt_ms)
 
         for passenger in self.engine.passengers:
@@ -249,7 +228,7 @@ class TestEngine(BaseTestCase):
         )
         for station in self.engine.stations:
             station.draw(self.screen)
-        self.connect_stations([i for i in range(5)])
+        self._connect_stations([i for i in range(5)])
         self.engine._passenger_spawner._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
         self.engine._travel_plan_finder.find_travel_plan_for_passengers()  # pyright: ignore [reportPrivateUsage]
         for station in self.engine.stations:

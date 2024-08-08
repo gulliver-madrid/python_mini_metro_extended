@@ -1,5 +1,4 @@
 import unittest
-from collections.abc import Sequence
 from unittest.mock import create_autospec
 
 import pygame
@@ -7,8 +6,6 @@ import pygame
 from src.config import Config, station_color, station_size
 from src.engine.engine import Engine
 from src.entity import Station, get_random_stations
-from src.event.mouse import MouseEvent
-from src.event.type import MouseEventType
 from src.geometry.circle import Circle
 from src.geometry.polygons import Rect
 from src.graph.graph_algo import bfs, build_station_nodes_dict
@@ -16,10 +13,10 @@ from src.graph.node import Node
 from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 
-from test.base_test import BaseTestCase
+from test.base_test import GameplayBaseTestCase
 
 
-class TestGraph(BaseTestCase):
+class TestGraph(GameplayBaseTestCase):
     def setUp(self) -> None:
         super().setUp()
         self.width, self.height = Config.screen_width, Config.screen_height
@@ -38,26 +35,6 @@ class TestGraph(BaseTestCase):
         self.engine.stations.clear()
         self.engine.stations.extend(
             get_random_stations(n, passengers_mediator=self.engine.passengers_mediator)
-        )
-
-    def connect_stations(self, station_idx: Sequence[int]) -> None:
-        self.reactor.react(
-            MouseEvent(
-                MouseEventType.MOUSE_DOWN,
-                self.engine.stations[station_idx[0]].position,
-            )
-        )
-        for idx in station_idx[1:]:
-            self.reactor.react(
-                MouseEvent(
-                    MouseEventType.MOUSE_MOTION, self.engine.stations[idx].position
-                )
-            )
-        self.reactor.react(
-            MouseEvent(
-                MouseEventType.MOUSE_UP,
-                self.engine.stations[station_idx[-1]].position,
-            )
         )
 
     def test_build_station_nodes_dict(self) -> None:
@@ -86,7 +63,7 @@ class TestGraph(BaseTestCase):
         for station in self.engine.stations:
             station.draw(self.screen)
 
-        self.connect_stations([0, 1])
+        self._connect_stations([0, 1])
 
         station_nodes_dict = build_station_nodes_dict(
             self.engine.stations, self.engine.paths
@@ -100,7 +77,7 @@ class TestGraph(BaseTestCase):
         for station in self.engine.stations:
             station.draw(self.screen)
 
-        self.connect_stations([0, 1])
+        self._connect_stations([0, 1])
 
         station_nodes_dict = build_station_nodes_dict(
             self.engine.stations, self.engine.paths
@@ -120,8 +97,8 @@ class TestGraph(BaseTestCase):
         for station in self.engine.stations:
             station.draw(self.screen)
 
-        self.connect_stations([0, 1, 2])
-        self.connect_stations([0, 3])
+        self._connect_stations([0, 1, 2])
+        self._connect_stations([0, 3])
 
         station_nodes_dict = build_station_nodes_dict(
             self.engine.stations, self.engine.paths
