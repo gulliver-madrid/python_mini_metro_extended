@@ -140,6 +140,7 @@ class UI_Reactor:
                         entity, index_clicked - 1
                     )
                 )
+
             assert self.wrapper_creating_or_expanding
             next(self.wrapper_creating_or_expanding)
 

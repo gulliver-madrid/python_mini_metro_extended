@@ -20,9 +20,17 @@ class ExpandingPath(CreatingOrExpandingPathBase):
     ######################
     ### public methods ###
     ######################
+
     @override
     def add_station_to_path(self, station: Station) -> None:
         assert self.is_active
+        if station in self.path.stations:
+            if station not in (self.path.first_station, self.path.last_station):
+                return
+            if station is self.path.first_station and not self._from_end:
+                return
+            if station is self.path.last_station and self._from_end:
+                return
 
         self._add_station_to_path(station)
         assert self.is_active

@@ -13,9 +13,11 @@ def gen_wrapper_creating_or_expanding(
     creating_or_expanding: CreatingOrExpandingPathBase,
 ) -> WrapperCreatingOrExpanding:
     assert creating_or_expanding
+    print("\nentering wrapper")
 
     while True:
         mouse_op, station = yield None
+        print(f"received {mouse_op}")
 
         match mouse_op:
             case "mouse_motion":
@@ -33,5 +35,5 @@ def gen_wrapper_creating_or_expanding(
 
         if not creating_or_expanding:
             break
-
+    print("\nexiting wrapper")
     yield "exit"

@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Final
 
-
 from src.entity import Path, Station
 
 from ..game_components import GameComponents
