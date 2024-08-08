@@ -107,12 +107,9 @@ class UI_Reactor:
         self, entity: Station | PathButton | None, position: Point
     ) -> None:
         if self._engine.path_manager.path_being_created:
-            assert self.wrapper_creating_or_expanding
-            result = self.wrapper_creating_or_expanding.send(("mouse_down", None))
-            if result == "exit":
-                self.wrapper_creating_or_expanding = None
+            self._send_to_wrapper_creating_or_expanding("mouse_down", entity)
 
-        if isinstance(entity, Station):
+        elif isinstance(entity, Station):
             if self._last_clicked == entity:
                 self._index_clicked += 1
             else:
@@ -156,11 +153,7 @@ class UI_Reactor:
     def _on_mouse_up(self, entity: Station | PathButton | None) -> None:
         path_manager = self._engine.path_manager
         if path_manager.path_being_created:
-            assert self.wrapper_creating_or_expanding
-            station = entity if isinstance(entity, Station) else None
-            result = self.wrapper_creating_or_expanding.send(("mouse_up", station))
-            if result == "exit":
-                self.wrapper_creating_or_expanding = None
+            self._send_to_wrapper_creating_or_expanding("mouse_up", entity)
         elif path_manager.editing_intermediate_stations:
             path_manager.stop_edition()
         elif isinstance(entity, PathButton) and entity.path:
@@ -174,8 +167,8 @@ class UI_Reactor:
         path_manager = self._engine.path_manager
         if isinstance(entity, Station):
             if path_manager.path_being_created:
-                assert self.wrapper_creating_or_expanding
-                self.wrapper_creating_or_expanding.send(("mouse_motion", entity))
+                self._send_to_wrapper_creating_or_expanding("mouse_motion", entity)
+
             elif path_manager.editing_intermediate_stations:
                 path_manager.touch(entity)
         else:
@@ -188,3 +181,12 @@ class UI_Reactor:
             entity.on_hover()
         else:
             self._engine.ui.exit_buttons()
+
+    def _send_to_wrapper_creating_or_expanding(
+        self, command: str, entity: Station | object
+    ) -> None:
+        assert self.wrapper_creating_or_expanding
+        station = entity if isinstance(entity, Station) else None
+        result = self.wrapper_creating_or_expanding.send((command, station))
+        if result == "exit":
+            self.wrapper_creating_or_expanding = None

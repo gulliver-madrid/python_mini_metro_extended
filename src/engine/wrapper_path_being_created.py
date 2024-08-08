@@ -13,8 +13,10 @@ def gen_wrapper_creating_or_expanding(
     path_being_created: PathBeingCreatedOrExpanding,
 ) -> WrapperCreatingOrExpanding:
     assert path_being_created.is_active
+
     while True:
         mouse_op, station = yield None
+
         match mouse_op:
             case "mouse_motion":
                 assert isinstance(station, Station)
@@ -29,6 +31,7 @@ def gen_wrapper_creating_or_expanding(
                 path_being_created.abort_path_creation_or_expanding()
                 break
             case _:
-                assert False
+                assert False, f"Unknown command: {mouse_op}"
+
     assert not path_being_created.is_active
     yield "exit"
