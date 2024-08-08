@@ -13,26 +13,28 @@ from .path_finder import find_next_path_for_passenger_at_station
 
 
 class TravelPlanFinder:
-    __slots__ = ("_components",)
+    __slots__ = (
+        "_components",
+        "_station_nodes_mapping",
+    )
 
     def __init__(self, components: GameComponents):
         self._components: Final = components
+        self._station_nodes_mapping: Mapping[Station, Node] | None = None
 
     ######################
     ### public methods ###
     ######################
 
     def find_travel_plan_for_passengers(self) -> None:
-        station_nodes_mapping = build_station_nodes_dict(
+        self._station_nodes_mapping = build_station_nodes_dict(
             self._components.stations, self._components.paths
         )
         for station in self._components.stations:
             for passenger in station.passengers:
                 if _passenger_has_travel_plan_with_next_path(passenger):
                     continue
-                self._find_travel_plan_for_passenger(
-                    station_nodes_mapping, station, passenger
-                )
+                self._find_travel_plan_for_passenger(station, passenger)
 
     #######################
     ### private methods ###
@@ -40,17 +42,17 @@ class TravelPlanFinder:
 
     def _find_travel_plan_for_passenger(
         self,
-        station_nodes_mapping: Mapping[Station, Node],
         station: Station,
         passenger: Passenger,
     ) -> None:
+        assert self._station_nodes_mapping
         possible_dst_stations = self._get_stations_for_shape_type(
             passenger.destination_shape.type
         )
 
         for possible_dst_station in possible_dst_stations:
-            start = station_nodes_mapping[station]
-            end = station_nodes_mapping[possible_dst_station]
+            start = self._station_nodes_mapping[station]
+            end = self._station_nodes_mapping[possible_dst_station]
             node_path = bfs(start, end)
             if len(node_path) == 0:
                 continue
