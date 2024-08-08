@@ -3,7 +3,7 @@ from typing import Final, Mapping
 
 from src.entity import Passenger, Station
 from src.geometry.type import ShapeType
-from src.graph.graph_algo import bfs
+from src.graph.graph_algo import bfs, build_station_nodes_dict
 from src.graph.node import Node
 from src.graph.skip_intermediate import skip_stations_on_same_path
 from src.travel_plan import TravelPlan
@@ -22,7 +22,23 @@ class TravelPlanFinder:
     ### public methods ###
     ######################
 
-    def find_travel_plan_for_passenger(
+    def find_travel_plan_for_passengers(self) -> None:
+        station_nodes_mapping = build_station_nodes_dict(
+            self._components.stations, self._components.paths
+        )
+        for station in self._components.stations:
+            for passenger in station.passengers:
+                if _passenger_has_travel_plan_with_next_path(passenger):
+                    continue
+                self._find_travel_plan_for_passenger(
+                    station_nodes_mapping, station, passenger
+                )
+
+    #######################
+    ### private methods ###
+    #######################
+
+    def _find_travel_plan_for_passenger(
         self,
         station_nodes_mapping: Mapping[Station, Node],
         station: Station,
@@ -50,10 +66,6 @@ class TravelPlanFinder:
             if travel_plan != passenger.travel_plan:
                 passenger.travel_plan = travel_plan
 
-    #######################
-    ### private methods ###
-    #######################
-
     def _get_stations_for_shape_type(self, shape_type: ShapeType) -> list[Station]:
         stations = [
             station
@@ -70,3 +82,10 @@ class TravelPlanFinder:
         find_next_path_for_passenger_at_station(
             self._components.paths, passenger.travel_plan, station
         )
+
+
+def _passenger_has_travel_plan_with_next_path(passenger: Passenger) -> bool:
+    return (
+        passenger.travel_plan is not None
+        and passenger.travel_plan.next_path is not None
+    )

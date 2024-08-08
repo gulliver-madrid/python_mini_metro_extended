@@ -3,10 +3,9 @@ from __future__ import annotations
 from typing import Final, Sequence
 
 from src.config import max_num_metros, max_num_paths
-from src.entity import Metro, Passenger, Path, Station
+from src.entity import Metro, Path, Station
 from src.entity.segments import PathSegment, Segment
 from src.geometry.point import Point
-from src.graph.graph_algo import build_station_nodes_dict
 from src.tools.setup_logging import configure_logger
 
 from .editing_intermediate import EditingIntermediateStations
@@ -88,16 +87,7 @@ class PathManager:
         self.find_travel_plan_for_passengers()
 
     def find_travel_plan_for_passengers(self) -> None:
-        station_nodes_mapping = build_station_nodes_dict(
-            self._components.stations, self._components.paths
-        )
-        for station in self._components.stations:
-            for passenger in station.passengers:
-                if _passenger_has_travel_plan_with_next_path(passenger):
-                    continue
-                self._travel_plan_finder.find_travel_plan_for_passenger(
-                    station_nodes_mapping, station, passenger
-                )
+        self._travel_plan_finder.find_travel_plan_for_passengers()
 
     def try_to_set_temporary_point(self, position: Point) -> None:
         if self._path_being_created:
@@ -184,11 +174,4 @@ class PathManager:
 def _segment_has_metros(segment: Segment, metros: Sequence[Metro]) -> bool:
     return any(
         metro.current_segment == segment for metro in metros if metro.current_segment
-    )
-
-
-def _passenger_has_travel_plan_with_next_path(passenger: Passenger) -> bool:
-    return (
-        passenger.travel_plan is not None
-        and passenger.travel_plan.next_path is not None
     )
