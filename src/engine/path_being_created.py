@@ -144,10 +144,8 @@ class PathBeingCreatedOrExpanding:
         assert self.is_active
         self.path.is_being_created = False
         self.path.remove_temporary_point()
-        if len(self._components.metros) < max_num_metros:
-            metro = Metro(self._components.passengers_mediator)
-            self.path.add_metro(metro)
-            self._components.metros.append(metro)
+        if self._can_add_metro():
+            self._add_new_metro()
         self._stop_creating_or_expanding()
         self._components.ui.assign_paths_to_buttons(self._components.paths)
 
@@ -170,3 +168,11 @@ class PathBeingCreatedOrExpanding:
 
     def _can_make_loop(self, station: Station) -> bool:
         return self._num_stations_in_this_path() > 2 and self._is_first_station(station)
+
+    def _can_add_metro(self) -> bool:
+        return len(self._components.metros) < max_num_metros
+
+    def _add_new_metro(self) -> None:
+        metro = Metro(self._components.passengers_mediator)
+        self.path.add_metro(metro)
+        self._components.metros.append(metro)
