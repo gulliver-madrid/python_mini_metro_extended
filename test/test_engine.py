@@ -251,7 +251,7 @@ class TestEngine(BaseTestCase):
             station.draw(self.screen)
         self.connect_stations([i for i in range(5)])
         self.engine._passenger_spawner._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
-        self.engine.path_manager.find_travel_plan_for_passengers()
+        self.engine._travel_plan_finder.find_travel_plan_for_passengers()  # pyright: ignore [reportPrivateUsage]
         for station in self.engine.stations:
             for passenger in station.passengers:
                 assert passenger.travel_plan

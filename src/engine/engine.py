@@ -5,6 +5,7 @@ from typing import Final, NoReturn
 import pygame
 
 from src.config import Config, num_stations
+from src.engine.travel_plan_finder import TravelPlanFinder
 from src.entity import Passenger, Path, Station, get_random_stations
 from src.geometry.point import Point
 from src.passengers_mediator import PassengersMediator
@@ -30,6 +31,7 @@ class Engine:
         "_passenger_spawner",
         "_passenger_mover",
         "_game_renderer",
+        "_travel_plan_finder",
         "steps_allowed",
     )
 
@@ -48,6 +50,7 @@ class Engine:
             status=MediatorStatus(),
             passengers_mediator=passengers_mediator,
         )
+        self._travel_plan_finder = TravelPlanFinder(self._components)
 
         # status
         self.showing_debug = False
@@ -62,8 +65,10 @@ class Engine:
             self._components,
             Config.passenger_spawning.interval_step,
         )
+
         self.path_manager = PathManager(
             self._components,
+            self._travel_plan_finder,
         )
         self._passenger_mover = PassengerMover(self._components)
 
@@ -91,7 +96,7 @@ class Engine:
 
         # is this needed? or is better only to find travel plans when
         # something change (paths)
-        self.path_manager.find_travel_plan_for_passengers()
+        self._travel_plan_finder.find_travel_plan_for_passengers()
         self._move_passengers()
 
         self._move_metros(dt_ms)

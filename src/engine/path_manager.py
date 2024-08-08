@@ -32,15 +32,14 @@ class PathManager:
     )
 
     def __init__(
-        self,
-        components: GameComponents,
+        self, components: GameComponents, travel_plan_finder: TravelPlanFinder
     ):
         self.max_num_paths: Final = max_num_paths
         self.max_num_metros: Final = max_num_metros
         self._components: Final = components
         self._path_being_created: PathBeingCreatedOrExpanding | None = None
         self.editing_intermediate_stations: EditingIntermediateStations | None = None
-        self._travel_plan_finder = TravelPlanFinder(components)
+        self._travel_plan_finder: Final = travel_plan_finder
 
     ######################
     ### public methods ###
@@ -84,10 +83,7 @@ class PathManager:
         self._components.path_color_manager.release_color_for_path(path)
         self._components.paths.remove(path)
         self._components.ui.assign_paths_to_buttons(self._components.paths)
-        self.find_travel_plan_for_passengers()
-
-    def find_travel_plan_for_passengers(self) -> None:
-        self._travel_plan_finder.find_travel_plan_for_passengers()
+        self._find_travel_plan_for_passengers()
 
     def try_to_set_temporary_point(self, position: Point) -> None:
         if self._path_being_created:
@@ -164,6 +160,9 @@ class PathManager:
             metro.move_passenger(passenger, passenger.last_station)
         assert not metro.passengers
         self._components.metros.remove(metro)
+
+    def _find_travel_plan_for_passengers(self) -> None:
+        self._travel_plan_finder.find_travel_plan_for_passengers()
 
 
 ################################
