@@ -1,13 +1,16 @@
 from collections.abc import Sequence
-from typing import Any
-from unittest.mock import Mock, create_autospec, patch
+from math import ceil
+from typing import Any, Final
+from unittest.mock import create_autospec, patch
 
 import pygame
 
 from src.config import Config
+from src.engine.editing_intermediate import EditingIntermediateStations
 from src.engine.engine import Engine
 from src.engine.path_manager import PathManager
 from src.entity.get_entity import get_random_stations
+from src.entity.segments import PathSegment
 from src.event.keyboard import KeyboardEvent
 from src.event.mouse import MouseEvent
 from src.event.type import KeyboardEventType, MouseEventType
@@ -247,3 +250,37 @@ class TestGameplay(BaseTestCase):
                 self.engine.stations[1].position,
             )
         )
+
+    def test_that_removing_the_initial_station_doesnt_cause_list_index_out_of_range_if_metro_is_in_the_last_segment(
+        self,
+    ) -> None:
+        framerate: Final = 60
+        dt_ms: Final = ceil(1000 / framerate)
+        self.connect_stations([0, 1, 2, 3])
+        metros = self.engine._components.metros  # pyright: ignore [reportPrivateUsage]
+        paths = self.engine._components.paths  # pyright: ignore [reportPrivateUsage]
+        assert len(metros) == 1
+        assert len(paths) == 1
+        metro = metros[0]
+        path = paths[0]
+        # run until the train is in the last segment
+        while True:
+            self.engine.increment_time(dt_ms)
+            if (
+                metro.current_segment_idx
+                == len(path._segments) - 1  # pyright: ignore [reportPrivateUsage]
+            ):
+                break
+        first = path._segments[0]  # pyright: ignore [reportPrivateUsage]
+        assert isinstance(first, PathSegment)
+
+        # remove first station
+        editing = EditingIntermediateStations(path, first)
+        editing.remove_station(self.engine.stations[0])
+
+        # resume running (the bug raised here)
+        while metro.is_forward:
+            self.engine.increment_time(dt_ms)
+
+        # removing was ok
+        assert len(path.stations) == 3

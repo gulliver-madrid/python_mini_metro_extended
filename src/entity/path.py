@@ -229,12 +229,17 @@ class Path(Entity):
             metro.is_forward,
             self.is_looped,
         )
-        match behaviour:
-            case ChangeIndex(value):
-                metro.current_segment_idx = value
-                metro.current_segment = self._segments[metro.current_segment_idx]
-            case ReverseDirection():
-                metro.is_forward = not metro.is_forward
+        while True:
+            match behaviour:
+                case ChangeIndex(value):
+                    if value >= len(self._segments):
+                        behaviour = ReverseDirection()
+                        continue
+                    metro.current_segment_idx = value
+                    metro.current_segment = self._segments[metro.current_segment_idx]
+                case ReverseDirection():
+                    metro.is_forward = not metro.is_forward
+            break
 
     def _draw_highlighted_stations(self, surface: pygame.surface.Surface) -> None:
         surface_size = surface.get_size()
