@@ -3,6 +3,10 @@ from __future__ import annotations
 from typing import Final, Sequence
 
 from src.config import max_num_metros, max_num_paths
+from src.engine.path_being_created_or_expanded_base import (
+    PathBeingCreatedOrExpandedBase,
+)
+from src.engine.path_being_expanded import PathBeingExpanded
 from src.entity import Metro, Path, Station
 from src.entity.segments import PathSegment, Segment
 from src.geometry.point import Point
@@ -10,7 +14,7 @@ from src.tools.setup_logging import configure_logger
 
 from .editing_intermediate import EditingIntermediateStations
 from .game_components import GameComponents
-from .path_being_created import PathBeingCreatedOrExpanding
+from .path_being_created import PathBeingCreated
 from .travel_plan_finder import TravelPlanFinder
 from .utils import update_metros_segment_idx
 from .wrapper_path_being_created import (
@@ -26,7 +30,7 @@ class PathManager:
         "_components",
         "max_num_paths",
         "max_num_metros",
-        "_path_being_created",
+        "_path_being_created_or_expanded",
         "editing_intermediate_stations",
         "_travel_plan_finder",
     )
@@ -37,7 +41,9 @@ class PathManager:
         self.max_num_paths: Final = max_num_paths
         self.max_num_metros: Final = max_num_metros
         self._components: Final = components
-        self._path_being_created: PathBeingCreatedOrExpanding | None = None
+        self._path_being_created_or_expanded: PathBeingCreatedOrExpandedBase | None = (
+            None
+        )
         self.editing_intermediate_stations: EditingIntermediateStations | None = None
         self._travel_plan_finder: Final = travel_plan_finder
 
@@ -48,7 +54,7 @@ class PathManager:
     def start_path_on_station(
         self, station: Station
     ) -> WrapperCreatingOrExpanding | None:
-        assert not self._path_being_created
+        assert not self._path_being_created_or_expanded
 
         if len(self._components.paths) >= self.max_num_paths:
             return None
@@ -58,23 +64,23 @@ class PathManager:
         path = Path(color)
         path.is_being_created = True
         path.selected = True
-        self._path_being_created = PathBeingCreatedOrExpanding(self._components, path)
+        self._path_being_created_or_expanded = PathBeingCreated(self._components, path)
         self._components.path_color_manager.assign_color_to_path(color, path)
         self._components.paths.append(path)
 
         path.add_station(station)
-        return gen_wrapper_creating_or_expanding(self._path_being_created)
+        return gen_wrapper_creating_or_expanding(self._path_being_created_or_expanded)
 
     def start_expanding_path_on_station(
         self, station: Station, index: int
     ) -> WrapperCreatingOrExpanding | None:
-        assert not self._path_being_created
+        assert not self._path_being_created_or_expanded
         path = self.get_paths_with_station(station)[index]
         path.selected = True
-        self._path_being_created = PathBeingCreatedOrExpanding(
+        self._path_being_created_or_expanded = PathBeingExpanded(
             self._components, path, station
         )
-        return gen_wrapper_creating_or_expanding(self._path_being_created)
+        return gen_wrapper_creating_or_expanding(self._path_being_created_or_expanded)
 
     def remove_path(self, path: Path) -> None:
         self._components.ui.path_to_button[path].remove_path()
@@ -86,14 +92,14 @@ class PathManager:
         self._find_travel_plan_for_passengers()
 
     def try_to_set_temporary_point(self, position: Point) -> None:
-        if self._path_being_created:
+        if self._path_being_created_or_expanded:
             assert not self.editing_intermediate_stations
-            self._path_being_created.path.set_temporary_point(position)
+            self._path_being_created_or_expanded.path.set_temporary_point(position)
         elif self.editing_intermediate_stations:
             self.editing_intermediate_stations.set_temporary_point(position)
 
     def try_starting_path_edition(self, position: Point) -> None:
-        assert not self._path_being_created
+        assert not self._path_being_created_or_expanded
         segment: PathSegment | None = None
         for path in self._components.paths:
             segment = path.get_containing_path_segment(position)
@@ -132,7 +138,7 @@ class PathManager:
 
     @property
     def is_creating_or_expanding(self) -> bool:
-        return bool(self._path_being_created)
+        return bool(self._path_being_created_or_expanded)
 
     #######################
     ### private methods ###
