@@ -4,6 +4,7 @@ from src.engine.game_components import GameComponents
 from src.engine.path_being_created_or_expanded_base import (
     PathBeingCreatedOrExpandedBase,
 )
+from src.engine.utils import update_metros_segment_idx
 from src.entity.path import Path
 from src.entity.station import Station
 
@@ -17,6 +18,9 @@ class PathBeingExpanded(PathBeingCreatedOrExpandedBase):
         super().__init__(components, path, station)
         assert self.is_expanding
 
+    ######################
+    ### public methods ###
+    ######################
     @override
     def add_station_to_path(self, station: Station) -> None:
         assert self.is_active
@@ -73,3 +77,16 @@ class PathBeingExpanded(PathBeingCreatedOrExpandedBase):
 
         self._add_station_to_path_from_end(station)
         return False
+
+    #######################
+    ### private methods ###
+    #######################
+
+    def _insert_station(self, station: Station, index: int) -> None:
+        assert self.is_active
+        assert self.is_expanding
+        path = self.path
+        index = index - 1
+        # we insert the station *after* that index
+        path.stations.insert(index + 1, station)
+        update_metros_segment_idx(path.metros, after_index=index, change=1)

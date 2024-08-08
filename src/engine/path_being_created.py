@@ -1,9 +1,11 @@
 from typing_extensions import override
 
+from src.config import max_num_metros
 from src.engine.game_components import GameComponents
 from src.engine.path_being_created_or_expanded_base import (
     PathBeingCreatedOrExpandedBase,
 )
+from src.entity.metro import Metro
 from src.entity.path import Path
 from src.entity.station import Station
 
@@ -17,6 +19,10 @@ class PathBeingCreated(PathBeingCreatedOrExpandedBase):
         super().__init__(components, path)
         assert not self.is_expanding
         assert self._from_end
+
+    ######################
+    ### public methods ###
+    ######################
 
     @override
     def add_station_to_path(self, station: Station) -> None:
@@ -52,6 +58,10 @@ class PathBeingCreated(PathBeingCreatedOrExpandedBase):
         self._remove_path_from_network()
         self._stop_creating_or_expanding()
 
+    #######################
+    ### private methods ###
+    #######################
+
     @override
     def _add_station_to_path(self, station: Station) -> bool:
         """
@@ -59,3 +69,26 @@ class PathBeingCreated(PathBeingCreatedOrExpandedBase):
         """
         self._add_station_to_path_from_end(station)
         return False
+
+    def _can_end_with(self, station: Station) -> bool:
+        return self._num_stations_in_this_path() > 1 and self._is_last_station(station)
+
+    def _can_add_metro(self) -> bool:
+        return len(self._components.metros) < max_num_metros
+
+    def _add_new_metro(self) -> None:
+        metro = Metro(self._components.passengers_mediator)
+        self.path.add_metro(metro)
+        self._components.metros.append(metro)
+
+    def _finish_path_creation(self) -> None:
+        assert self.is_active
+        self.path.is_being_created = False
+        if self._can_add_metro():
+            self._add_new_metro()
+        self._stop_creating_or_expanding()
+        self._components.ui.assign_paths_to_buttons(self._components.paths)
+
+    def _remove_path_from_network(self) -> None:
+        self._components.path_color_manager.release_color_for_path(self.path)
+        self._components.paths.remove(self.path)
