@@ -21,19 +21,17 @@ def gen_wrapper_creating_or_expanding(
             case "mouse_motion":
                 assert isinstance(station, Station)
                 path_being_created.add_station_to_path(station)
-                if not path_being_created:
-                    break
             case "mouse_up":
                 if isinstance(station, Station):
                     path_being_created.try_to_end_path_on_station(station)
                 else:
                     path_being_created.try_to_end_path_on_last_station()
-                break
             case "mouse_down":
                 path_being_created.abort_path_creation_or_expanding()
-                break
             case _:
                 assert False, f"Unknown command: {mouse_op}"
 
-    assert not path_being_created
+        if not path_being_created:
+            break
+
     yield "exit"
