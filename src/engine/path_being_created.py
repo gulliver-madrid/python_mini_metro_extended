@@ -51,4 +51,5 @@ class PathBeingCreated(PathBeingCreatedOrExpandedBase):
         """
         Returns True if it should be inserted at start instead
         """
-        return self._add_station_to_path_from_end(station)
+        self._add_station_to_path_from_end(station)
+        return False

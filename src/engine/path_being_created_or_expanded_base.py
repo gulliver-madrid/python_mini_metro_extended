@@ -78,24 +78,20 @@ class PathBeingCreatedOrExpandedBase(ABC):
         # TODO: improve this, avoid having to return a boolean
         raise NotImplementedError
 
-    def _add_station_to_path_from_end(self, station: Station) -> bool:
-        """
-        Returns True if it should be inserted at start instead
-        """
-        # TODO: improve this, avoid having to return a boolean
+    def _add_station_to_path_from_end(self, station: Station) -> None:
         assert self._from_end
         if self._is_last_station(station):
-            return False
+            return
         assert not self.path.is_looped
         # loop
         if self._can_make_loop(station):
             self.path.set_loop()
-            return False
+            return
         # non-loop
         allowed = Config.allow_self_crossing_lines or station not in self.path.stations
         if allowed:
             self.path.add_station(station)
-        return False
+        return
 
     def _finish_path_creation(self) -> None:
         assert self.is_active

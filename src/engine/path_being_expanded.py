@@ -65,4 +65,5 @@ class PathBeingExpanded(PathBeingCreatedOrExpandedBase):
                 return True
             return False
 
-        return self._add_station_to_path_from_end(station)
+        self._add_station_to_path_from_end(station)
+        return False
