@@ -46,11 +46,7 @@ class Passenger(Entity):
         return self._travel_plan
 
     @travel_plan.setter
-    def travel_plan(self, value: TravelPlanProtocol) -> None:
-        if self._travel_plan:
+    def travel_plan(self, value: TravelPlanProtocol | None) -> None:
+        if self._travel_plan and value:
             assert value.node_path != self._travel_plan.node_path
         self._travel_plan = value
-
-    @travel_plan.deleter
-    def travel_plan(self) -> None:
-        self._travel_plan = None

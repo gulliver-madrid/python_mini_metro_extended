@@ -66,7 +66,7 @@ class PassengerMover:
         for passenger in to_arrive:
             passenger.is_at_destination = True
             metro.passenger_arrives(passenger)
-            del passenger.travel_plan
+            passenger.travel_plan = None
             self._components.status.score += 1
 
     def _transfer_passengers_from_metro_to_station(
