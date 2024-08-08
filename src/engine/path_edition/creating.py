@@ -2,15 +2,14 @@ from typing_extensions import override
 
 from src.config import max_num_metros
 from src.engine.game_components import GameComponents
-from src.engine.path_being_created_or_expanded_base import (
-    PathBeingCreatedOrExpandedBase,
-)
 from src.entity.metro import Metro
 from src.entity.path import Path
 from src.entity.station import Station
 
+from .creating_or_expanding_base import CreatingOrExpandingPathBase
 
-class PathBeingCreated(PathBeingCreatedOrExpandedBase):
+
+class CreatingPath(CreatingOrExpandingPathBase):
     """Creating"""
 
     __slots__ = ()

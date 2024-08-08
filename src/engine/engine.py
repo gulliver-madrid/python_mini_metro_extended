@@ -5,7 +5,6 @@ from typing import Final, NoReturn
 import pygame
 
 from src.config import Config, num_stations
-from src.engine.travel_plan_finder import TravelPlanFinder
 from src.entity import Passenger, Path, Station, get_random_stations
 from src.geometry.point import Point
 from src.passengers_mediator import PassengersMediator
@@ -18,6 +17,7 @@ from .passenger_mover import PassengerMover
 from .passenger_spawner import PassengerSpawner, TravelPlansMapping
 from .path_manager import PathManager
 from .status import MediatorStatus
+from .travel_plan_finder import TravelPlanFinder
 
 pp = pprint.PrettyPrinter(indent=4)
 

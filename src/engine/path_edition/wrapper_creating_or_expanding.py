@@ -2,7 +2,7 @@ from typing import Generator, Literal
 
 from src.entity import Station
 
-from .path_being_created_or_expanded_base import PathBeingCreatedOrExpandedBase
+from .creating_or_expanding_base import CreatingOrExpandingPathBase
 
 WrapperCreatingOrExpanding = Generator[
     Literal["exit"] | None, tuple[str, Station | None], None
@@ -10,7 +10,7 @@ WrapperCreatingOrExpanding = Generator[
 
 
 def gen_wrapper_creating_or_expanding(
-    creating_or_expanding: PathBeingCreatedOrExpandedBase,
+    creating_or_expanding: CreatingOrExpandingPathBase,
 ) -> WrapperCreatingOrExpanding:
     assert creating_or_expanding
 

@@ -4,10 +4,10 @@ from typing import Final
 from src.config import Config
 from src.entity import Path, Station
 
-from .game_components import GameComponents
+from ..game_components import GameComponents
 
 
-class PathBeingCreatedOrExpandedBase(ABC):
+class CreatingOrExpandingPathBase(ABC):
     """Created or expanding"""
 
     __slots__ = (

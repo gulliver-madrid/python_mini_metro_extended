@@ -3,7 +3,7 @@ import pygame
 from src.config import Config
 from src.console import Console
 from src.engine.engine import Engine
-from src.engine.wrapper_path_being_created import WrapperCreatingOrExpanding
+from src.engine.path_edition import WrapperCreatingOrExpanding
 from src.entity.station import Station
 from src.event.event import Event
 from src.event.keyboard import KeyboardEvent

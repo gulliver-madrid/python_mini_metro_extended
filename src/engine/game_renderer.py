@@ -4,13 +4,13 @@ from typing import Final
 import pygame
 
 from src.config import Config
-from src.engine.editing_intermediate import EditingIntermediateStations
 from src.entity import Passenger, Path
 from src.geometry.point import Point
 from src.ui.ui import UI
 
 from .game_components import GameComponents
 from .passenger_spawner import TravelPlansMapping
+from .path_edition import EditingIntermediateStations
 
 
 class GameRenderer:

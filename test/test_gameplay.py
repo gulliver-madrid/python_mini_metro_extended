@@ -5,8 +5,8 @@ from unittest.mock import create_autospec, patch
 import pygame
 
 from src.config import Config
-from src.engine.editing_intermediate import EditingIntermediateStations
 from src.engine.engine import Engine
+from src.engine.path_edition import EditingIntermediateStations
 from src.engine.path_manager import PathManager
 from src.entity.get_entity import get_random_stations
 from src.entity.segments import PathSegment

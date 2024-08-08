@@ -1,15 +1,14 @@
 from typing_extensions import override
 
 from src.engine.game_components import GameComponents
-from src.engine.path_being_created_or_expanded_base import (
-    PathBeingCreatedOrExpandedBase,
-)
 from src.engine.utils import update_metros_segment_idx
 from src.entity.path import Path
 from src.entity.station import Station
 
+from .creating_or_expanding_base import CreatingOrExpandingPathBase
 
-class PathBeingExpanded(PathBeingCreatedOrExpandedBase):
+
+class ExpandingPath(CreatingOrExpandingPathBase):
     """Expanding"""
 
     __slots__ = ()
