@@ -47,7 +47,6 @@ class PathBeingCreatedOrExpanding:
                     self._insert_station(station, 0)
                 assert self.is_active
                 assert self.is_expanding
-                self.path.remove_temporary_point()
                 self._stop_creating_or_expanding()
                 # TODO: allow adding more than one station when expanding
             return
@@ -66,7 +65,6 @@ class PathBeingCreatedOrExpanding:
             return
 
         if self.is_expanding:
-            self.path.remove_temporary_point()
             self._stop_creating_or_expanding()
             return
 
@@ -87,8 +85,7 @@ class PathBeingCreatedOrExpanding:
     def abort_path_creation_or_expanding(self) -> None:
         assert self.is_active
         if not self.is_expanding:
-            self._components.path_color_manager.release_color_for_path(self.path)
-            self._components.paths.remove(self.path)
+            self._remove_path_from_network()
         self._stop_creating_or_expanding()
 
     #######################
@@ -143,7 +140,6 @@ class PathBeingCreatedOrExpanding:
     def _finish_path_creation(self) -> None:
         assert self.is_active
         self.path.is_being_created = False
-        self.path.remove_temporary_point()
         if self._can_add_metro():
             self._add_new_metro()
         self._stop_creating_or_expanding()
@@ -151,6 +147,7 @@ class PathBeingCreatedOrExpanding:
 
     def _stop_creating_or_expanding(self) -> None:
         assert self.is_active
+        self.path.remove_temporary_point()
         self.path.selected = False
         self.is_active = False
 
@@ -176,3 +173,7 @@ class PathBeingCreatedOrExpanding:
         metro = Metro(self._components.passengers_mediator)
         self.path.add_metro(metro)
         self._components.metros.append(metro)
+
+    def _remove_path_from_network(self) -> None:
+        self._components.path_color_manager.release_color_for_path(self.path)
+        self._components.paths.remove(self.path)
