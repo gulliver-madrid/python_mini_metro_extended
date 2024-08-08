@@ -13,6 +13,8 @@ from src.tools.setup_logging import configure_logger
 
 logger = configure_logger("main")
 
+DEBUG_TIME = False
+
 
 def main() -> None:
     pygame.init()
@@ -59,8 +61,9 @@ def main() -> None:
         pygame.display.flip()
 
         tt = time.time() - t
-        if tt > 0.06:
-            print(f"{tt=}")
+        if DEBUG_TIME:
+            if tt > 0.06:
+                print(f"{tt=}")
 
 
 if __name__ == "__main__":
