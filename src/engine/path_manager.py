@@ -81,11 +81,7 @@ class PathManager:
     def remove_path(self, path: Path) -> None:
         self._components.ui.path_to_button[path].remove_path()
         for metro in path.metros:
-            for passenger in metro.passengers[:]:
-                assert passenger.last_station
-                metro.move_passenger(passenger, passenger.last_station)
-            assert not metro.passengers
-            self._components.metros.remove(metro)
+            self._remove_metro(metro)
         self._components.path_color_manager.release_color_for_path(path)
         self._components.paths.remove(path)
         self._components.ui.assign_paths_to_buttons(self._components.paths)
@@ -171,6 +167,13 @@ class PathManager:
         assert self.editing_intermediate_stations
         self.editing_intermediate_stations.remove_station(station)
         self.stop_edition()
+
+    def _remove_metro(self, metro: Metro) -> None:
+        for passenger in metro.passengers[:]:
+            assert passenger.last_station
+            metro.move_passenger(passenger, passenger.last_station)
+        assert not metro.passengers
+        self._components.metros.remove(metro)
 
 
 ################################
