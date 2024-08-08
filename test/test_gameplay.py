@@ -290,7 +290,11 @@ class TestGameplay(GameplayBaseTestCase):
         self._send_event_to_station(MouseEventType.MOUSE_UP, expansion_start)
         # second click for expanding current path
         self._send_event_to_station(MouseEventType.MOUSE_DOWN, expansion_start)
-        # movement to expand
+        # movement to expand: first a small move
+        self._send_event_to_station(
+            MouseEventType.MOUSE_MOTION, expansion_start, Point(2, 2)
+        )
+        # after, go to the station target
         self._send_event_to_station(MouseEventType.MOUSE_MOTION, expansion_end)
         # release
         self._send_event_to_station(MouseEventType.MOUSE_UP, expansion_end)

@@ -6,6 +6,7 @@ from unittest.mock import Mock
 import numpy as np
 import pygame
 
+from src.geometry.point import Point
 from src.engine.engine import Engine
 from src.event.mouse import MouseEvent
 from src.event.type import MouseEventType
@@ -36,14 +37,15 @@ class GameplayBaseTestCase(BaseTestCase):
     engine: Engine
 
     def _send_event_to_station(
-        self, event_type: MouseEventType, station_idx: int
+        self,
+        event_type: MouseEventType,
+        station_idx: int,
+        modified: Point | None = None,
     ) -> None:
-        self.reactor.react(
-            MouseEvent(
-                event_type,
-                self.engine.stations[station_idx].position,
-            )
-        )
+        position = self.engine.stations[station_idx].position
+        if modified:
+            position += modified
+        self.reactor.react(MouseEvent(event_type, position))
 
     def _connect_stations(self, station_indexes: Sequence[int]) -> None:
         self._send_event_to_station(MouseEventType.MOUSE_DOWN, station_indexes[0])
