@@ -284,3 +284,58 @@ class TestGameplay(BaseTestCase):
 
         # removing was ok
         assert len(path.stations) == 3
+
+    def test_expanding_path(self) -> None:
+        """Test than path can be expanded from the start or from the end"""
+        for expansion_start in (0, 1):
+            with self.subTest(expansion_start=expansion_start):
+                self.setUp()
+                try:
+                    self._subtest_expanding_path(expansion_start)
+                finally:
+                    self.tearDown()
+
+    def _subtest_expanding_path(self, expansion_start: int) -> None:
+        # Arrange
+        paths = self.engine._components.paths  # pyright: ignore [reportPrivateUsage]
+        self.connect_stations([0, 1])
+        assert len(paths) == 1, paths
+        path = paths[0]
+        assert len(path.stations) == 2
+
+        # Act
+        # first click is for starting a new path
+        self.reactor.react(
+            MouseEvent(
+                MouseEventType.MOUSE_DOWN,
+                self.engine.stations[expansion_start].position,
+            )
+        )
+        self.reactor.react(
+            MouseEvent(
+                MouseEventType.MOUSE_UP,
+                self.engine.stations[expansion_start].position,
+            )
+        )
+        # second click for expanding current path
+        self.reactor.react(
+            MouseEvent(
+                MouseEventType.MOUSE_DOWN,
+                self.engine.stations[expansion_start].position,
+            )
+        )
+        self.reactor.react(
+            MouseEvent(MouseEventType.MOUSE_MOTION, self.engine.stations[2].position)
+        )
+
+        self.reactor.react(
+            MouseEvent(
+                MouseEventType.MOUSE_UP,
+                self.engine.stations[2].position,
+            )
+        )
+
+        # Assert
+        assert len(paths) == 1
+        path = paths[0]
+        assert len(path.stations) == 3
