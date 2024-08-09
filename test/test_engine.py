@@ -100,8 +100,7 @@ class TestEngine(GameplayBaseTestCase):
                 )
 
     def test_passengers_at_connected_stations_have_a_way_to_destination(self) -> None:
-        self.engine.stations.clear()
-        self.engine.stations.extend(
+        self._replace_stations(
             [
                 Station(
                     Rect(
@@ -153,8 +152,7 @@ class TestEngine(GameplayBaseTestCase):
             self.assertIsNone(passenger.travel_plan.next_station)
 
     def test_get_station_for_shape_type(self) -> None:
-        self.engine.stations.clear()
-        self.engine.stations.extend(
+        self._replace_stations(
             [
                 Station(
                     Rect(
@@ -222,10 +220,7 @@ class TestEngine(GameplayBaseTestCase):
         self.assertCountEqual(triangle_stations, self.engine.stations[3:])
 
     def test_skip_stations_on_same_path(self) -> None:
-        self.engine.stations.clear()
-        self.engine.stations.extend(
-            get_random_stations(5, self.engine.passengers_mediator)
-        )
+        self._replace_stations(get_random_stations(5, self.engine.passengers_mediator))
         for station in self.engine.stations:
             station.draw(self.screen)
         self._connect_stations([i for i in range(5)])

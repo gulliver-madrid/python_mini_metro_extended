@@ -6,10 +6,11 @@ from unittest.mock import Mock
 import numpy as np
 import pygame
 
-from src.geometry.point import Point
 from src.engine.engine import Engine
+from src.entity.station import Station
 from src.event.mouse import MouseEvent
 from src.event.type import MouseEventType
+from src.geometry.point import Point
 from src.reactor import UI_Reactor
 
 from test.random_seed_config import RANDOM_SEED
@@ -35,6 +36,10 @@ class BaseTestCase(FixedRandomSeedTestCase):
 class GameplayBaseTestCase(BaseTestCase):
     reactor: UI_Reactor
     engine: Engine
+
+    def _replace_stations(self, stations: Sequence[Station]) -> None:
+        self.engine.stations.clear()
+        self.engine.stations.extend(stations)
 
     def _send_event_to_station(
         self,

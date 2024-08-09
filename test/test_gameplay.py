@@ -35,8 +35,7 @@ class TestGameplay(GameplayBaseTestCase):
         super().tearDown()
 
     def _replace_with_random_stations(self, n: int) -> None:
-        self.engine.stations.clear()
-        self.engine.stations.extend(
+        self._replace_stations(
             get_random_stations(n, passengers_mediator=self.engine.passengers_mediator)
         )
 
@@ -290,7 +289,7 @@ class TestGameplay(GameplayBaseTestCase):
         self._send_event_to_station(MouseEventType.MOUSE_UP, expansion_start)
         # second click for expanding current path
         self._send_event_to_station(MouseEventType.MOUSE_DOWN, expansion_start)
-        # movement to expand: first a small move
+        # movement to expand: first a small move (realistic human)
         self._send_event_to_station(
             MouseEventType.MOUSE_MOTION, expansion_start, Point(2, 2)
         )

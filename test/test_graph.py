@@ -32,14 +32,12 @@ class TestGraph(GameplayBaseTestCase):
         super().tearDown()
 
     def _replace_with_random_stations(self, n: int) -> None:
-        self.engine.stations.clear()
-        self.engine.stations.extend(
+        self._replace_stations(
             get_random_stations(n, passengers_mediator=self.engine.passengers_mediator)
         )
 
     def test_build_station_nodes_dict(self) -> None:
-        self.engine.stations.clear()
-        self.engine.stations.extend(
+        self._replace_stations(
             [
                 Station(
                     Rect(
