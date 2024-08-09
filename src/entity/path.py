@@ -118,6 +118,7 @@ class Path(Entity):
             self._path_order = path_order
 
     def draw_with_order(self, surface: pygame.surface.Surface, path_order: int) -> None:
+        # legacy, used in tests
         self._path_order = path_order
         self.draw(surface)
 
