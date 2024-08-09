@@ -69,7 +69,7 @@ class Path(Entity):
         self.update_segments()
 
     def update_segments(self) -> None:
-        self._segments.clear()
+        segments: list[Segment] = []
         path_segments: list[Segment] = []
 
         # add path segments
@@ -96,11 +96,11 @@ class Path(Entity):
                 current_segment.end,
                 next_segment.start,
             )
-            self._segments.append(current_segment)
-            self._segments.append(padding_segment)
+            segments.append(current_segment)
+            segments.append(padding_segment)
 
         if path_segments:
-            self._segments.append(path_segments[-1])
+            segments.append(path_segments[-1])
 
         if self.is_looped:
             padding_segment = PaddingSegment(
@@ -108,7 +108,9 @@ class Path(Entity):
                 path_segments[-1].end,
                 path_segments[0].start,
             )
-            self._segments.append(padding_segment)
+            segments.append(padding_segment)
+        self._segments.clear()
+        self._segments.extend(segments)
 
     def set_path_order(self, path_order: int) -> None:
         if path_order != self._path_order:
