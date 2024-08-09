@@ -1,4 +1,5 @@
 import math
+from collections.abc import Sequence
 from itertools import pairwise
 from typing import Final
 
@@ -69,46 +70,9 @@ class Path(Entity):
         self.update_segments()
 
     def update_segments(self) -> None:
-        segments: list[Segment] = []
-        path_segments: list[Segment] = []
-
-        # add path segments
-        for i in range(len(self.stations) - 1):
-            s1 = self.stations[i]
-            s2 = self.stations[i + 1]
-            path_segments.append(
-                PathSegment(self.color, s1, s2, self._path_order * get_sign(s1, s2))
-            )
-            del s1, s2
-
-        if self.is_looped:
-            s1 = self.last_station
-            s2 = self.first_station
-            path_segments.append(
-                PathSegment(self.color, s1, s2, self._path_order * get_sign(s1, s2))
-            )
-            del s1, s2
-
-        # add padding segments
-        for current_segment, next_segment in pairwise(path_segments):
-            padding_segment = PaddingSegment(
-                self.color,
-                current_segment.end,
-                next_segment.start,
-            )
-            segments.append(current_segment)
-            segments.append(padding_segment)
-
-        if path_segments:
-            segments.append(path_segments[-1])
-
-        if self.is_looped:
-            padding_segment = PaddingSegment(
-                self.color,
-                path_segments[-1].end,
-                path_segments[0].start,
-            )
-            segments.append(padding_segment)
+        segments: list[Segment] = _get_updated_segments(
+            self.stations, self.color, self._path_order, self.is_looped
+        )
         self._segments.clear()
         self._segments.extend(segments)
 
@@ -283,3 +247,49 @@ def get_sign(s1: Station, s2: Station) -> int:
         return 1
     else:
         return -1
+
+
+def _get_updated_segments(
+    stations: Sequence[Station],
+    color: Color,
+    path_order: int,
+    is_looped: bool,
+) -> list[Segment]:
+    segments: list[Segment] = []
+    path_segments: list[Segment] = []
+
+    # add path segments
+    for i in range(len(stations) - 1):
+        s1 = stations[i]
+        s2 = stations[i + 1]
+        path_segments.append(PathSegment(color, s1, s2, path_order * get_sign(s1, s2)))
+        del s1, s2
+
+    if is_looped:
+        s1 = stations[-1]
+        s2 = stations[0]
+        path_segments.append(PathSegment(color, s1, s2, path_order * get_sign(s1, s2)))
+        del s1, s2
+
+    # add padding segments
+    for current_segment, next_segment in pairwise(path_segments):
+        padding_segment = PaddingSegment(
+            color,
+            current_segment.end,
+            next_segment.start,
+        )
+        segments.append(current_segment)
+        segments.append(padding_segment)
+
+    if path_segments:
+        segments.append(path_segments[-1])
+
+    if is_looped:
+        padding_segment = PaddingSegment(
+            color,
+            path_segments[-1].end,
+            path_segments[0].start,
+        )
+        segments.append(padding_segment)
+
+    return segments
