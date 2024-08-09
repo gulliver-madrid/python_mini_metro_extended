@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Final, Iterable, TypeVar
 
 import pygame
@@ -25,15 +27,15 @@ class SegmentEdges:
     end: Point
 
 
+@dataclass
+class SegmentConnections:
+    start: Segment | None = field(default=None)
+    end: Segment | None = field(default=None)
+
+
 class Segment(Entity):
-    __slots__ = (
-        "color",
-        "stations",
-        "_edges",
-        "line",
-    )
-    stations: Final[StationPair | None]
-    _edges: Final[SegmentEdges]
+    __slots__ = ("color", "stations", "_edges", "line", "connections")
+
     line: Line
 
     def __init__(
@@ -45,9 +47,10 @@ class Segment(Entity):
         stations: StationPair | None = None,
     ) -> None:
         super().__init__(id)
-        self.color = color
-        self.stations = stations
-        self._edges = edges
+        self.color: Final = color
+        self.stations: Final[StationPair | None] = stations
+        self._edges: Final[SegmentEdges] = edges
+        self.connections: Final = SegmentConnections()
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Segment) and (self._edges == other._edges)
