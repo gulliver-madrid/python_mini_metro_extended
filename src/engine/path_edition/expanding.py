@@ -57,9 +57,6 @@ class ExpandingPath(CreatingOrExpandingPathBase):
 
     @override
     def _add_station_to_path(self, station: Station) -> None:
-        # print(f"{station=}")
-        # print(f"{self._from_end=}")
-
         if not self._from_end:
             if self._is_first_station(station):
                 return

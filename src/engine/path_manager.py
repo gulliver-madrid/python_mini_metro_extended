@@ -100,10 +100,10 @@ class PathManager:
         for path in self._components.paths:
             segment = path.get_containing_path_segment(position)
             if segment:
-                print("segment selected")
+                # print("segment selected")
                 break
         else:
-            print("no segment selected")
+            # print("no segment selected")
             return
         assert segment
         assert path
