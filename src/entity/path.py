@@ -155,7 +155,8 @@ class Path(Entity):
 
     def add_metro(self, metro: Metro) -> None:
         metro.shape.color = self.color
-        metro.current_segment = self._segments[metro.current_segment_idx]
+        self._update_metro_current_segment(metro)
+        assert metro.current_segment
         metro.position = metro.current_segment.start
         metro.path_id = self.id
         # TODO: review this
@@ -247,10 +248,13 @@ class Path(Entity):
                         behaviour = ReverseDirection()
                         continue
                     metro.current_segment_idx = value
-                    metro.current_segment = self._segments[metro.current_segment_idx]
+                    self._update_metro_current_segment(metro)
                 case ReverseDirection():
                     metro.is_forward = not metro.is_forward
             break
+
+    def _update_metro_current_segment(self, metro: Metro) -> None:
+        metro.current_segment = self._segments[metro.current_segment_idx]
 
     def _draw_highlighted_stations(self, surface: pygame.surface.Surface) -> None:
         surface_size = surface.get_size()
