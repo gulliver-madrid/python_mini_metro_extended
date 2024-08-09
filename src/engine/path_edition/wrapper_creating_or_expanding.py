@@ -21,10 +21,10 @@ def gen_wrapper_creating_or_expanding(
 
         match mouse_op:
             case "mouse_motion":
-                assert isinstance(station, Station)
+                assert station
                 creating_or_expanding.add_station_to_path(station)
             case "mouse_up":
-                if isinstance(station, Station):
+                if station:
                     creating_or_expanding.try_to_end_path_on_station(station)
                 else:
                     creating_or_expanding.try_to_end_path_on_last_station()
