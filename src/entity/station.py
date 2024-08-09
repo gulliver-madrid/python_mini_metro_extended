@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
 class Station(Holder):
     __slots__ = ()
+    _size = station_size
 
     def __init__(
         self, shape: Shape, position: Point, passengers_mediator: PassengersMediator
@@ -24,11 +25,10 @@ class Station(Holder):
             shape=shape,
             capacity=station_capacity,
             id=create_new_station_id(shape.type),
+            passengers_per_row=station_passengers_per_row,
             mediator=passengers_mediator,
         )
-        self._size = station_size
         self.position = position
-        self._passengers_per_row = station_passengers_per_row
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Station) and self.id == other.id

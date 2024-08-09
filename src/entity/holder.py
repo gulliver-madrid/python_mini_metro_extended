@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, Protocol, Sequence
+from typing import TYPE_CHECKING, ClassVar, Final, Protocol, Sequence
 
 import pygame
 
@@ -21,27 +21,27 @@ class Holder(Entity):
         "shape",
         "_capacity",
         "_passengers_per_row",
-        "_size",
         "position",
-        "mediator",
+        "_mediator",
     )
 
-    _passengers_per_row: int
-    _size: int
+    _size: ClassVar[int] = 0
     position: Point
-    mediator: Final[PassengersMediator]
 
     def __init__(
         self,
         shape: Shape,
         capacity: int,
         id: EntityId,
+        passengers_per_row: int,
         mediator: PassengersMediator,
     ) -> None:
         super().__init__(id)
-        self.shape: Final = shape
-        self._capacity: Final = capacity
-        self.mediator = mediator
+        assert self._size  # make sure derived class define it
+        self.shape: Final[Shape] = shape
+        self._capacity: Final[int] = capacity
+        self._passengers_per_row: Final[int] = passengers_per_row
+        self._mediator: Final[PassengersMediator] = mediator
 
     ######################
     ### public methods ###
@@ -55,26 +55,26 @@ class Holder(Entity):
         return self.shape.contains(point)
 
     def has_room(self) -> bool:
-        assert self.mediator
-        return self.mediator.holder_has_room(self)
+        assert self._mediator
+        return self._mediator.holder_has_room(self)
 
     def add_new_passenger(self, passenger: Passenger) -> None:
-        assert self.mediator
-        self.mediator.add_new_passenger_to_holder(self, passenger)
+        assert self._mediator
+        self._mediator.add_new_passenger_to_holder(self, passenger)
 
     def move_passenger(self, passenger: Passenger, dest: Holder) -> None:
-        assert self.mediator
-        self.mediator.move_passenger(passenger, self, dest)
+        assert self._mediator
+        self._mediator.move_passenger(passenger, self, dest)
 
     @property
     def passengers(self) -> Sequence[Passenger]:
-        assert self.mediator, self
-        return self.mediator.get_passengers_in_holder(self)
+        assert self._mediator, self
+        return self._mediator.get_passengers_in_holder(self)
 
     @property
     def occupation(self) -> int:
-        assert self.mediator
-        return self.mediator.get_holder_occupation(self)
+        assert self._mediator
+        return self._mediator.get_holder_occupation(self)
 
     @property
     def capacity(self) -> int:
@@ -85,7 +85,7 @@ class Holder(Entity):
     #######################
 
     def _draw_passengers(self, surface: pygame.surface.Surface) -> None:
-        assert self.mediator
+        assert self._mediator
         abs_offset: Final = Point(
             (-passenger_size - passenger_display_buffer), 0.75 * self._size
         )
@@ -93,7 +93,7 @@ class Holder(Entity):
         gap: Final = passenger_size / 2 + passenger_display_buffer
         row = 0
         col = 0
-        for passenger in self.mediator.get_passengers_in_holder(self):
+        for passenger in self._mediator.get_passengers_in_holder(self):
             rel_offset = Point(col * gap, row * gap)
             passenger.position = base_position + rel_offset
             passenger.draw(surface)
