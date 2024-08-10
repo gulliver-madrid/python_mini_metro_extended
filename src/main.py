@@ -60,6 +60,9 @@ def main() -> None:
 
         pygame.display.flip()
 
+        if Config.stop:
+            breakpoint()
+
         tt = time.time() - t
         if DEBUG_TIME:
             if tt > 0.06:

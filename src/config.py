@@ -77,8 +77,9 @@ class Config:
     min_distance = station_size * 3
     # path
     path_width = _path_width
+    # rules
+    allow_self_crossing_lines = False
     # debug
     unfilled_shapes = _unfilled_shapes
     padding_segments_color = _padding_segments_color
-    # rules
-    allow_self_crossing_lines = False
+    stop = False
