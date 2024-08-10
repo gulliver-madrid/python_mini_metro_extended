@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 import math
 from dataclasses import dataclass, field
 from typing import Final, Iterable, TypeVar
@@ -33,7 +34,7 @@ class SegmentConnections:
     end: Segment | None = field(default=None)
 
 
-class Segment(Entity):
+class Segment(Entity, ABC):
     __slots__ = ("color", "stations", "_edges", "line", "connections")
 
     line: Line
@@ -76,6 +77,9 @@ class Segment(Entity):
             position.top,
         )
         return dist is not None and dist < Config.path_width
+
+    def repr(self) -> str:
+        return f"{type(self).__name__}(id={self.num_id}, start={self.start}, end={self.end}, stations={self.stations})"
 
 
 def distance_point_segment(
