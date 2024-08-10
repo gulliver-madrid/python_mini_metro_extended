@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Final, Protocol, Sequence
+from typing import TYPE_CHECKING, ClassVar, Final, Sequence
 
 import pygame
 
@@ -13,7 +13,7 @@ from .ids import EntityId
 from .passenger import Passenger
 
 if TYPE_CHECKING:
-    from src.passengers_mediator import PassengersMediator
+    from src.passengers_mediator import PassengersMediatorProtocol
 
 
 class Holder(Entity):
@@ -23,6 +23,7 @@ class Holder(Entity):
         "_passengers_per_row",
         "position",
         "_mediator",
+        "_passengers",
     )
 
     _size: ClassVar[int] = 0
@@ -34,14 +35,15 @@ class Holder(Entity):
         capacity: int,
         id: EntityId,
         passengers_per_row: int,
-        mediator: PassengersMediator,
+        mediator: PassengersMediatorProtocol,
     ) -> None:
         super().__init__(id)
         assert self._size  # make sure derived class define it
         self.shape: Final[Shape] = shape
         self._capacity: Final[int] = capacity
         self._passengers_per_row: Final[int] = passengers_per_row
-        self._mediator: Final[PassengersMediator] = mediator
+        self._mediator: Final[PassengersMediatorProtocol] = mediator
+        self._passengers: Final[list[Passenger]] = []
 
     ######################
     ### public methods ###
@@ -55,26 +57,25 @@ class Holder(Entity):
         return self.shape.contains(point)
 
     def has_room(self) -> bool:
-        assert self._mediator
-        return self._mediator.holder_has_room(self)
+        return self.capacity > self.occupation
 
     def add_new_passenger(self, passenger: Passenger) -> None:
-        assert self._mediator
-        self._mediator.add_new_passenger_to_holder(self, passenger)
+        assert not self._mediator.any_holder_has(passenger)
+        self._add_passenger(passenger)
 
     def move_passenger(self, passenger: Passenger, dest: Holder) -> None:
-        assert self._mediator
-        self._mediator.move_passenger(passenger, self, dest)
+        source = self
+        self._mediator.on_passenger_exit(self, passenger)
+        dest._add_passenger(passenger)
+        source._remove_passenger(passenger)
 
     @property
     def passengers(self) -> Sequence[Passenger]:
-        assert self._mediator, self
-        return self._mediator.get_passengers_in_holder(self)
+        return self._passengers
 
     @property
     def occupation(self) -> int:
-        assert self._mediator
-        return self._mediator.get_holder_occupation(self)
+        return len(self._passengers)
 
     @property
     def capacity(self) -> int:
@@ -83,6 +84,14 @@ class Holder(Entity):
     #######################
     ### private methods ###
     #######################
+
+    def _add_passenger(self, passenger: Passenger) -> None:
+        assert self.has_room()
+        self._passengers.append(passenger)
+
+    def _remove_passenger(self, passenger: Passenger) -> None:
+        assert passenger in self._passengers
+        self._passengers.remove(passenger)
 
     def _draw_passengers(self, surface: pygame.surface.Surface) -> None:
         assert self._mediator
@@ -93,7 +102,7 @@ class Holder(Entity):
         gap: Final = passenger_size / 2 + passenger_display_buffer
         row = 0
         col = 0
-        for passenger in self._mediator.get_passengers_in_holder(self):
+        for passenger in self.passengers:
             rel_offset = Point(col * gap, row * gap)
             passenger.position = base_position + rel_offset
             passenger.draw(surface)
@@ -103,8 +112,3 @@ class Holder(Entity):
             else:
                 row += 1
                 col = 0
-
-
-class HolderProtocol(Protocol):
-    @property
-    def capacity(self) -> int: ...

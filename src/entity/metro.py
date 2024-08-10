@@ -62,8 +62,8 @@ class Metro(Holder):
             self._update_passengers_last_station()
 
     def passenger_arrives(self, passenger: Passenger) -> None:
-        assert self._mediator
-        self._mediator.passenger_arrives(self, passenger)
+        assert passenger in self._passengers
+        self._remove_passenger(passenger)
 
     #######################
     ### private methods ###
