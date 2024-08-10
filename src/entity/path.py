@@ -38,19 +38,22 @@ class Path(Entity):
         "_path_order",
         "temp_point_is_from_end",
     )
-    _segments: Final[list[Segment]]
 
     def __init__(self, color: Color) -> None:
         super().__init__(create_new_path_id())
+
+        # Final attributes
         self.color: Final = color
-        self.stations: list[Station] = []
-        self.metros: list[Metro] = []
+        self.stations: Final[list[Station]] = []
+        self.metros: Final[list[Metro]] = []
+        self._segments: Final[list[Segment]] = []
+
+        # Non-final attributes
         self.is_looped = False
         self.is_being_created = False
         self.selected = False
         self.temp_point: Point | None = None
         self.temp_point_is_from_end = True
-        self._segments = []
         self._path_order = 0
 
     ########################
