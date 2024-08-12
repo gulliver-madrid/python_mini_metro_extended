@@ -466,7 +466,18 @@ files = [
     {file = "typing_extensions-4.12.2.tar.gz", hash = "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"},
 ]
 
+[[package]]
+name = "unittest-prettify"
+version = "1.0.post4"
+description = "A simple module to improve the unittest output."
+optional = false
+python-versions = ">=3.5.*"
+files = [
+    {file = "unittest-prettify-1.0.post4.tar.gz", hash = "sha256:1bfa34cea29943cf6b911f19ccb02d54d489b22d4a3ef225100b1841af84d60f"},
+    {file = "unittest_prettify-1.0.post4-py3-none-any.whl", hash = "sha256:d5baf5aea58f4d5c7c4f72e9d3c59140ff059f8743af8f43810ecce7ce969756"},
+]
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "4945793f8fa62d33037b794512c3d495f5b2eee6ab1c413844fba0a008e13059"
+content-hash = "f9713623a09ab4a354c249126371a385644d75e2aac456704f582cd57379f01f"

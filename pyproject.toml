@@ -19,6 +19,7 @@ mypy = "^1.10.1"
 isort = "^5.13.2"
 black = "^24.4.2"
 coverage = "^7.5.4"
+unittest-prettify = "^1.0.post4"
 
 [build-system]
 requires = ["poetry-core"]
