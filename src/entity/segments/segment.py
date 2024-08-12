@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from abc import ABC, abstractmethod
+from abc import ABC
 from dataclasses import dataclass, field
 from typing import Final, Iterable, TypeVar
 
@@ -10,16 +10,9 @@ import pygame
 from src.config import Config
 from src.entity.entity import Entity
 from src.entity.ids import EntityId
-from src.entity.station import Station
 from src.geometry.line import Line
 from src.geometry.point import Point
 from src.type import Color
-
-
-@dataclass(frozen=True)
-class StationPair:
-    start: Station
-    end: Station
 
 
 @dataclass(frozen=True)
@@ -35,7 +28,7 @@ class SegmentConnections:
 
 
 class Segment(Entity, ABC):
-    __slots__ = ("color", "stations", "_edges", "line", "connections")
+    __slots__ = ("color", "_edges", "line", "connections")
 
     line: Line
 
@@ -45,11 +38,9 @@ class Segment(Entity, ABC):
         id: EntityId,
         *,
         edges: SegmentEdges,
-        stations: StationPair | None = None,
     ) -> None:
         super().__init__(id)
         self.color: Final = color
-        self.stations: Final[StationPair | None] = stations
         self._edges: Final[SegmentEdges] = edges
         self.connections: Final = SegmentConnections()
 
@@ -79,7 +70,7 @@ class Segment(Entity, ABC):
         return dist is not None and dist < Config.path_width
 
     def repr(self) -> str:
-        return f"{type(self).__name__}(id={self.num_id}, start={self.start}, end={self.end}, stations={self.stations})"
+        return f"{type(self).__name__}(id={self.num_id}, start={self.start}, end={self.end})"
 
 
 def distance_point_segment(

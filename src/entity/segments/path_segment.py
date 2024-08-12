@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+from typing import Final
+
 from src.config import Config, path_order_shift
 from src.entity.ids import create_new_path_segment_id
 from src.entity.station import Station
@@ -7,11 +10,17 @@ from src.geometry.types import create_degrees
 from src.geometry.utils import get_direction
 from src.type import Color
 
-from .segment import Segment, SegmentEdges, StationPair
+from .segment import Segment, SegmentEdges
+
+
+@dataclass(frozen=True)
+class StationPair:
+    start: Station
+    end: Station
 
 
 class PathSegment(Segment):
-    __slots__ = ("_path_order",)
+    __slots__ = ("_path_order", "stations")
 
     def __init__(
         self,
@@ -20,11 +29,9 @@ class PathSegment(Segment):
         end_station: Station,
         path_order: int,
     ) -> None:
-        stations = StationPair(start_station, end_station)
-        edges = _get_segment_edges(stations, path_order)
-        super().__init__(
-            color, create_new_path_segment_id(), edges=edges, stations=stations
-        )
+        self.stations: Final = StationPair(start_station, end_station)
+        edges = _get_segment_edges(self.stations, path_order)
+        super().__init__(color, create_new_path_segment_id(), edges=edges)
         self._path_order = path_order
         self.line = Line(
             color=self.color,
@@ -32,6 +39,9 @@ class PathSegment(Segment):
             end=self.end,
             width=Config.path_width,
         )
+
+    def repr(self) -> str:
+        return f"{type(self).__name__}(id={self.num_id}, start={self.start}, end={self.end}, stations={self.stations})"
 
 
 def _get_segment_edges(stations: StationPair, path_order: int) -> SegmentEdges:
