@@ -71,7 +71,7 @@ class Path(Entity):
 
     def update_segments(self) -> None:
         segments: list[Segment] = _get_updated_segments(
-            self.stations, self.color, self._path_order, self._state.is_looped
+            self.stations, self._state.is_looped, self.color, self._path_order
         )
         self._state.segments.clear()
         self._state.segments.extend(segments)
@@ -169,14 +169,25 @@ def get_sign(s1: Station, s2: Station) -> int:
 
 def _get_updated_segments(
     stations: Sequence[Station],
+    is_looped: bool,
+    color: Color,
+    path_order: int,
+) -> list[Segment]:
+
+    path_segments: Sequence[PathSegment] = _create_path_segments(
+        stations, color, path_order, is_looped
+    )
+    segments = _incorporate_padding_segments(path_segments, color, is_looped)
+    return segments
+
+
+def _create_path_segments(
+    stations: Sequence[Station],
     color: Color,
     path_order: int,
     is_looped: bool,
-) -> list[Segment]:
-    segments: list[Segment] = []
-    path_segments: list[Segment] = []
-
-    # add path segments
+) -> list[PathSegment]:
+    path_segments: list[PathSegment] = []
     for i in range(len(stations) - 1):
         s1 = stations[i]
         s2 = stations[i + 1]
@@ -188,8 +199,15 @@ def _get_updated_segments(
         s2 = stations[0]
         path_segments.append(PathSegment(color, s1, s2, path_order * get_sign(s1, s2)))
         del s1, s2
+    return path_segments
 
-    # add padding segments
+
+def _incorporate_padding_segments(
+    path_segments: Sequence[PathSegment],
+    color: Color,
+    is_looped: bool,
+) -> list[Segment]:
+    segments: list[Segment] = []
     for current_segment, next_segment in pairwise(path_segments):
         padding_segment = PaddingSegment(
             color,
@@ -209,5 +227,4 @@ def _get_updated_segments(
             path_segments[0].start,
         )
         segments.append(padding_segment)
-
     return segments
