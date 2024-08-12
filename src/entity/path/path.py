@@ -1,22 +1,14 @@
-import math
 from collections.abc import Sequence
-from dataclasses import dataclass, field
 from itertools import pairwise
 from typing import Final
 
 import pygame
 
 from src.config import Config
-from src.entity.end_segment_behaviour import (
-    ChangeIndex,
-    ReverseDirection,
-    get_segment_behaviour_at_the_end_of_the_segment,
-)
+from src.entity.path.metro_movement import MetroMovementSystem
+from src.entity.path.state import PathState
 from src.geometry.line import Line
 from src.geometry.point import Point
-from src.geometry.polygons import Polygon
-from src.geometry.types import radians_to_degrees
-from src.geometry.utils import get_direction, get_distance
 from src.type import Color
 
 from ..entity import Entity
@@ -24,15 +16,6 @@ from ..ids import create_new_path_id
 from ..metro import Metro
 from ..segments import PaddingSegment, PathSegment, Segment
 from ..station import Station
-
-
-@dataclass
-class PathState:
-    segments: Final[list[Segment]] = field(init=False, default_factory=list)
-    is_looped: bool = field(init=False, default=False)
-
-    def update_metro_current_segment(self, metro: Metro) -> None:
-        metro.current_segment = self.segments[metro.current_segment_idx]
 
 
 class Path(Entity):
@@ -186,12 +169,6 @@ class Path(Entity):
 #######################
 
 
-def _set_rotation_angle(polygon: Polygon, direct: Point) -> None:
-    radians = math.atan2(direct.top, direct.left)
-    degrees = radians_to_degrees(radians)
-    polygon.set_degrees(degrees)
-
-
 def get_sign(s1: Station, s2: Station) -> int:
     assert s1.num_id != s2.num_id
     if s1.num_id > s2.num_id:
@@ -244,88 +221,3 @@ def _get_updated_segments(
         segments.append(padding_segment)
 
     return segments
-
-
-def _determine_destination(metro: Metro) -> tuple[Point, Station | None]:
-    """
-    Determine the position and the possible station at the end of current segment.
-    """
-    segment = metro.current_segment
-    assert segment is not None
-
-    if metro.is_forward:
-        dst_position = segment.end
-    else:
-        dst_position = segment.start
-
-    if isinstance(segment, PathSegment):
-        assert segment.stations
-        stations = segment.stations
-        dst_station = stations.end if metro.is_forward else stations.start
-    else:
-        dst_station = None
-
-    return dst_position, dst_station
-
-
-def _calculate_direction_and_distance(
-    start_point: Point, end_point: Point
-) -> tuple[float, Point]:
-    """Calculate the distance and direction to the destination point"""
-    distance = get_distance(start_point, end_point)
-    direction = get_direction(start_point, end_point)
-    return distance, direction
-
-
-@dataclass
-class MetroMovementSystem:
-    """Delegated class of Path to manage metros movement"""
-
-    _state: PathState
-
-    def move_metro(self, metro: Metro, dt_ms: int) -> None:
-        dst_position, dst_station = _determine_destination(metro)
-
-        distance_to_destination, direction = _calculate_direction_and_distance(
-            metro.position, dst_position
-        )
-
-        # Calculate and set the rotation angle of the metro
-        if isinstance(metro.shape, Polygon):
-            _set_rotation_angle(metro.shape, direction)
-
-        # Calculate the distance the metro can travel in this time step
-        distance_can_travel = metro.game_speed * dt_ms
-
-        segment_end_reached = distance_can_travel >= distance_to_destination
-        if segment_end_reached:
-            self._handle_metro_movement_at_the_end_of_the_segment(metro, dst_station)
-        else:
-            metro.current_station = None
-            metro.position += direction * distance_can_travel
-
-    def _handle_metro_movement_at_the_end_of_the_segment(
-        self, metro: Metro, possible_dest_station: Station | None
-    ) -> None:
-        """Handle metro movement at the end of the segment"""
-        # Update the current station if necessary
-        if metro.current_station != possible_dest_station:
-            metro.current_station = possible_dest_station
-
-        behaviour = get_segment_behaviour_at_the_end_of_the_segment(
-            len(self._state.segments),
-            metro.current_segment_idx,
-            metro.is_forward,
-            self._state.is_looped,
-        )
-        while True:
-            match behaviour:
-                case ChangeIndex(value):
-                    if value >= len(self._state.segments):
-                        behaviour = ReverseDirection()
-                        continue
-                    metro.current_segment_idx = value
-                    self._state.update_metro_current_segment(metro)
-                case ReverseDirection():
-                    metro.is_forward = not metro.is_forward
-            break
