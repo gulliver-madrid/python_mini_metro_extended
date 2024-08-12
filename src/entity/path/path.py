@@ -19,11 +19,11 @@ from src.geometry.types import radians_to_degrees
 from src.geometry.utils import get_direction, get_distance
 from src.type import Color
 
-from .entity import Entity
-from .ids import create_new_path_id
-from .metro import Metro
-from .segments import PaddingSegment, PathSegment, Segment
-from .station import Station
+from ..entity import Entity
+from ..ids import create_new_path_id
+from ..metro import Metro
+from ..segments import PaddingSegment, PathSegment, Segment
+from ..station import Station
 
 
 class Path(Entity):
