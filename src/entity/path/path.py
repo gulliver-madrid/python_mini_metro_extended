@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from itertools import pairwise
+import itertools
 from typing import Final
 
 import pygame
@@ -177,7 +177,7 @@ def _get_updated_segments(
     path_segments: Sequence[PathSegment] = _create_path_segments(
         stations, color, path_order, is_looped
     )
-    segments = _incorporate_padding_segments(path_segments, color, is_looped)
+    segments = _add_padding_segments(path_segments, color, is_looped)
     return segments
 
 
@@ -187,44 +187,46 @@ def _create_path_segments(
     path_order: int,
     is_looped: bool,
 ) -> list[PathSegment]:
-    path_segments: list[PathSegment] = []
-    for i in range(len(stations) - 1):
-        s1 = stations[i]
-        s2 = stations[i + 1]
-        path_segments.append(PathSegment(color, s1, s2, path_order * get_sign(s1, s2)))
-        del s1, s2
 
+    def create_path_segment(s1: Station, s2: Station) -> PathSegment:
+        fixed_path_order = path_order * get_sign(s1, s2)
+        return PathSegment(color, s1, s2, fixed_path_order)
+
+    path_segments = [
+        create_path_segment(s1, s2) for s1, s2 in itertools.pairwise(stations)
+    ]
     if is_looped:
-        s1 = stations[-1]
-        s2 = stations[0]
-        path_segments.append(PathSegment(color, s1, s2, path_order * get_sign(s1, s2)))
-        del s1, s2
+        closing_loop_segment = create_path_segment(stations[-1], stations[0])
+        path_segments.append(closing_loop_segment)
     return path_segments
 
 
-def _incorporate_padding_segments(
+def _add_padding_segments(
     path_segments: Sequence[PathSegment],
     color: Color,
     is_looped: bool,
 ) -> list[Segment]:
+    if not path_segments:
+        return []
     segments: list[Segment] = []
-    for current_segment, next_segment in pairwise(path_segments):
-        padding_segment = PaddingSegment(
-            color,
-            current_segment.end,
-            next_segment.start,
-        )
+    for current_segment, next_segment in itertools.pairwise(path_segments):
         segments.append(current_segment)
-        segments.append(padding_segment)
+        segments.append(
+            PaddingSegment(
+                color,
+                current_segment.end,
+                next_segment.start,
+            )
+        )
 
-    if path_segments:
-        segments.append(path_segments[-1])
+    segments.append(path_segments[-1])
 
     if is_looped:
-        padding_segment = PaddingSegment(
-            color,
-            path_segments[-1].end,
-            path_segments[0].start,
+        segments.append(
+            PaddingSegment(
+                color,
+                path_segments[-1].end,
+                path_segments[0].start,
+            )
         )
-        segments.append(padding_segment)
     return segments
