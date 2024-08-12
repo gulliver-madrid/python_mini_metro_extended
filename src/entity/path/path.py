@@ -1,6 +1,6 @@
-from dataclasses import dataclass
 import math
 from collections.abc import Sequence
+from dataclasses import dataclass, field
 from itertools import pairwise
 from typing import Final
 
@@ -26,16 +26,24 @@ from ..segments import PaddingSegment, PathSegment, Segment
 from ..station import Station
 
 
+@dataclass
+class PathState:
+    segments: Final[list[Segment]] = field(init=False, default_factory=list)
+    is_looped: bool = field(init=False, default=False)
+
+    def update_metro_current_segment(self, metro: Metro) -> None:
+        metro.current_segment = self.segments[metro.current_segment_idx]
+
+
 class Path(Entity):
     __slots__ = (
         "color",
         "stations",
         "metros",
-        "is_looped",
         "is_being_created",
         "selected",
         "temp_point",
-        "_segments",
+        "_state",
         "_path_order",
         "temp_point_is_from_end",
         "_metro_movement_system",
@@ -48,11 +56,10 @@ class Path(Entity):
         self.color: Final = color
         self.stations: Final[list[Station]] = []
         self.metros: Final[list[Metro]] = []
-        self._segments: Final[list[Segment]] = []
-        self._metro_movement_system: Final = MetroMovementSystem(self)
+        self._state: Final = PathState()
+        self._metro_movement_system: Final = MetroMovementSystem(self._state)
 
         # Non-final attributes
-        self.is_looped = False
         self.is_being_created = False
         self.selected = False
         self.temp_point: Point | None = None
@@ -64,6 +71,10 @@ class Path(Entity):
     ########################
 
     @property
+    def is_looped(self) -> bool:
+        return self._state.is_looped
+
+    @property
     def first_station(self) -> Station:
         return self.stations[0]
 
@@ -71,16 +82,21 @@ class Path(Entity):
     def last_station(self) -> Station:
         return self.stations[-1]
 
+    @property
+    def _segments(self) -> list[Segment]:
+        # test only (legacy)
+        return self._state.segments
+
     def add_station(self, station: Station) -> None:
         self.stations.append(station)
         self.update_segments()
 
     def update_segments(self) -> None:
         segments: list[Segment] = _get_updated_segments(
-            self.stations, self.color, self._path_order, self.is_looped
+            self.stations, self.color, self._path_order, self._state.is_looped
         )
-        self._segments.clear()
-        self._segments.extend(segments)
+        self._state.segments.clear()
+        self._state.segments.extend(segments)
 
     def set_path_order(self, path_order: int) -> None:
         if path_order != self._path_order:
@@ -96,7 +112,7 @@ class Path(Entity):
         if self.selected:
             self._draw_highlighted_stations(surface)
 
-        for segment in self._segments:
+        for segment in self._state.segments:
             segment.draw(surface)
 
         if self.temp_point:
@@ -116,16 +132,16 @@ class Path(Entity):
         self.temp_point = None
 
     def set_loop(self) -> None:
-        self.is_looped = True
+        self._state.is_looped = True
         self.update_segments()
 
     def remove_loop(self) -> None:
-        self.is_looped = False
+        self._state.is_looped = False
         self.update_segments()
 
     def add_metro(self, metro: Metro) -> None:
         metro.shape.color = self.color
-        self._update_metro_current_segment(metro)
+        self._state.update_metro_current_segment(metro)
         assert metro.current_segment
         metro.position = metro.current_segment.start
         metro.path_id = self.id
@@ -144,14 +160,11 @@ class Path(Entity):
         return None
 
     def get_path_segments(self) -> list[PathSegment]:
-        return [seg for seg in self._segments if isinstance(seg, PathSegment)]
+        return [seg for seg in self._state.segments if isinstance(seg, PathSegment)]
 
     #########################
     ### private interface ###
     #########################
-
-    def _update_metro_current_segment(self, metro: Metro) -> None:
-        metro.current_segment = self._segments[metro.current_segment_idx]
 
     def _draw_highlighted_stations(self, surface: pygame.surface.Surface) -> None:
         surface_size = surface.get_size()
@@ -268,8 +281,7 @@ def _calculate_direction_and_distance(
 class MetroMovementSystem:
     """Delegated class of Path to manage metros movement"""
 
-    _path: Path
-    # TODO: use a shared state instead of the Path instance
+    _state: PathState
 
     def move_metro(self, metro: Metro, dt_ms: int) -> None:
         dst_position, dst_station = _determine_destination(metro)
@@ -301,19 +313,19 @@ class MetroMovementSystem:
             metro.current_station = possible_dest_station
 
         behaviour = get_segment_behaviour_at_the_end_of_the_segment(
-            len(self._path._segments),
+            len(self._state.segments),
             metro.current_segment_idx,
             metro.is_forward,
-            self._path.is_looped,
+            self._state.is_looped,
         )
         while True:
             match behaviour:
                 case ChangeIndex(value):
-                    if value >= len(self._path._segments):
+                    if value >= len(self._state.segments):
                         behaviour = ReverseDirection()
                         continue
                     metro.current_segment_idx = value
-                    self._path._update_metro_current_segment(metro)
+                    self._state.update_metro_current_segment(metro)
                 case ReverseDirection():
                     metro.is_forward = not metro.is_forward
             break
