@@ -132,10 +132,9 @@ class Path(Entity):
         self.metros.append(metro)
 
     def move_metro(self, metro: Metro, dt_ms: int) -> None:
-        dst_position, dst_station = self._determine_destination(metro)
+        dst_position, dst_station = _determine_destination(metro)
 
-        # Calculate the distance and direction to the destination point
-        distance_to_destination, direction = self._calculate_direction_and_distance(
+        distance_to_destination, direction = _calculate_direction_and_distance(
             metro.position, dst_position
         )
 
@@ -165,34 +164,6 @@ class Path(Entity):
     #########################
     ### private interface ###
     #########################
-
-    def _determine_destination(self, metro: Metro) -> tuple[Point, Station | None]:
-        """
-        Determine the position and the possible station at the end of current segment.
-        """
-        segment = metro.current_segment
-        assert segment is not None
-
-        if metro.is_forward:
-            dst_position = segment.end
-        else:
-            dst_position = segment.start
-
-        if isinstance(segment, PathSegment):
-            assert segment.stations
-            stations = segment.stations
-            dst_station = stations.end if metro.is_forward else stations.start
-        else:
-            dst_station = None
-
-        return dst_position, dst_station
-
-    def _calculate_direction_and_distance(
-        self, start_point: Point, end_point: Point
-    ) -> tuple[float, Point]:
-        distance = get_distance(start_point, end_point)
-        direction = get_direction(start_point, end_point)
-        return distance, direction
 
     def _handle_metro_movement_at_the_end_of_the_segment(
         self, metro: Metro, possible_dest_station: Station | None
@@ -236,6 +207,11 @@ class Path(Entity):
             )
 
         surface.blit(selected_surface, (0, 0))
+
+
+#######################
+### free functions ###
+#######################
 
 
 def _set_rotation_angle(polygon: Polygon, direct: Point) -> None:
@@ -296,3 +272,34 @@ def _get_updated_segments(
         segments.append(padding_segment)
 
     return segments
+
+
+def _determine_destination(metro: Metro) -> tuple[Point, Station | None]:
+    """
+    Determine the position and the possible station at the end of current segment.
+    """
+    segment = metro.current_segment
+    assert segment is not None
+
+    if metro.is_forward:
+        dst_position = segment.end
+    else:
+        dst_position = segment.start
+
+    if isinstance(segment, PathSegment):
+        assert segment.stations
+        stations = segment.stations
+        dst_station = stations.end if metro.is_forward else stations.start
+    else:
+        dst_station = None
+
+    return dst_position, dst_station
+
+
+def _calculate_direction_and_distance(
+    start_point: Point, end_point: Point
+) -> tuple[float, Point]:
+    """Calculate the distance and direction to the destination point"""
+    distance = get_distance(start_point, end_point)
+    direction = get_direction(start_point, end_point)
+    return distance, direction
