@@ -18,6 +18,11 @@ from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 
 from test.base_test import GameplayBaseTestCase
+from test.legacy_access import (
+    legacy_get_engine_paths,
+    legacy_get_engine_stations,
+    legacy_path_segments,
+)
 
 
 class TestGameplay(GameplayBaseTestCase):
@@ -44,7 +49,7 @@ class TestGameplay(GameplayBaseTestCase):
         self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
-                self.engine.stations[3].position + Point(1, 1),
+                legacy_get_engine_stations(self.engine)[3].position + Point(1, 1),
             )
         )
         mock_start_path_on_station.assert_called_once()
@@ -53,16 +58,16 @@ class TestGameplay(GameplayBaseTestCase):
         self.reactor.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))
         self.reactor.react(MouseEvent(MouseEventType.MOUSE_UP, Point(-1, -1)))
 
-        self.assertEqual(len(self.engine.paths), 0)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 0)
 
     def test_mouse_dragged_between_stations_creates_path(self) -> None:
         self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
-                self.engine.stations[0].position + Point(1, 1),
+                legacy_get_engine_stations(self.engine)[0].position + Point(1, 1),
             )
         )
-        new_position = self.engine.stations[1].position + Point(2, 2)
+        new_position = legacy_get_engine_stations(self.engine)[1].position + Point(2, 2)
         self.reactor.react(MouseEvent(MouseEventType.MOUSE_MOTION, new_position))
         self.reactor.react(
             MouseEvent(
@@ -71,10 +76,13 @@ class TestGameplay(GameplayBaseTestCase):
             )
         )
 
-        self.assertEqual(len(self.engine.paths), 1)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 1)
         self.assertSequenceEqual(
-            self.engine.paths[0].stations,
-            [self.engine.stations[0], self.engine.stations[1]],
+            legacy_get_engine_paths(self.engine)[0].stations,
+            [
+                legacy_get_engine_stations(self.engine)[0],
+                legacy_get_engine_stations(self.engine)[1],
+            ],
         )
 
     def test_mouse_dragged_between_non_station_points_does_not_create_path(
@@ -84,7 +92,7 @@ class TestGameplay(GameplayBaseTestCase):
         self.reactor.react(MouseEvent(MouseEventType.MOUSE_MOTION, Point(2, 2)))
         self.reactor.react(MouseEvent(MouseEventType.MOUSE_UP, Point(0, 1)))
 
-        self.assertEqual(len(self.engine.paths), 0)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 0)
 
     def test_mouse_dragged_between_station_and_non_station_points_does_not_create_path(
         self,
@@ -92,36 +100,36 @@ class TestGameplay(GameplayBaseTestCase):
         self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
-                self.engine.stations[0].position + Point(1, 1),
+                legacy_get_engine_stations(self.engine)[0].position + Point(1, 1),
             )
         )
         self.reactor.react(MouseEvent(MouseEventType.MOUSE_MOTION, Point(2, 2)))
         self.reactor.react(MouseEvent(MouseEventType.MOUSE_UP, Point(0, 1)))
 
-        self.assertEqual(len(self.engine.paths), 0)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 0)
 
     def test_mouse_dragged_between_3_stations_creates_looped_path(self) -> None:
         self._connect_stations([0, 1, 2, 0])
 
-        self.assertEqual(len(self.engine.paths), 1)
-        self.assertTrue(self.engine.paths[0].is_looped)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 1)
+        self.assertTrue(legacy_get_engine_paths(self.engine)[0].is_looped)
 
     def test_mouse_dragged_between_4_stations_creates_looped_path(self) -> None:
         self._connect_stations([0, 1, 2, 3, 0])
-        self.assertEqual(len(self.engine.paths), 1)
-        self.assertTrue(self.engine.paths[0].is_looped)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 1)
+        self.assertTrue(legacy_get_engine_paths(self.engine)[0].is_looped)
 
     def test_path_between_2_stations_is_not_looped(self) -> None:
         self._connect_stations([0, 1])
-        self.assertEqual(len(self.engine.paths), 1)
-        self.assertFalse(self.engine.paths[0].is_looped)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 1)
+        self.assertFalse(legacy_get_engine_paths(self.engine)[0].is_looped)
 
     def test_mouse_dragged_between_3_stations_without_coming_back_to_first_does_not_create_loop(
         self,
     ) -> None:
         self._connect_stations([0, 1, 2])
-        self.assertEqual(len(self.engine.paths), 1)
-        self.assertFalse(self.engine.paths[0].is_looped)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 1)
+        self.assertFalse(legacy_get_engine_paths(self.engine)[0].is_looped)
 
     def test_space_key_pauses_and_unpauses_game(self) -> None:
         self.reactor.react(KeyboardEvent(KeyboardEventType.KEY_DOWN, pygame.K_SPACE))
@@ -138,35 +146,47 @@ class TestGameplay(GameplayBaseTestCase):
 
     def test_path_button_removes_path_on_click(self) -> None:
         self._replace_with_random_stations(5)
-        for station in self.engine.stations:
+        for station in legacy_get_engine_stations(self.engine):
             station.draw(self.screen)
         self._connect_stations([0, 1])
         self.reactor.react(
             MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
         )
-        self.assertEqual(len(self.engine.paths), 0)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 0)
         self.assertEqual(len(self.engine.ui.path_to_button.items()), 0)
 
     def test_path_buttons_get_assigned_upon_path_creation(self) -> None:
         self._replace_with_random_stations(5)
-        for station in self.engine.stations:
+        for station in legacy_get_engine_stations(self.engine):
             station.draw(self.screen)
         self._connect_stations([0, 1])
         self.assertEqual(len(self.engine.ui.path_to_button.items()), 1)
-        self.assertIn(self.engine.paths[0], self.engine.ui.path_to_button)
+        self.assertIn(
+            legacy_get_engine_paths(self.engine)[0], self.engine.ui.path_to_button
+        )
         self._connect_stations([2, 3])
         self.assertEqual(len(self.engine.ui.path_to_button.items()), 2)
-        self.assertIn(self.engine.paths[0], self.engine.ui.path_to_button)
-        self.assertIn(self.engine.paths[1], self.engine.ui.path_to_button)
+        self.assertIn(
+            legacy_get_engine_paths(self.engine)[0], self.engine.ui.path_to_button
+        )
+        self.assertIn(
+            legacy_get_engine_paths(self.engine)[1], self.engine.ui.path_to_button
+        )
         self._connect_stations([1, 3])
         self.assertEqual(len(self.engine.ui.path_to_button.items()), 3)
-        self.assertIn(self.engine.paths[0], self.engine.ui.path_to_button)
-        self.assertIn(self.engine.paths[1], self.engine.ui.path_to_button)
-        self.assertIn(self.engine.paths[2], self.engine.ui.path_to_button)
+        self.assertIn(
+            legacy_get_engine_paths(self.engine)[0], self.engine.ui.path_to_button
+        )
+        self.assertIn(
+            legacy_get_engine_paths(self.engine)[1], self.engine.ui.path_to_button
+        )
+        self.assertIn(
+            legacy_get_engine_paths(self.engine)[2], self.engine.ui.path_to_button
+        )
 
     def test_more_paths_can_be_created_after_removing_paths(self) -> None:
         self._replace_with_random_stations(5)
-        for station in self.engine.stations:
+        for station in legacy_get_engine_stations(self.engine):
             station.draw(self.screen)
         self._connect_stations([0, 1])
         self._connect_stations([2, 3])
@@ -174,14 +194,14 @@ class TestGameplay(GameplayBaseTestCase):
         self.reactor.react(
             MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
         )
-        self.assertEqual(len(self.engine.paths), 2)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 2)
         self._connect_stations([1, 3])
-        self.assertEqual(len(self.engine.paths), 3)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 3)
 
     def test_assigned_path_buttons_bubble_to_left(self) -> None:
         self._replace_with_random_stations(5)
 
-        for station in self.engine.stations:
+        for station in legacy_get_engine_stations(self.engine):
             station.draw(self.screen)
         self._connect_stations([0, 1])
         self._connect_stations([2, 3])
@@ -189,26 +209,26 @@ class TestGameplay(GameplayBaseTestCase):
         self.reactor.react(
             MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
         )
-        self.assertEqual(len(self.engine.paths), 2)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 2)
         self.reactor.react(
             MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
         )
-        self.assertEqual(len(self.engine.paths), 1)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 1)
         self.reactor.react(
             MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
         )
-        self.assertEqual(len(self.engine.paths), 0)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 0)
 
     def test_unassigned_path_buttons_do_nothing_on_click(self) -> None:
-        self.assertEqual(len(self.engine.paths), 0)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 0)
         self.reactor.react(
             MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
         )
-        self.assertEqual(len(self.engine.paths), 0)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 0)
         self.reactor.react(
             MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
         )
-        self.assertEqual(len(self.engine.paths), 0)
+        self.assertEqual(len(legacy_get_engine_paths(self.engine)), 0)
 
     def test_the_program_doesnt_break_if_mouse_motion_is_skipped(self) -> None:
         """
@@ -219,13 +239,13 @@ class TestGameplay(GameplayBaseTestCase):
         self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_DOWN,
-                self.engine.stations[0].position,
+                legacy_get_engine_stations(self.engine)[0].position,
             )
         )
         self.reactor.react(
             MouseEvent(
                 MouseEventType.MOUSE_UP,
-                self.engine.stations[1].position,
+                legacy_get_engine_stations(self.engine)[1].position,
             )
         )
 
@@ -236,7 +256,7 @@ class TestGameplay(GameplayBaseTestCase):
         dt_ms: Final = ceil(1000 / framerate)
         self._connect_stations([0, 1, 2, 3])
         metros = self.engine._components.metros  # pyright: ignore [reportPrivateUsage]
-        paths = self.engine._components.paths  # pyright: ignore [reportPrivateUsage]
+        paths = legacy_get_engine_paths(self.engine)
         assert len(metros) == 1
         assert len(paths) == 1
         metro = metros[0]
@@ -244,17 +264,14 @@ class TestGameplay(GameplayBaseTestCase):
         # run until the train is in the last segment
         while True:
             self.engine.increment_time(dt_ms)
-            if (
-                metro.current_segment_idx
-                == len(path._segments) - 1  # pyright: ignore [reportPrivateUsage]
-            ):
+            if metro.current_segment_idx == len(legacy_path_segments(path)) - 1:
                 break
-        first = path._segments[0]  # pyright: ignore [reportPrivateUsage]
+        first = legacy_path_segments(path)[0]  # pyright: ignore [reportPrivateUsage]
         assert isinstance(first, PathSegment)
 
         # remove first station
         editing = EditingIntermediateStations(path, first)
-        editing.remove_station(self.engine.stations[0])
+        editing.remove_station(legacy_get_engine_stations(self.engine)[0])
 
         # resume running (the bug raised here)
         while metro.is_forward:

@@ -13,6 +13,7 @@ from src.event.type import MouseEventType
 from src.geometry.point import Point
 from src.reactor import UI_Reactor
 
+from test.legacy_access import legacy_get_engine_stations
 from test.random_seed_config import RANDOM_SEED
 
 
@@ -38,8 +39,8 @@ class GameplayBaseTestCase(BaseTestCase):
     engine: Engine
 
     def _replace_stations(self, stations: Sequence[Station]) -> None:
-        self.engine.stations.clear()
-        self.engine.stations.extend(stations)
+        legacy_get_engine_stations(self.engine).clear()
+        legacy_get_engine_stations(self.engine).extend(stations)
 
     def _send_event_to_station(
         self,
@@ -47,7 +48,7 @@ class GameplayBaseTestCase(BaseTestCase):
         station_idx: int,
         modified: Point | None = None,
     ) -> None:
-        position = self.engine.stations[station_idx].position
+        position = legacy_get_engine_stations(self.engine)[station_idx].position
         if modified:
             position += modified
         self.reactor.react(MouseEvent(event_type, position))

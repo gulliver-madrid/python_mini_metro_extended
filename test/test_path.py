@@ -12,6 +12,7 @@ from src.passengers_mediator import PassengersMediator
 from src.utils import get_random_color, get_random_position, get_random_station_shape
 
 from test.base_test import BaseTestCase
+from test.legacy_access import legacy_path_draw_with_order, legacy_path_segments
 
 # some tests break under lower/higher framerate
 # TODO: analize why
@@ -43,7 +44,7 @@ class TestPath(BaseTestCase):
         stations = get_random_stations(5, self.passengers_mediator)
         for station in stations:
             path.add_station(station)
-        path.draw_with_order(self.screen, 0)
+        legacy_path_draw_with_order(path, self.screen, 0)
 
         self.assertEqual(self._draw.line.call_count, 4 + 3)
 
@@ -51,7 +52,7 @@ class TestPath(BaseTestCase):
         path = Path(get_random_color())
         path.add_station(get_random_station(self.passengers_mediator))
         path.set_temporary_point(Point(1, 1))
-        path.draw_with_order(self.screen, 0)
+        legacy_path_draw_with_order(path, self.screen, 0)
 
         self.assertEqual(self._draw.line.call_count, 1)
 
@@ -59,13 +60,13 @@ class TestPath(BaseTestCase):
         path = Path(get_random_color())
         path.add_station(get_random_station(self.passengers_mediator))
         path.add_station(get_random_station(self.passengers_mediator))
-        path.draw_with_order(self.screen, 0)
+        legacy_path_draw_with_order(path, self.screen, 0)
         metro = Metro(self.passengers_mediator)
         path.add_metro(metro)
 
         self.assertEqual(
             metro.current_segment,
-            path._segments[0],  # pyright: ignore [reportPrivateUsage]
+            legacy_path_segments(path)[0],  # pyright: ignore [reportPrivateUsage]
         )
         self.assertEqual(metro.current_segment_idx, 0)
         self.assertTrue(metro.is_forward)
@@ -83,7 +84,7 @@ class TestPath(BaseTestCase):
                 self.passengers_mediator,
             )
         )
-        path.draw_with_order(self.screen, 0)
+        legacy_path_draw_with_order(path, self.screen, 0)
 
         for station in path.stations:
             station.draw(self.screen)
@@ -108,7 +109,7 @@ class TestPath(BaseTestCase):
                 self.passengers_mediator,
             )
         )
-        path.draw_with_order(self.screen, 0)
+        legacy_path_draw_with_order(path, self.screen, 0)
         for station in path.stations:
             station.draw(self.screen)
         metro = Metro(self.passengers_mediator)
@@ -147,7 +148,7 @@ class TestPath(BaseTestCase):
             )
         )
         path.set_loop()
-        path.draw_with_order(self.screen, 0)
+        legacy_path_draw_with_order(path, self.screen, 0)
         for station in path.stations:
             station.draw(self.screen)
         metro = Metro(self.passengers_mediator)

@@ -5,7 +5,7 @@ from typing import Final, NoReturn
 import pygame
 
 from src.config import Config, num_stations
-from src.entity import Passenger, Path, Station, get_random_stations
+from src.entity import Station, get_random_stations
 from src.geometry.point import Point
 from src.passengers_mediator import PassengersMediator
 from src.ui.path_button import PathButton
@@ -111,12 +111,15 @@ class Engine:
     def try_starting_path_edition(self, position: Point) -> None:
         self.path_manager.try_starting_path_edition(position)
 
+    def max_paths_reached(self) -> bool:
+        return len(self._components.paths) < self.path_manager.max_num_paths
+
     def render(self, screen: pygame.surface.Surface) -> None:
         self._game_renderer.render_game(
             screen,
             gui_height=self._gui_height,
             main_surface_height=self._main_surface_height,
-            paths=self.paths,
+            paths=self._components.paths,
             max_num_paths=self.path_manager.max_num_paths,
             travel_plans=self.travel_plans,
             editing_intermediate_stations=self.path_manager.editing_intermediate_stations,
@@ -144,27 +147,12 @@ class Engine:
         return self._components.passengers_mediator
 
     @property
-    def passengers(self) -> list[Passenger]:
-        # tests only
-        return self._components.passengers
-
-    @property
     def travel_plans(self) -> TravelPlansMapping:
         return {
             passenger: passenger.travel_plan
             for passenger in self._components.passengers
             if passenger.travel_plan
         }
-
-    @property
-    def paths(self) -> list[Path]:
-        # tests only
-        return self._components.paths
-
-    @property
-    def stations(self) -> list[Station]:
-        # tests only
-        return self._components.stations
 
     @property
     def ui(self) -> UI:
@@ -179,7 +167,7 @@ class Engine:
     #######################
 
     def _move_metros(self, dt_ms: int) -> None:
-        for path in self.paths:
+        for path in self._components.paths:
             for metro in path.metros:
                 path.move_metro(metro, dt_ms)
 

@@ -19,6 +19,7 @@ from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 
 from test.base_test import GameplayBaseTestCase
+from test.legacy_access import legacy_get_engine_passengers, legacy_get_engine_stations
 
 # some tests break under lower/higher framerate
 # TODO: analize why
@@ -41,7 +42,7 @@ class TestEngine(GameplayBaseTestCase):
         super().tearDown()
 
     def test_react_mouse_down(self) -> None:
-        for station in self.engine.stations:
+        for station in legacy_get_engine_stations(self.engine):
             station.draw(self.screen)
         self.reactor.react(MouseEvent(MouseEventType.MOUSE_DOWN, Point(-1, -1)))
 
@@ -50,7 +51,7 @@ class TestEngine(GameplayBaseTestCase):
     def test_get_containing_entity(self) -> None:
         self.assertTrue(
             self.engine.get_containing_entity(
-                self.engine.stations[2].position + Point(1, 1)
+                legacy_get_engine_stations(self.engine)[2].position + Point(1, 1)
             )
         )
 
@@ -62,7 +63,10 @@ class TestEngine(GameplayBaseTestCase):
     def test_passengers_are_added_to_stations(self) -> None:
         self.engine._passenger_spawner._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
 
-        self.assertEqual(len(self.engine.passengers), len(self.engine.stations))
+        self.assertEqual(
+            len(legacy_get_engine_passengers(self.engine)),
+            len(legacy_get_engine_stations(self.engine)),
+        )
 
     @patch.object(PassengerSpawner, "_spawn_passengers", new_callable=Mock)
     def test_is_passenger_spawn_time(self, mock_spawn_passengers: Any) -> None:
@@ -91,9 +95,9 @@ class TestEngine(GameplayBaseTestCase):
         ):
             self.engine.increment_time(dt_ms)
 
-        assert self.engine.passengers
+        assert legacy_get_engine_passengers(self.engine)
 
-        for station in self.engine.stations:
+        for station in legacy_get_engine_stations(self.engine):
             for passenger in station.passengers:
                 self.assertNotEqual(
                     passenger.destination_shape.type, station.shape.type
@@ -122,7 +126,7 @@ class TestEngine(GameplayBaseTestCase):
             ]
         )
         # Need to draw stations if you want to override them
-        for station in self.engine.stations:
+        for station in legacy_get_engine_stations(self.engine):
             station.draw(self.screen)
 
         # Run the game until first wave of passengers spawn
@@ -132,7 +136,7 @@ class TestEngine(GameplayBaseTestCase):
         self._connect_stations([0, 1])
         self.engine.increment_time(dt_ms)
 
-        for passenger in self.engine.passengers:
+        for passenger in legacy_get_engine_passengers(self.engine):
             self.assertIn(passenger, self.engine.travel_plans)
             self.assertIsNotNone(passenger.travel_plan)
             assert passenger.travel_plan
@@ -144,7 +148,7 @@ class TestEngine(GameplayBaseTestCase):
         for _ in range(Config.passenger_spawning.interval_step + 1):
             self.engine.increment_time(dt_ms)
 
-        for passenger in self.engine.passengers:
+        for passenger in legacy_get_engine_passengers(self.engine):
             self.assertIn(passenger, self.engine.travel_plans)
             self.assertIsNotNone(passenger.travel_plan)
             assert passenger.travel_plan
@@ -215,18 +219,24 @@ class TestEngine(GameplayBaseTestCase):
             ShapeType.TRIANGLE
         )
 
-        self.assertCountEqual(rect_stations, self.engine.stations[0:1])
-        self.assertCountEqual(circle_stations, self.engine.stations[1:3])
-        self.assertCountEqual(triangle_stations, self.engine.stations[3:])
+        self.assertCountEqual(
+            rect_stations, legacy_get_engine_stations(self.engine)[0:1]
+        )
+        self.assertCountEqual(
+            circle_stations, legacy_get_engine_stations(self.engine)[1:3]
+        )
+        self.assertCountEqual(
+            triangle_stations, legacy_get_engine_stations(self.engine)[3:]
+        )
 
     def test_skip_stations_on_same_path(self) -> None:
         self._replace_stations(get_random_stations(5, self.engine.passengers_mediator))
-        for station in self.engine.stations:
+        for station in legacy_get_engine_stations(self.engine):
             station.draw(self.screen)
         self._connect_stations([i for i in range(5)])
         self.engine._passenger_spawner._spawn_passengers()  # pyright: ignore [reportPrivateUsage]
         self.engine._travel_plan_finder.find_travel_plan_for_passengers()  # pyright: ignore [reportPrivateUsage]
-        for station in self.engine.stations:
+        for station in legacy_get_engine_stations(self.engine):
             for passenger in station.passengers:
                 assert passenger.travel_plan
                 self.assertEqual(len(passenger.travel_plan.node_path), 1)

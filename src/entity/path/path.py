@@ -65,11 +65,6 @@ class Path(Entity):
     def last_station(self) -> Station:
         return self.stations[-1]
 
-    @property
-    def _segments(self) -> list[Segment]:
-        # test only (legacy)
-        return self._state.segments
-
     def add_station(self, station: Station) -> None:
         self.stations.append(station)
         self.update_segments()
@@ -85,11 +80,6 @@ class Path(Entity):
         if path_order != self._path_order:
             self.update_segments()
             self._path_order = path_order
-
-    def draw_with_order(self, surface: pygame.surface.Surface, path_order: int) -> None:
-        # legacy, used in tests
-        self._path_order = path_order
-        self.draw(surface)
 
     def draw(self, surface: pygame.surface.Surface) -> None:
         if self.selected:

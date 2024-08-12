@@ -118,9 +118,7 @@ class UI_Reactor:
 
             paths = self._engine.path_manager.get_paths_with_station(entity)
 
-            allow_creating_new_path = (
-                len(self._engine.paths) < self._engine.path_manager.max_num_paths
-            )
+            allow_creating_new_path = self._engine.max_paths_reached()
 
             num_possible_targets = len(paths) + allow_creating_new_path
             if not num_possible_targets:

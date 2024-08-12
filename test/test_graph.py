@@ -14,6 +14,7 @@ from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 
 from test.base_test import GameplayBaseTestCase
+from test.legacy_access import legacy_get_engine_paths, legacy_get_engine_stations
 
 
 class TestGraph(GameplayBaseTestCase):
@@ -25,7 +26,7 @@ class TestGraph(GameplayBaseTestCase):
         self.color = get_random_color()
         self.engine = Engine()
         self.reactor = UI_Reactor(self.engine)
-        for station in self.engine.stations:
+        for station in legacy_get_engine_stations(self.engine):
             station.draw(self.screen)
 
     def tearDown(self) -> None:
@@ -58,30 +59,34 @@ class TestGraph(GameplayBaseTestCase):
                 ),
             ]
         )
-        for station in self.engine.stations:
+        for station in legacy_get_engine_stations(self.engine):
             station.draw(self.screen)
 
         self._connect_stations([0, 1])
 
         station_nodes_dict = build_station_nodes_dict(
-            self.engine.stations, self.engine.paths
+            legacy_get_engine_stations(self.engine),
+            legacy_get_engine_paths(self.engine),
         )
-        self.assertCountEqual(list(station_nodes_dict.keys()), self.engine.stations)
+        self.assertCountEqual(
+            list(station_nodes_dict.keys()), legacy_get_engine_stations(self.engine)
+        )
         for station, node in station_nodes_dict.items():
             self.assertEqual(node.station, station)
 
     def test_bfs_two_stations(self) -> None:
         self._replace_with_random_stations(2)
-        for station in self.engine.stations:
+        for station in legacy_get_engine_stations(self.engine):
             station.draw(self.screen)
 
         self._connect_stations([0, 1])
 
         station_nodes_dict = build_station_nodes_dict(
-            self.engine.stations, self.engine.paths
+            legacy_get_engine_stations(self.engine),
+            legacy_get_engine_paths(self.engine),
         )
-        start_station = self.engine.stations[0]
-        end_station = self.engine.stations[1]
+        start_station = legacy_get_engine_stations(self.engine)[0]
+        end_station = legacy_get_engine_stations(self.engine)[1]
         start_node = station_nodes_dict[start_station]
         end_node = station_nodes_dict[end_station]
         node_path = bfs(start_node, end_node)
@@ -92,39 +97,40 @@ class TestGraph(GameplayBaseTestCase):
 
     def test_bfs_five_stations(self) -> None:
         self._replace_with_random_stations(5)
-        for station in self.engine.stations:
+        for station in legacy_get_engine_stations(self.engine):
             station.draw(self.screen)
 
         self._connect_stations([0, 1, 2])
         self._connect_stations([0, 3])
 
         station_nodes_dict = build_station_nodes_dict(
-            self.engine.stations, self.engine.paths
+            legacy_get_engine_stations(self.engine),
+            legacy_get_engine_paths(self.engine),
         )
-        start_node = station_nodes_dict[self.engine.stations[0]]
-        end_node = station_nodes_dict[self.engine.stations[2]]
+        start_node = station_nodes_dict[legacy_get_engine_stations(self.engine)[0]]
+        end_node = station_nodes_dict[legacy_get_engine_stations(self.engine)[2]]
         node_path = bfs(start_node, end_node)
         self.assertSequenceEqual(
             node_path,
             [
-                Node(self.engine.stations[0]),
-                Node(self.engine.stations[1]),
-                Node(self.engine.stations[2]),
+                Node(legacy_get_engine_stations(self.engine)[0]),
+                Node(legacy_get_engine_stations(self.engine)[1]),
+                Node(legacy_get_engine_stations(self.engine)[2]),
             ],
         )
-        start_node = station_nodes_dict[self.engine.stations[1]]
-        end_node = station_nodes_dict[self.engine.stations[3]]
+        start_node = station_nodes_dict[legacy_get_engine_stations(self.engine)[1]]
+        end_node = station_nodes_dict[legacy_get_engine_stations(self.engine)[3]]
         node_path = bfs(start_node, end_node)
         self.assertSequenceEqual(
             node_path,
             [
-                Node(self.engine.stations[1]),
-                Node(self.engine.stations[0]),
-                Node(self.engine.stations[3]),
+                Node(legacy_get_engine_stations(self.engine)[1]),
+                Node(legacy_get_engine_stations(self.engine)[0]),
+                Node(legacy_get_engine_stations(self.engine)[3]),
             ],
         )
-        start_node = station_nodes_dict[self.engine.stations[0]]
-        end_node = station_nodes_dict[self.engine.stations[4]]
+        start_node = station_nodes_dict[legacy_get_engine_stations(self.engine)[0]]
+        end_node = station_nodes_dict[legacy_get_engine_stations(self.engine)[4]]
         node_path = bfs(start_node, end_node)
         self.assertSequenceEqual(
             node_path,
