@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, ClassVar, Final, Sequence
 import pygame
 
 from src.config import passenger_display_buffer, passenger_size
-from src.exceptions import GameException
 from src.geometry.point import Point
 from src.geometry.shape import Shape
 
@@ -62,10 +61,7 @@ class Holder(Entity):
         return self.capacity > self.occupation
 
     def add_new_passenger(self, passenger: Passenger) -> None:
-        if self._mediator.any_holder_has(passenger):
-            raise GameException(
-                "Passengers can be in more than one Holder at the same time"
-            )
+        self._mediator.on_new_passenger_added(passenger)
         self._add_passenger(passenger)
 
     def move_passenger(self, passenger: Passenger, dest: Holder) -> None:
