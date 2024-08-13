@@ -1,4 +1,4 @@
-from typing import Final, Protocol
+from typing import Final
 
 from src.entity.holder import Holder
 from src.entity.passenger import Passenger
@@ -34,12 +34,3 @@ class PassengersMediator:
     #######################
     def _any_holder_has(self, passenger: Passenger) -> bool:
         return any(passenger in holder.passengers for holder in self._holders)
-
-
-class PassengersMediatorProtocol(Protocol):
-
-    def register(self, holder: Holder) -> None: ...
-
-    def on_new_passenger_added(self, passenger: Passenger) -> None: ...
-
-    def on_passenger_exit(self, source: Holder, passenger: Passenger) -> None: ...

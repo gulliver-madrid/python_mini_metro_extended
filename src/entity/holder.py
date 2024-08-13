@@ -1,19 +1,17 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Final, Sequence
+from typing import ClassVar, Final, Sequence
 
 import pygame
 
 from src.config import passenger_display_buffer, passenger_size
 from src.geometry.point import Point
 from src.geometry.shape import Shape
+from src.protocols.passenger_mediator import PassengersMediatorProtocol
 
 from .entity import Entity
 from .ids import EntityId
 from .passenger import Passenger
-
-if TYPE_CHECKING:
-    from src.passengers_mediator import PassengersMediatorProtocol
 
 
 class Holder(Entity):
