@@ -183,6 +183,7 @@ def _get_updated_segments(
         stations, color, path_order, is_looped
     )
     segments = _add_padding_segments(path_segments, color, is_looped)
+    _update_connections(segments)
     return segments
 
 
@@ -249,3 +250,9 @@ def _add_padding_segments(
             )
         )
     return segments
+
+
+def _update_connections(segments: Sequence[Segment]) -> None:
+    for current, next_segment in itertools.pairwise(segments):
+        current.connections.end = next_segment
+        next_segment.connections.start = current
