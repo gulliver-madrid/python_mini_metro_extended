@@ -40,7 +40,7 @@ class GameRenderer:
             0, gui_height, Config.screen_width, main_surface_height
         )
         main_surface.fill((180, 180, 120))
-        self._draw_paths(screen, paths, max_num_paths)
+        self._draw_paths(screen, paths)
         if editing_intermediate_stations:
             editing_intermediate_stations.draw(screen)
         for station in self._components.stations:
@@ -61,11 +61,9 @@ class GameRenderer:
             )
 
     def _draw_paths(
-        self, screen: pygame.surface.Surface, paths: Sequence[Path], max_num_paths: int
+        self, screen: pygame.surface.Surface, paths: Sequence[Path]
     ) -> None:
-        for idx, path in enumerate(paths):
-            path_order = idx - round(max_num_paths / 2)
-            path.set_path_order(path_order)
+        for path in paths:
             path.draw(screen)
 
 

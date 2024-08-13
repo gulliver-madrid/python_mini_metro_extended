@@ -33,14 +33,14 @@ class TestPath(BaseTestCase):
         super().tearDown()
 
     def test_init(self) -> None:
-        path = Path(get_random_color())
+        path = Path(get_random_color(), 0)
         station = get_random_station(self.passengers_mediator)
         path.add_station(station)
 
         self.assertIn(station, path.stations)
 
     def test_draw(self) -> None:
-        path = Path(get_random_color())
+        path = Path(get_random_color(), 0)
         stations = get_random_stations(5, self.passengers_mediator)
         for station in stations:
             path.add_station(station)
@@ -49,7 +49,7 @@ class TestPath(BaseTestCase):
         self.assertEqual(self._draw.line.call_count, 4 + 3)
 
     def test_draw_temporary_point(self) -> None:
-        path = Path(get_random_color())
+        path = Path(get_random_color(), 0)
         path.add_station(get_random_station(self.passengers_mediator))
         path.set_temporary_point(Point(1, 1))
         legacy_path_draw_with_order(path, self.screen, 0)
@@ -57,7 +57,7 @@ class TestPath(BaseTestCase):
         self.assertEqual(self._draw.line.call_count, 1)
 
     def test_metro_starts_at_beginning_of_first_line(self) -> None:
-        path = Path(get_random_color())
+        path = Path(get_random_color(), 0)
         path.add_station(get_random_station(self.passengers_mediator))
         path.add_station(get_random_station(self.passengers_mediator))
         legacy_path_draw_with_order(path, self.screen, 0)
@@ -72,7 +72,7 @@ class TestPath(BaseTestCase):
         self.assertTrue(metro.is_forward)
 
     def test_metro_moves_from_beginning_to_end(self) -> None:
-        path = Path(get_random_color())
+        path = Path(get_random_color(), 0)
         path.add_station(
             Station(get_random_station_shape(), Point(0, 0), self.passengers_mediator)
         )
@@ -97,7 +97,7 @@ class TestPath(BaseTestCase):
         self.assertTrue(path.stations[1].contains(metro.position))
 
     def test_metro_turns_around_when_it_reaches_the_end(self) -> None:
-        path = Path(get_random_color())
+        path = Path(get_random_color(), 0)
         path.add_station(
             Station(get_random_station_shape(), Point(0, 0), self.passengers_mediator)
         )
@@ -121,7 +121,7 @@ class TestPath(BaseTestCase):
         self.assertFalse(metro.is_forward)
 
     def test_metro_loops_around_the_path(self) -> None:
-        path = Path(get_random_color())
+        path = Path(get_random_color(), 0)
         path.add_station(
             Station(get_random_station_shape(), Point(0, 0), self.passengers_mediator)
         )

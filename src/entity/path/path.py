@@ -35,7 +35,7 @@ class Path(Entity):
         "_location_service",
     )
 
-    def __init__(self, color: Color) -> None:
+    def __init__(self, color: Color, path_order: int) -> None:
         super().__init__(create_new_path_id())
 
         # Final attributes
@@ -51,7 +51,7 @@ class Path(Entity):
         self.selected = False
         self.temp_point: Point | None = None
         self.temp_point_is_from_end = True
-        self._path_order = 0
+        self._path_order = path_order
 
     ########################
     ### public interface ###
@@ -93,11 +93,6 @@ class Path(Entity):
                         segment.stations, segment.path_order
                     )
                 )
-
-    def set_path_order(self, path_order: int) -> None:
-        if path_order != self._path_order:
-            self.update_segments()
-            self._path_order = path_order
 
     def draw(self, surface: pygame.surface.Surface) -> None:
         if self.selected:

@@ -20,14 +20,17 @@ class PathColorManager:
         self._color_status[path] = color
         self._path_colors[color] = True
 
-    def get_first_path_color_available(self) -> Color | None:
+    def get_first_path_color_available(self) -> tuple[int, Color] | None:
         assigned_color: Color | None = None
-        for path_color, taken in self._path_colors.items():
+        offset = max_num_paths // 2
+        for i, (path_color, taken) in enumerate(self._path_colors.items()):
             if taken:
                 continue
             assigned_color = path_color
             break
-        return assigned_color
+        else:
+            return None
+        return i - offset, assigned_color
 
     def release_color_for_path(self, path: Path) -> None:
         self._path_colors[path.color] = False

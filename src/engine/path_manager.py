@@ -55,9 +55,10 @@ class PathManager:
         if len(self._components.paths) >= self.max_num_paths:
             return None
 
-        color = self._components.path_color_manager.get_first_path_color_available()
-        assert color
-        path = Path(color)
+        result = self._components.path_color_manager.get_first_path_color_available()
+        assert result
+        path_order, color = result
+        path = Path(color, path_order)
         path.is_being_created = True
         path.selected = True
         self._creating_or_expanding_path = CreatingPath(self._components, path)
