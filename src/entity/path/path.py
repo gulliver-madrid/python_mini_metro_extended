@@ -164,14 +164,6 @@ class Path(Entity):
 #######################
 
 
-def get_sign(s1: Station, s2: Station) -> int:
-    assert s1.num_id != s2.num_id
-    if s1.num_id > s2.num_id:
-        return 1
-    else:
-        return -1
-
-
 def _get_updated_segments(
     stations: Sequence[Station],
     is_looped: bool,
@@ -195,8 +187,7 @@ def _create_path_segments(
 ) -> list[PathSegment]:
 
     def create_path_segment(s1: Station, s2: Station) -> PathSegment:
-        fixed_path_order = path_order * get_sign(s1, s2)
-        return PathSegment(color, s1, s2, fixed_path_order)
+        return PathSegment(color, s1, s2, path_order)
 
     path_segments = [
         create_path_segment(s1, s2) for s1, s2 in itertools.pairwise(stations)
@@ -230,6 +221,8 @@ def _add_padding_segments(
                 path_order,
             )
         )
+        assert segments[-1].start == current_segment.end
+        assert segments[-1].end == next_segment.start
 
     segments.append(path_segments[-1])
 
@@ -248,6 +241,8 @@ def _add_padding_segments(
                 path_order,
             )
         )
+        assert segments[-1].start == prev_segment.end
+        assert segments[-1].end == next_segment.start
     return segments
 
 

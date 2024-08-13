@@ -24,13 +24,17 @@ connection_positions: Final[dict[tuple[Station, Station, PathOrder], Point]] = {
 
 class LocationService:
     @staticmethod
+    def clear() -> None:
+        connection_positions.clear()
+
+    @staticmethod
     def get_padding_segment_edges(
         stations: GroupOfThreeStations, path_order: int
     ) -> SegmentEdges:
         from src.entity.segments.path_segment import StationPair
 
         prev_edges = LocationService.get_path_segment_edges(
-            StationPair(stations.previous, stations.current), -path_order
+            StationPair(stations.previous, stations.current), path_order
         )
         next_edges = LocationService.get_path_segment_edges(
             StationPair(stations.current, stations.next), path_order
@@ -45,18 +49,32 @@ class LocationService:
         if not start:
             start = stations.start.position + offset_vector
             connection_positions[start_key] = start
+        else:
+            assert start == stations.start.position + offset_vector
 
-        end_key = (stations.end, stations.start, -path_order)
+        end_key = (stations.end, stations.start, path_order)
         end = connection_positions.get(end_key)
         if not end:
             end = stations.end.position + offset_vector
             connection_positions[end_key] = end
+        else:
+            assert end == stations.end.position + offset_vector
         return SegmentEdges(start, end)
 
 
 def _get_offset_vector(stations: StationPair, path_order: int) -> Point:
+    factor = _get_sign_using_station_num_id(stations.start, stations.end)
     start_point = stations.start.position
     end_point = stations.end.position
+
     direct = get_direction(start_point, end_point)
     buffer_vector = (direct * path_order_shift).rotate(create_degrees(90))
-    return buffer_vector * path_order
+    return buffer_vector * (path_order) * factor
+
+
+def _get_sign_using_station_num_id(s1: Station, s2: Station) -> int:
+    assert s1.num_id != s2.num_id
+    if s1.num_id > s2.num_id:
+        return 1
+    else:
+        return -1
