@@ -15,7 +15,7 @@ from src.utils import get_random_color, get_random_position
 from test.base_test import BaseTestCase
 
 
-class TestGeometry(BaseTestCase):
+class TestGeometryAdvanced(BaseTestCase):
     def setUp(self) -> None:
         super().setUp()
         self.width, self.height = Config.screen_width, Config.screen_height
@@ -30,24 +30,30 @@ class TestGeometry(BaseTestCase):
     def tearDown(self) -> None:
         super().tearDown()
 
-    def test_circle_init(self) -> None:
-        radius = 1
-        circle = Circle(self.color, radius)
-
-        self.assertSequenceEqual(circle.color, self.color)
-        self.assertEqual(circle.radius, radius)
-
-    def init_circle(self) -> Circle:
+    def _init_circle(self) -> Circle:
         return Circle(self.color, 1)
 
+    def _init_rect(self) -> Rect:
+        return Rect(self.color, 10, 20)
+
+    def _init_line(self) -> Line:
+        return Line(self.color, self.start, self.end, self.linewidth)
+
+    def _init_triangle(self) -> Triangle:
+        return Triangle(self.color, 10)
+
+    ######################
+    ### tests ############
+    ######################
+
     def test_circle_draw(self) -> None:
-        circle = self.init_circle()
+        circle = self._init_circle()
         circle.draw(self.screen, self.position)
 
         self._draw.circle.assert_called_once()
 
     def test_circle_contains_point(self) -> None:
-        circle = self.init_circle()
+        circle = self._init_circle()
         circle.draw(self.screen, self.position)
 
         self.assertTrue(
@@ -57,33 +63,21 @@ class TestGeometry(BaseTestCase):
             circle.contains(self.position + Point(circle.radius + 1, circle.radius + 1))
         )
 
-    def test_rect_init(self) -> None:
-        width = 2
-        height = 3
-        rect = Rect(self.color, width, height)
-
-        self.assertSequenceEqual(rect.color, self.color)
-        self.assertEqual(rect.width, width)
-        self.assertEqual(rect.height, height)
-
-    def init_rect(self) -> Rect:
-        return Rect(self.color, 10, 20)
-
     def test_rect_draw(self) -> None:
-        rect = self.init_rect()
+        rect = self._init_rect()
         rect.draw(self.screen, self.position)
 
         self._draw.polygon.assert_called_once()
 
     def test_rect_contains_point(self) -> None:
-        rect = self.init_rect()
+        rect = self._init_rect()
         rect.draw(self.screen, self.position)
 
         self.assertTrue(rect.contains(rect.position + Point(1, 1)))
         self.assertFalse(rect.contains(rect.position + Point(rect.width, rect.height)))
 
     def test_rect_rotate(self) -> None:
-        rect = self.init_rect()
+        rect = self._init_rect()
         rect.draw(self.screen, self.position)
         rect_points = deepcopy(rect.points)
         rect.rotate(create_degrees(180))
@@ -95,7 +89,7 @@ class TestGeometry(BaseTestCase):
         self.assertSequenceEqual(rect.points, rect_points)
 
     def test_rect_set_degrees(self) -> None:
-        rect = self.init_rect()
+        rect = self._init_rect()
         rect.draw(self.screen, self.position)
         rect_points = deepcopy(rect.points)
         rect.set_degrees(create_degrees(180))
@@ -106,34 +100,14 @@ class TestGeometry(BaseTestCase):
         rect.set_degrees(create_degrees(360))
         self.assertSequenceEqual(rect.points, rect_points)
 
-    def test_line_init(self) -> None:
-        line = Line(self.color, self.start, self.end, self.linewidth)
-
-        self.assertSequenceEqual(line.color, self.color)
-        self.assertEqual(line.start, self.start)
-        self.assertEqual(line.end, self.end)
-        self.assertEqual(line.width, self.linewidth)
-
-    def init_line(self) -> Line:
-        return Line(self.color, self.start, self.end, self.linewidth)
-
     def test_line_draw(self) -> None:
-        line = self.init_line()
+        line = self._init_line()
         line.draw(self.screen)
 
         self._draw.line.assert_called_once()
 
-    def test_triangle_init(self) -> None:
-        size = 10
-        triangle = Triangle(self.color, size)
-
-        self.assertSequenceEqual(triangle.color, self.color)
-
-    def init_triangle(self) -> Triangle:
-        return Triangle(self.color, 10)
-
     def test_triangle_draw(self) -> None:
-        triangle = self.init_triangle()
+        triangle = self._init_triangle()
         triangle.draw(self.screen, self.position)
 
         self._draw.polygon.assert_called_once()
