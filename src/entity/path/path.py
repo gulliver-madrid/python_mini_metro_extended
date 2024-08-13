@@ -182,7 +182,7 @@ def _get_updated_segments(
     path_segments: Sequence[PathSegment] = _create_path_segments(
         stations, color, path_order, is_looped
     )
-    segments = _add_padding_segments(path_segments, color, is_looped)
+    segments = _add_padding_segments(path_segments, color, path_order, is_looped)
     _update_connections(segments)
     return segments
 
@@ -210,6 +210,7 @@ def _create_path_segments(
 def _add_padding_segments(
     path_segments: Sequence[PathSegment],
     color: Color,
+    path_order: int,
     is_looped: bool,
 ) -> list[Segment]:
     if not path_segments:
@@ -221,13 +222,12 @@ def _add_padding_segments(
         segments.append(
             PaddingSegment(
                 color,
-                current_segment.end,
-                next_segment.start,
                 GroupOfThreeStations(
                     current_segment.stations.start,
                     current_segment.stations.end,
                     next_segment.stations.end,
                 ),
+                path_order,
             )
         )
 
@@ -240,13 +240,12 @@ def _add_padding_segments(
         segments.append(
             PaddingSegment(
                 color,
-                prev_segment.end,
-                next_segment.start,
                 GroupOfThreeStations(
                     prev_segment.stations.start,
                     prev_segment.stations.end,
                     next_segment.stations.end,
                 ),
+                path_order,
             )
         )
     return segments

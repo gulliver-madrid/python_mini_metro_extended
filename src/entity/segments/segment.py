@@ -41,7 +41,7 @@ class Segment(Entity, ABC):
     ) -> None:
         super().__init__(id)
         self.color: Final = color
-        self._edges: Final[SegmentEdges] = edges
+        self._edges: SegmentEdges | None = edges
         self.connections: Final = SegmentConnections()
 
     def __eq__(self, other: object) -> bool:
@@ -52,10 +52,12 @@ class Segment(Entity, ABC):
 
     @property
     def start(self) -> Point:
+        assert self._edges
         return self._edges.start
 
     @property
     def end(self) -> Point:
+        assert self._edges
         return self._edges.end
 
     def includes(self, position: Point) -> bool:
