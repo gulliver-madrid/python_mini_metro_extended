@@ -3,12 +3,11 @@ from typing import Final
 
 from src.config import Config
 from src.entity.ids import create_new_padding_segment_id
-from src.entity.segments.location import LocationService
 from src.entity.station import Station
 from src.geometry.line import Line
 from src.type import Color
 
-from .segment import Segment
+from .segment import Segment, SegmentEdges
 
 
 @dataclass(frozen=True)
@@ -27,9 +26,12 @@ class PaddingSegment(Segment):
         super().__init__(
             color,
             create_new_padding_segment_id(),
-            edges=LocationService.get_padding_segment_edges(stations, path_order),
+            path_order=path_order,
         )
         self.stations: Final = stations
+
+    def set_edges(self, value: SegmentEdges) -> None:
+        super().set_edges(value)
         self.line = Line(
             color=Config.padding_segments_color or self.color,
             start=self.start,

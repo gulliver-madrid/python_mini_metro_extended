@@ -14,6 +14,9 @@ def get_circle() -> Circle:
 
 
 class TestLocation(unittest.TestCase):
+    def setUp(self) -> None:
+        self.location = LocationService()
+
     def _create_stations(
         self, mediator: PassengersMediator
     ) -> tuple[Station, Station, Station]:
@@ -26,20 +29,20 @@ class TestLocation(unittest.TestCase):
         """No conflict with points between different segments (different segments share some points without conflict)"""
         for path_order in (0, 1, -1, 2, -2):
             with self.subTest(path_order=path_order):
-                LocationService.clear()
+                self.location.clear()
                 passenger_mediator = PassengersMediator()
                 station_1, station_2, station_3 = self._create_stations(
                     passenger_mediator
                 )
 
-                first_path_segment_edges = LocationService.get_path_segment_edges(
+                first_path_segment_edges = self.location.get_path_segment_edges(
                     StationPair(station_1, station_2), path_order
                 )
-                second_path_segment_edges = LocationService.get_path_segment_edges(
+                second_path_segment_edges = self.location.get_path_segment_edges(
                     StationPair(station_2, station_3), path_order
                 )
                 group = GroupOfThreeStations(station_1, station_2, station_3)
-                padding_edges = LocationService.get_padding_segment_edges(
+                padding_edges = self.location.get_padding_segment_edges(
                     group, path_order
                 )
 
@@ -47,7 +50,7 @@ class TestLocation(unittest.TestCase):
                 self.assertEqual(second_path_segment_edges.start, padding_edges.end)
 
                 first_path_segment_reversed_edges = (
-                    LocationService.get_path_segment_edges(
+                    self.location.get_path_segment_edges(
                         StationPair(station_2, station_1), path_order
                     )
                 )
@@ -64,7 +67,7 @@ class TestLocation(unittest.TestCase):
         """Test that reversing order in stations does not affect. It can be removed when there is no logic comparing Station.num_index order"""
         for path_order in (0, 1, -1, 2, -2):
             with self.subTest(path_order=path_order):
-                LocationService.clear()
+                self.location.connection_positions.clear()
                 passenger_mediator = PassengersMediator()
                 station_1, station_2, station_3 = self._create_stations(
                     passenger_mediator
@@ -73,14 +76,14 @@ class TestLocation(unittest.TestCase):
                 # reverse the order
                 station_1, station_2 = station_2, station_1
 
-                first_path_segment_edges = LocationService.get_path_segment_edges(
+                first_path_segment_edges = self.location.get_path_segment_edges(
                     StationPair(station_1, station_2), path_order
                 )
-                second_path_segment_edges = LocationService.get_path_segment_edges(
+                second_path_segment_edges = self.location.get_path_segment_edges(
                     StationPair(station_2, station_3), path_order
                 )
                 group = GroupOfThreeStations(station_1, station_2, station_3)
-                padding_edges = LocationService.get_padding_segment_edges(
+                padding_edges = self.location.get_padding_segment_edges(
                     group, path_order
                 )
                 self.assertEqual(first_path_segment_edges.end, padding_edges.start)
@@ -90,7 +93,8 @@ class TestLocation(unittest.TestCase):
         """Another reversing option. Same that previous"""
         for path_order in (0, 1, -1, 2, -2):
             with self.subTest(path_order=path_order):
-                LocationService.clear()
+                self.location.connection_positions.clear()
+                assert not self.location.connection_positions
                 passenger_mediator = PassengersMediator()
                 station_1, station_2, station_3 = self._create_stations(
                     passenger_mediator
@@ -99,14 +103,14 @@ class TestLocation(unittest.TestCase):
                 # reverse the order
                 station_1, station_2, station_3 = station_3, station_2, station_1
 
-                first_path_segment_edges = LocationService.get_path_segment_edges(
+                first_path_segment_edges = self.location.get_path_segment_edges(
                     StationPair(station_1, station_2), path_order
                 )
-                second_path_segment_edges = LocationService.get_path_segment_edges(
+                second_path_segment_edges = self.location.get_path_segment_edges(
                     StationPair(station_2, station_3), path_order
                 )
                 group = GroupOfThreeStations(station_1, station_2, station_3)
-                padding_edges = LocationService.get_padding_segment_edges(
+                padding_edges = self.location.get_padding_segment_edges(
                     group, path_order
                 )
                 self.assertEqual(first_path_segment_edges.end, padding_edges.start)
@@ -115,20 +119,20 @@ class TestLocation(unittest.TestCase):
     def test_location_different(self) -> None:
         """Test there is no overlapping"""
 
-        LocationService.clear()
+        self.location.clear()
         path_order_1 = 1
         path_order_2 = -1
 
         passenger_mediator = PassengersMediator()
         station_1, station_2, _ = self._create_stations(passenger_mediator)
 
-        first_path_segment_edges = LocationService.get_path_segment_edges(
+        first_path_segment_edges = self.location.get_path_segment_edges(
             StationPair(station_1, station_2), path_order_1
         )
-        second_path_segment_edges = LocationService.get_path_segment_edges(
+        second_path_segment_edges = self.location.get_path_segment_edges(
             StationPair(station_1, station_2), path_order_2
         )
-        third_path_segment_edges = LocationService.get_path_segment_edges(
+        third_path_segment_edges = self.location.get_path_segment_edges(
             StationPair(station_2, station_1), path_order_2
         )
 

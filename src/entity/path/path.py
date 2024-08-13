@@ -7,6 +7,7 @@ import pygame
 from src.config import Config
 from src.entity.path.metro_movement import MetroMovementSystem
 from src.entity.path.state import PathState
+from src.entity.segments.location import LocationService
 from src.entity.segments.padding_segment import GroupOfThreeStations
 from src.geometry.line import Line
 from src.geometry.point import Point
@@ -31,6 +32,7 @@ class Path(Entity):
         "_path_order",
         "temp_point_is_from_end",
         "_metro_movement_system",
+        "_location_service",
     )
 
     def __init__(self, color: Color) -> None:
@@ -42,6 +44,7 @@ class Path(Entity):
         self.metros: Final[list[Metro]] = []
         self._state: Final = PathState()
         self._metro_movement_system: Final = MetroMovementSystem(self._state)
+        self._location_service: Final = LocationService()
 
         # Non-final attributes
         self.is_being_created = False
@@ -76,6 +79,20 @@ class Path(Entity):
         )
         self._state.segments.clear()
         self._state.segments.extend(segments)
+        for segment in self._state.segments:
+            if isinstance(segment, PaddingSegment):
+                segment.set_edges(
+                    self._location_service.get_padding_segment_edges(
+                        segment.stations, segment.path_order
+                    )
+                )
+            else:
+                assert isinstance(segment, PathSegment)
+                segment.set_edges(
+                    self._location_service.get_path_segment_edges(
+                        segment.stations, segment.path_order
+                    )
+                )
 
     def set_path_order(self, path_order: int) -> None:
         if path_order != self._path_order:
@@ -210,19 +227,17 @@ def _add_padding_segments(
     for current_segment, next_segment in itertools.pairwise(path_segments):
         segments.append(current_segment)
         assert current_segment.stations.end is next_segment.stations.start
-        segments.append(
-            PaddingSegment(
-                color,
-                GroupOfThreeStations(
-                    current_segment.stations.start,
-                    current_segment.stations.end,
-                    next_segment.stations.end,
-                ),
-                path_order,
-            )
+        padding_segment = PaddingSegment(
+            color,
+            GroupOfThreeStations(
+                current_segment.stations.start,
+                current_segment.stations.end,
+                next_segment.stations.end,
+            ),
+            path_order,
         )
-        assert segments[-1].start == current_segment.end
-        assert segments[-1].end == next_segment.start
+
+        segments.append(padding_segment)
 
     segments.append(path_segments[-1])
 
@@ -241,8 +256,6 @@ def _add_padding_segments(
                 path_order,
             )
         )
-        assert segments[-1].start == prev_segment.end
-        assert segments[-1].end == next_segment.start
     return segments
 
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Final, Iterable, TypeVar
 
@@ -28,7 +28,7 @@ class SegmentConnections:
 
 
 class Segment(Entity, ABC):
-    __slots__ = ("color", "_edges", "line", "connections")
+    __slots__ = ("color", "_edges", "line", "connections", "path_order")
 
     line: Line
 
@@ -37,11 +37,12 @@ class Segment(Entity, ABC):
         color: Color,
         id: EntityId,
         *,
-        edges: SegmentEdges,
+        path_order: int,
     ) -> None:
         super().__init__(id)
         self.color: Final = color
-        self._edges: SegmentEdges | None = edges
+        self._edges: SegmentEdges | None = None
+        self.path_order: Final = path_order
         self.connections: Final = SegmentConnections()
 
     def __eq__(self, other: object) -> bool:
@@ -49,6 +50,11 @@ class Segment(Entity, ABC):
 
     def draw(self, surface: pygame.surface.Surface) -> None:
         self.line.draw(surface)
+
+    @abstractmethod
+    def set_edges(self, value: SegmentEdges) -> None:
+        assert not self._edges
+        self._edges = value
 
     @property
     def start(self) -> Point:

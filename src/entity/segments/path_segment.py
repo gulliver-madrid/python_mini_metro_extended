@@ -3,12 +3,11 @@ from typing import Final
 
 from src.config import Config
 from src.entity.ids import create_new_path_segment_id
-from src.entity.segments.location import LocationService
 from src.entity.station import Station
 from src.geometry.line import Line
 from src.type import Color
 
-from .segment import Segment
+from .segment import Segment, SegmentEdges
 
 
 @dataclass(frozen=True)
@@ -28,9 +27,12 @@ class PathSegment(Segment):
         path_order: int,
     ) -> None:
         self.stations: Final = StationPair(start_station, end_station)
-        edges = LocationService.get_path_segment_edges(self.stations, path_order)
-        super().__init__(color, create_new_path_segment_id(), edges=edges)
+
+        super().__init__(color, create_new_path_segment_id(), path_order=path_order)
         self._path_order = path_order
+
+    def set_edges(self, value: SegmentEdges) -> None:
+        super().set_edges(value)
         self.line = Line(
             color=self.color,
             start=self.start,
