@@ -51,6 +51,14 @@ class TestGeometryBasics(unittest.TestCase):
 
         self.assertSequenceEqual(triangle.color, self.color)
 
+    def test_point_are_identified_by_their_left_and_top_attributes(self) -> None:
+        one_point = Point(100, 100)
+        other_same_position = Point(100, 100)
+        points = [one_point]
+        self.assertEqual(one_point, other_same_position)
+        self.assertTrue(other_same_position in points)
+        self.assertTrue(Point(200, 100) not in points)
+
 
 if __name__ == "__main__":
     unittest.main()
