@@ -7,6 +7,7 @@ from src.entity.passenger import Passenger
 from src.entity.path.path import Path
 from src.entity.segments.segment import Segment
 from src.entity.station import Station
+from src.protocols.passenger_mediator import PassengersMediatorProtocol
 
 
 def legacy_get_engine_passengers(engine: Engine) -> list[Passenger]:
@@ -19,6 +20,12 @@ def legacy_get_engine_paths(engine: Engine) -> list[Path]:
 
 def legacy_get_engine_stations(engine: Engine) -> list[Station]:
     return engine._components.stations  # pyright: ignore [reportPrivateUsage]
+
+
+def legacy_get_engine_passengers_mediator(engine: Engine) -> PassengersMediatorProtocol:
+    return (
+        engine._components.passengers_mediator  # pyright: ignore [reportPrivateUsage]
+    )
 
 
 def legacy_path_segments(path: Path) -> list[Segment]:

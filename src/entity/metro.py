@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final
+from typing import Final
 
 from src.config import (
     metro_capacity,
@@ -10,15 +10,13 @@ from src.config import (
     metro_speed_per_ms,
 )
 from src.geometry.polygons import Rect
+from src.protocols.passenger_mediator import PassengersMediatorProtocol
 
 from .holder import Holder
 from .ids import EntityId, create_new_metro_id
 from .passenger import Passenger
 from .segments import Segment
 from .station import Station
-
-if TYPE_CHECKING:
-    from src.passengers_mediator import PassengersMediator
 
 
 class Metro(Holder):
@@ -32,7 +30,7 @@ class Metro(Holder):
     game_speed: Final = metro_speed_per_ms
     _size = metro_size
 
-    def __init__(self, passengers_mediator: PassengersMediator) -> None:
+    def __init__(self, passengers_mediator: PassengersMediatorProtocol) -> None:
         metro_shape = Rect(color=metro_color, width=2 * self._size, height=self._size)
         super().__init__(
             shape=metro_shape,

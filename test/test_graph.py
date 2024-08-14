@@ -14,7 +14,11 @@ from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 
 from test.base_test import GameplayBaseTestCase
-from test.legacy_access import legacy_get_engine_paths, legacy_get_engine_stations
+from test.legacy_access import (
+    legacy_get_engine_passengers_mediator,
+    legacy_get_engine_paths,
+    legacy_get_engine_stations,
+)
 
 
 class TestGraph(GameplayBaseTestCase):
@@ -34,7 +38,10 @@ class TestGraph(GameplayBaseTestCase):
 
     def _replace_with_random_stations(self, n: int) -> None:
         self._replace_stations(
-            get_random_stations(n, passengers_mediator=self.engine.passengers_mediator)
+            get_random_stations(
+                n,
+                passengers_mediator=legacy_get_engine_passengers_mediator(self.engine),
+            )
         )
 
     def test_build_station_nodes_dict(self) -> None:
@@ -47,7 +54,7 @@ class TestGraph(GameplayBaseTestCase):
                         height=station_size,
                     ),
                     get_random_position(self.width, self.height),
-                    self.engine.passengers_mediator,
+                    legacy_get_engine_passengers_mediator(self.engine),
                 ),
                 Station(
                     Circle(
@@ -55,7 +62,7 @@ class TestGraph(GameplayBaseTestCase):
                         radius=round(station_size / 2),
                     ),
                     get_random_position(self.width, self.height),
-                    self.engine.passengers_mediator,
+                    legacy_get_engine_passengers_mediator(self.engine),
                 ),
             ]
         )

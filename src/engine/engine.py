@@ -143,10 +143,6 @@ class Engine:
         sys.exit()
 
     @property
-    def passengers_mediator(self) -> PassengersMediator:
-        return self._components.passengers_mediator
-
-    @property
     def travel_plans(self) -> TravelPlansMapping:
         return {
             passenger: passenger.travel_plan

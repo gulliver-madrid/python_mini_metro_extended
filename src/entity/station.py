@@ -1,17 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from src.config import station_capacity, station_passengers_per_row, station_size
 from src.geometry.point import Point
 from src.geometry.shape import Shape
 from src.geometry.utils import get_distance
+from src.protocols.passenger_mediator import PassengersMediatorProtocol
 
 from .holder import Holder
 from .ids import create_new_station_id
-
-if TYPE_CHECKING:
-    from src.passengers_mediator import PassengersMediator
 
 
 class Station(Holder):
@@ -19,7 +15,10 @@ class Station(Holder):
     _size = station_size
 
     def __init__(
-        self, shape: Shape, position: Point, passengers_mediator: PassengersMediator
+        self,
+        shape: Shape,
+        position: Point,
+        passengers_mediator: PassengersMediatorProtocol,
     ) -> None:
         super().__init__(
             shape=shape,

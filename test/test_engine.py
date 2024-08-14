@@ -19,7 +19,11 @@ from src.reactor import UI_Reactor
 from src.utils import get_random_color, get_random_position
 
 from test.base_test import GameplayBaseTestCase
-from test.legacy_access import legacy_get_engine_passengers, legacy_get_engine_stations
+from test.legacy_access import (
+    legacy_get_engine_passengers,
+    legacy_get_engine_passengers_mediator,
+    legacy_get_engine_stations,
+)
 
 # some tests break under lower/higher framerate
 # TODO: analize why
@@ -113,7 +117,7 @@ class TestEngine(GameplayBaseTestCase):
                         height=station_size,
                     ),
                     Point(100, 100),
-                    self.engine.passengers_mediator,
+                    legacy_get_engine_passengers_mediator(self.engine),
                 ),
                 Station(
                     Circle(
@@ -121,7 +125,7 @@ class TestEngine(GameplayBaseTestCase):
                         radius=round(station_size / 2),
                     ),
                     Point(100, 200),
-                    self.engine.passengers_mediator,
+                    legacy_get_engine_passengers_mediator(self.engine),
                 ),
             ]
         )
@@ -165,7 +169,7 @@ class TestEngine(GameplayBaseTestCase):
                         height=station_size,
                     ),
                     get_random_position(self.width, self.height),
-                    self.engine.passengers_mediator,
+                    legacy_get_engine_passengers_mediator(self.engine),
                 ),
                 Station(
                     Circle(
@@ -173,7 +177,7 @@ class TestEngine(GameplayBaseTestCase):
                         radius=round(station_size / 2),
                     ),
                     get_random_position(self.width, self.height),
-                    self.engine.passengers_mediator,
+                    legacy_get_engine_passengers_mediator(self.engine),
                 ),
                 Station(
                     Circle(
@@ -181,7 +185,7 @@ class TestEngine(GameplayBaseTestCase):
                         radius=round(station_size / 2),
                     ),
                     get_random_position(self.width, self.height),
-                    self.engine.passengers_mediator,
+                    legacy_get_engine_passengers_mediator(self.engine),
                 ),
                 Station(
                     Triangle(
@@ -189,7 +193,7 @@ class TestEngine(GameplayBaseTestCase):
                         size=station_size,
                     ),
                     get_random_position(self.width, self.height),
-                    self.engine.passengers_mediator,
+                    legacy_get_engine_passengers_mediator(self.engine),
                 ),
                 Station(
                     Triangle(
@@ -197,7 +201,7 @@ class TestEngine(GameplayBaseTestCase):
                         size=station_size,
                     ),
                     get_random_position(self.width, self.height),
-                    self.engine.passengers_mediator,
+                    legacy_get_engine_passengers_mediator(self.engine),
                 ),
                 Station(
                     Triangle(
@@ -205,7 +209,7 @@ class TestEngine(GameplayBaseTestCase):
                         size=station_size,
                     ),
                     get_random_position(self.width, self.height),
-                    self.engine.passengers_mediator,
+                    legacy_get_engine_passengers_mediator(self.engine),
                 ),
             ]
         )
@@ -230,7 +234,9 @@ class TestEngine(GameplayBaseTestCase):
         )
 
     def test_skip_stations_on_same_path(self) -> None:
-        self._replace_stations(get_random_stations(5, self.engine.passengers_mediator))
+        self._replace_stations(
+            get_random_stations(5, legacy_get_engine_passengers_mediator(self.engine))
+        )
         for station in legacy_get_engine_stations(self.engine):
             station.draw(self.screen)
         self._connect_stations([i for i in range(5)])
