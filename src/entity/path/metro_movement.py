@@ -1,14 +1,14 @@
 import math
 from dataclasses import dataclass
 
+from src.entity.metro import Metro
+from src.entity.segments import PaddingSegment, PathSegment
+from src.entity.station import Station
 from src.geometry.point import Point
 from src.geometry.polygons import Polygon
 from src.geometry.types import radians_to_degrees
 from src.geometry.utils import get_direction, get_distance
 
-from ..metro import Metro
-from ..segments import PathSegment
-from ..station import Station
 from .end_segment_behaviour import (
     ChangeIndex,
     ReverseDirection,
@@ -30,7 +30,7 @@ class MetroMovementSystem:
     def move_metro(self, metro: Metro, dt_ms: int) -> None:
         dst_position, dst_station = _determine_destination(metro)
 
-        distance_to_destination, direction = _calculate_direction_and_distance(
+        direction, distance_to_destination = _calculate_direction_and_distance(
             metro.position, dst_position
         )
 
@@ -95,16 +95,14 @@ def _determine_destination(metro: Metro) -> tuple[Point, Station | None]:
     segment = metro.current_segment
     assert segment is not None
 
-    if metro.is_forward:
-        dst_position = segment.end
-    else:
-        dst_position = segment.start
+    dst_position = segment.end if metro.is_forward else segment.start
 
     if isinstance(segment, PathSegment):
-        assert segment.stations
-        stations = segment.stations
-        dst_station = stations.end if metro.is_forward else stations.start
+        dst_station = (
+            segment.stations.end if metro.is_forward else segment.stations.start
+        )
     else:
+        assert isinstance(segment, PaddingSegment)
         dst_station = None
 
     return dst_position, dst_station
@@ -112,8 +110,8 @@ def _determine_destination(metro: Metro) -> tuple[Point, Station | None]:
 
 def _calculate_direction_and_distance(
     start_point: Point, end_point: Point
-) -> tuple[float, Point]:
+) -> tuple[Point, float]:
     """Calculate the distance and direction to the destination point"""
     distance = get_distance(start_point, end_point)
     direction = get_direction(start_point, end_point)
-    return distance, direction
+    return direction, distance
