@@ -1,7 +1,6 @@
 import math
 from dataclasses import dataclass
 
-from src.entity.path.state import PathState
 from src.geometry.point import Point
 from src.geometry.polygons import Polygon
 from src.geometry.types import radians_to_degrees
@@ -15,6 +14,7 @@ from .end_segment_behaviour import (
     ReverseDirection,
     get_segment_behaviour_at_the_end_of_the_segment,
 )
+from .state import PathState
 
 
 @dataclass

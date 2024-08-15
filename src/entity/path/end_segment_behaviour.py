@@ -20,11 +20,11 @@ def get_segment_behaviour_at_the_end_of_the_segment(
 
     last_idx = num_segments - 1
     if is_forward:
-        return _get_segment_end_result_forward(last_idx, current_idx, loop)
-    return _get_segment_end_result_backward(last_idx, current_idx, loop)
+        return _get_segment_end_behaviour_forward(last_idx, current_idx, loop)
+    return _get_segment_end_behaviour_backward(last_idx, current_idx, loop)
 
 
-def _get_segment_end_result_forward(
+def _get_segment_end_behaviour_forward(
     last_idx: int, current_idx: int, loop: bool
 ) -> ChangeIndex | ReverseDirection:
 
@@ -38,7 +38,7 @@ def _get_segment_end_result_forward(
     return ReverseDirection()
 
 
-def _get_segment_end_result_backward(
+def _get_segment_end_behaviour_backward(
     last_idx: int, current_idx: int, loop: bool
 ) -> ChangeIndex | ReverseDirection:
 
