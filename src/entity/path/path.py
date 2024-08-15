@@ -80,19 +80,7 @@ class Path(Entity):
         self._state.segments.clear()
         self._state.segments.extend(segments)
         for segment in self._state.segments:
-            if isinstance(segment, PaddingSegment):
-                segment.visual.set_edges(
-                    self._location_service.get_padding_segment_edges(
-                        segment.stations, self._path_order
-                    )
-                )
-            else:
-                assert isinstance(segment, PathSegment)
-                segment.visual.set_edges(
-                    self._location_service.get_path_segment_edges(
-                        segment.stations, self._path_order
-                    )
-                )
+            self._location_service.locate_segment(segment, self._path_order)
 
     def draw(self, surface: pygame.surface.Surface) -> None:
         if self.selected:

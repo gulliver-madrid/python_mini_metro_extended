@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Final
 
 from src.config import path_order_shift
-from src.entity.segments.visual_segment import SegmentEdges
+from src.entity.segments import PaddingSegment, PathSegment, Segment, SegmentEdges
 from src.entity.station import Station
 from src.geometry.point import Point
 from src.geometry.types import create_degrees
@@ -27,6 +27,16 @@ class LocationService:
 
     def clear(self) -> None:
         self.connection_positions.clear()
+
+    def locate_segment(self, segment: Segment, path_order: int) -> None:
+        match segment:
+            case PaddingSegment():
+                edges = self.get_padding_segment_edges(segment.stations, path_order)
+            case PathSegment():
+                edges = self.get_path_segment_edges(segment.stations, path_order)
+            case _:
+                assert False
+        segment.visual.set_edges(edges)
 
     def get_padding_segment_edges(
         self, stations: GroupOfThreeStations, path_order: int
