@@ -34,11 +34,9 @@ class MetroMovementSystem:
             metro.position, dst_position
         )
 
-        # Calculate and set the rotation angle of the metro
         if isinstance(metro.shape, Polygon):
-            _set_rotation_angle(metro.shape, direction)
+            _set_metro_rotation_angle(metro.shape, direction)
 
-        # Calculate the distance the metro can travel in this time step
         distance_can_travel = metro.game_speed * dt_ms
 
         segment_end_reached = distance_can_travel >= distance_to_destination
@@ -79,12 +77,12 @@ class MetroMovementSystem:
             break
 
 
-#######################
-### free functions ###
-#######################
+#########################
+### private interface ###
+#########################
 
 
-def _set_rotation_angle(polygon: Polygon, direct: Point) -> None:
+def _set_metro_rotation_angle(polygon: Polygon, direct: Point) -> None:
     radians = math.atan2(direct.top, direct.left)
     degrees = radians_to_degrees(radians)
     polygon.set_degrees(degrees)
