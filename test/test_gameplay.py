@@ -268,9 +268,10 @@ class TestGameplay(GameplayBaseTestCase):
         # run until the train is in the last segment
         while True:
             self.engine.increment_time(dt_ms)
-            if metro.current_segment_idx == len(legacy_path_segments(path)) - 1:
+            assert metro.travel_step
+            if metro.travel_step.current == legacy_path_segments(path)[-1]:
                 break
-        first = legacy_path_segments(path)[0]  # pyright: ignore [reportPrivateUsage]
+        first = legacy_path_segments(path)[0]
         assert isinstance(first, PathSegment)
 
         # remove first station

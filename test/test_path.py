@@ -64,11 +64,12 @@ class TestPath(BaseTestCase):
         metro = Metro(self.passengers_mediator)
         path.add_metro(metro)
 
+        self.assertEqual(metro.current_segment, legacy_path_segments(path)[0])
+        assert metro.travel_step
         self.assertEqual(
-            metro.current_segment,
-            legacy_path_segments(path)[0],  # pyright: ignore [reportPrivateUsage]
+            metro.travel_step.current,
+            legacy_path_segments(path)[0],
         )
-        self.assertEqual(metro.current_segment_idx, 0)
         self.assertTrue(metro.is_forward)
 
     def test_metro_moves_from_beginning_to_end(self) -> None:

@@ -1,7 +1,6 @@
 from typing_extensions import override
 
 from src.engine.game_components import GameComponents
-from src.engine.utils import update_metros_segment_idx
 from src.entity.path import Path
 from src.entity.station import Station
 
@@ -88,4 +87,5 @@ class ExpandingPath(CreatingOrExpandingPathBase):
         index = index - 1
         # we insert the station *after* that index
         path.stations.insert(index + 1, station)
-        update_metros_segment_idx(path.metros, after_index=index, change=1)
+        # TODO: update metros' travel step
+        path.update_segments()

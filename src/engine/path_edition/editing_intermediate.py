@@ -4,7 +4,6 @@ from typing import Iterable, TypeVar
 import pygame
 
 from src.color import reduce_saturation
-from src.engine.utils import update_metros_segment_idx
 from src.entity.path import Path
 from src.entity.segments import PathSegment
 from src.entity.segments.segment import Segment
@@ -40,11 +39,8 @@ class EditingIntermediateStations:
         path_segment = _find_equal_segment(segment, path_segments)
         assert path_segment
 
-        index = path_segments.index(path_segment)
-
         self.path.stations.remove(station)
-        update_metros_segment_idx(self.path.metros, after_index=index, change=-1)
-
+        # TODO: update metros' travel steps
         self.path.update_segments()
 
     def draw(self, surface: pygame.surface.Surface) -> None:

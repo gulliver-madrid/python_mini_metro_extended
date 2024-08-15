@@ -18,7 +18,6 @@ from .path_edition import (
     gen_wrapper_creating_or_expanding,
 )
 from .travel_plan_finder import TravelPlanFinder
-from .utils import update_metros_segment_idx
 
 logger = configure_logger(__name__)
 
@@ -149,7 +148,7 @@ class PathManager:
         )
         # we insert the station *after* that index
         path.stations.insert(index + 1, station)
-        update_metros_segment_idx(path.metros, after_index=index, change=1)
+        path.update_segments()
         self.stop_edition()
 
     def _remove_station(self, station: Station) -> None:

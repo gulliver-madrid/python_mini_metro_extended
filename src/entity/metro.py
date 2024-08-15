@@ -9,6 +9,7 @@ from src.config import (
     metro_size,
     metro_speed_per_ms,
 )
+from src.entity.travel_step import TravelStep
 from src.geometry.polygons import Rect
 from src.protocols.passenger_mediator import PassengersMediatorProtocol
 
@@ -22,10 +23,8 @@ from .station import Station
 class Metro(Holder):
     __slots__ = (
         "_current_station",
-        "current_segment",
-        "current_segment_idx",
         "path_id",
-        "is_forward",
+        "travel_step",
     )
     game_speed: Final = metro_speed_per_ms
     _size = metro_size
@@ -40,14 +39,25 @@ class Metro(Holder):
             mediator=passengers_mediator,
         )
         self._current_station: Station | None = None
-        self.current_segment: Segment | None = None
-        self.current_segment_idx = 0
-        self.is_forward = True
+        # self.current_segment: Segment | None = None
+        # self.current_segment_idx = 0
+        # self.is_forward = True
+        self.travel_step: TravelStep | None = None
         self.path_id: EntityId | None = None
 
     ######################
     ### public methods ###
     ######################
+
+    @property
+    def current_segment(self) -> Segment:
+        assert self.travel_step
+        return self.travel_step.current
+
+    @property
+    def is_forward(self) -> bool:
+        assert self.travel_step
+        return self.travel_step.is_forward
 
     @property
     def current_station(self) -> Station | None:

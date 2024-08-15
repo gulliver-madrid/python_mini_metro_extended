@@ -9,11 +9,6 @@ from src.geometry.polygons import Polygon
 from src.geometry.types import radians_to_degrees
 from src.geometry.utils import get_direction, get_distance
 
-from .end_segment_behaviour import (
-    ChangeIndex,
-    ReverseDirection,
-    get_segment_behaviour_at_the_end_of_the_segment,
-)
 from .state import PathState
 
 
@@ -57,24 +52,10 @@ class MetroMovementSystem:
         # Update the current station if necessary
         if metro.current_station != possible_dest_station:
             metro.current_station = possible_dest_station
-
-        behaviour = get_segment_behaviour_at_the_end_of_the_segment(
-            len(self._state.segments),
-            metro.current_segment_idx,
-            metro.is_forward,
-            self._state.is_looped,
-        )
-        while True:
-            match behaviour:
-                case ChangeIndex(value):
-                    if value >= len(self._state.segments):
-                        behaviour = ReverseDirection()
-                        continue
-                    metro.current_segment_idx = value
-                    self._state.update_metro_current_segment(metro)
-                case ReverseDirection():
-                    metro.is_forward = not metro.is_forward
-            break
+        assert metro.travel_step
+        assert metro.travel_step.next
+        metro.travel_step = metro.travel_step.next
+        return
 
 
 #########################

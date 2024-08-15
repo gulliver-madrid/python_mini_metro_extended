@@ -28,5 +28,8 @@ class PaddingSegment(Segment):
     def __eq__(self, other: object) -> bool:
         return type(other) == PaddingSegment and other.stations == self.stations
 
+    def __hash__(self) -> int:
+        return hash(self.stations)
+
     def repr(self) -> str:
         return f"{type(self).__name__}(id={self.num_id}, previous={self.stations.previous}, current={self.stations.current}, next={self.stations.next})"

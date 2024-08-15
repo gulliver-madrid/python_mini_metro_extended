@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import itertools
 from collections.abc import Sequence
 from typing import Final
@@ -9,6 +11,7 @@ from src.entity.path.metro_movement import MetroMovementSystem
 from src.entity.path.state import PathState
 from src.entity.segments.location import LocationService
 from src.entity.segments.padding_segment import GroupOfThreeStations
+from src.entity.travel_step import TravelStep
 from src.geometry.line import Line
 from src.geometry.point import Point
 from src.type import Color
@@ -74,9 +77,18 @@ class Path(Entity):
         self.update_segments()
 
     def update_segments(self) -> None:
+        """This should be called only when it is really needed"""
         segments: list[Segment] = _get_updated_segments(
             self.stations, self._state.is_looped, self.color
         )
+        if segments:
+            travel_step = build_travel_steps(segments, self.is_looped)
+            assert travel_step.current == segments[0]
+            assert travel_step.is_forward
+            if self.metros:
+                metro = self.metros[0]
+                assert metro
+                metro.travel_step = travel_step
         self._state.segments.clear()
         self._state.segments.extend(segments)
         for segment in self._state.segments:
@@ -115,11 +127,11 @@ class Path(Entity):
 
     def add_metro(self, metro: Metro) -> None:
         metro.shape.color = self.color
-        self._state.update_metro_current_segment(metro)
+        metro.travel_step = build_travel_steps(self._state.segments, self.is_looped)
         assert metro.current_segment
         metro.position = metro.current_segment.start
         metro.path_id = self.id
-        # TODO: review this, why?
+
         if isinstance(metro.current_segment, PathSegment):
             metro.current_station = metro.current_segment.stations.start
         else:
@@ -162,6 +174,49 @@ class Path(Entity):
 #######################
 ### free functions ###
 #######################
+
+
+def build_travel_steps(segments: Sequence[Segment], is_looped: bool) -> TravelStep:
+    assert len(set(segments)) == len(segments)
+    travel_step: TravelStep | None = None
+    current_index = 0
+    is_forward = True
+    previous: TravelStep | None = None
+    created: dict[tuple[int, bool], TravelStep] = {}
+    building = True
+    while building:
+        travel_step = created.get((current_index, is_forward))
+        if not travel_step:
+            travel_step = TravelStep(segments[current_index], is_forward)
+            created[(current_index, is_forward)] = travel_step
+        else:
+            building = False
+
+        if previous:
+            assert not previous.next
+            previous.next = travel_step
+
+        if not building:
+            break
+
+        if is_forward:
+            if current_index < len(segments) - 1:
+                current_index += 1
+            elif is_looped:
+                current_index = 0
+            else:
+                is_forward = False
+        else:
+            if current_index > 0:
+                current_index -= 1
+            elif is_looped:
+                current_index = len(segments) - 1
+            else:
+                is_forward = True
+
+        previous = travel_step
+    assert travel_step
+    return travel_step
 
 
 def _get_updated_segments(
