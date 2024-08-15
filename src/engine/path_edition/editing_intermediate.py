@@ -1,11 +1,13 @@
 from dataclasses import dataclass, field
+from typing import Iterable, TypeVar
 
 import pygame
 
 from src.color import reduce_saturation
 from src.engine.utils import update_metros_segment_idx
 from src.entity.path import Path
-from src.entity.segments import PathSegment, find_equal_segment
+from src.entity.segments import PathSegment
+from src.entity.segments.segment import Segment
 from src.entity.station import Station
 from src.geometry.line import Line
 from src.geometry.point import Point
@@ -24,7 +26,7 @@ class EditingIntermediateStations:
         segment = self.segment
         path_segments = self.path.get_path_segments()
 
-        path_segment = find_equal_segment(segment, path_segments)
+        path_segment = _find_equal_segment(segment, path_segments)
         assert path_segment
 
         index = path_segments.index(path_segment)
@@ -35,7 +37,7 @@ class EditingIntermediateStations:
         segment = self.segment
         path_segments = self.path.get_path_segments()
 
-        path_segment = find_equal_segment(segment, path_segments)
+        path_segment = _find_equal_segment(segment, path_segments)
         assert path_segment
 
         index = path_segments.index(path_segment)
@@ -62,3 +64,13 @@ class EditingIntermediateStations:
                 width=10,
             )
             temp_line2.draw(surface)
+
+
+T = TypeVar("T", bound=Segment)
+
+
+def _find_equal_segment(segment: T, segments: Iterable[T]) -> T | None:
+    for s in segments:
+        if segment == s:
+            return s
+    return None

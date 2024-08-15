@@ -2,14 +2,13 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Final, Iterable, TypeVar
+from typing import Final
 
 import pygame
 
 from src.entity.entity import Entity
 from src.entity.ids import EntityId
 from src.entity.segments.visual_segment import VisualSegment
-from src.geometry.line import Line
 from src.geometry.point import Point
 from src.type import Color
 
@@ -52,13 +51,3 @@ class Segment(Entity, ABC):
 
     def repr(self) -> str:
         return f"{type(self).__name__}(id={self.num_id})"
-
-
-T = TypeVar("T", bound=Segment)
-
-
-def find_equal_segment(segment: T, segments: Iterable[T]) -> T | None:
-    for s in segments:
-        if segment == s:
-            return s
-    return None
