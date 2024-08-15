@@ -75,22 +75,22 @@ class Path(Entity):
 
     def update_segments(self) -> None:
         segments: list[Segment] = _get_updated_segments(
-            self.stations, self._state.is_looped, self.color, self._path_order
+            self.stations, self._state.is_looped, self.color
         )
         self._state.segments.clear()
         self._state.segments.extend(segments)
         for segment in self._state.segments:
             if isinstance(segment, PaddingSegment):
-                segment.set_edges(
+                segment.visual.set_edges(
                     self._location_service.get_padding_segment_edges(
-                        segment.stations, segment.path_order
+                        segment.stations, self._path_order
                     )
                 )
             else:
                 assert isinstance(segment, PathSegment)
-                segment.set_edges(
+                segment.visual.set_edges(
                     self._location_service.get_path_segment_edges(
-                        segment.stations, segment.path_order
+                        segment.stations, self._path_order
                     )
                 )
 
@@ -180,13 +180,12 @@ def _get_updated_segments(
     stations: Sequence[Station],
     is_looped: bool,
     color: Color,
-    path_order: int,
 ) -> list[Segment]:
 
     path_segments: Sequence[PathSegment] = _create_path_segments(
-        stations, color, path_order, is_looped
+        stations, color, is_looped
     )
-    segments = _add_padding_segments(path_segments, color, path_order, is_looped)
+    segments = _add_padding_segments(path_segments, color, is_looped)
     _update_connections(segments)
     return segments
 
@@ -194,12 +193,11 @@ def _get_updated_segments(
 def _create_path_segments(
     stations: Sequence[Station],
     color: Color,
-    path_order: int,
     is_looped: bool,
 ) -> list[PathSegment]:
 
     def create_path_segment(s1: Station, s2: Station) -> PathSegment:
-        return PathSegment(color, s1, s2, path_order)
+        return PathSegment(color, s1, s2)
 
     path_segments = [
         create_path_segment(s1, s2) for s1, s2 in itertools.pairwise(stations)
@@ -213,7 +211,6 @@ def _create_path_segments(
 def _add_padding_segments(
     path_segments: Sequence[PathSegment],
     color: Color,
-    path_order: int,
     is_looped: bool,
 ) -> list[Segment]:
     if not path_segments:
@@ -229,7 +226,6 @@ def _add_padding_segments(
                 current_segment.stations.end,
                 next_segment.stations.end,
             ),
-            path_order,
         )
 
         segments.append(padding_segment)
@@ -248,7 +244,6 @@ def _add_padding_segments(
                     prev_segment.stations.end,
                     next_segment.stations.end,
                 ),
-                path_order,
             )
         )
     return segments

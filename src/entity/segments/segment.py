@@ -1,24 +1,17 @@
 from __future__ import annotations
 
-import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Final, Iterable, TypeVar
 
 import pygame
 
-from src.config import Config
 from src.entity.entity import Entity
 from src.entity.ids import EntityId
+from src.entity.segments.visual_segment import VisualSegment
 from src.geometry.line import Line
 from src.geometry.point import Point
 from src.type import Color
-
-
-@dataclass(frozen=True)
-class SegmentEdges:
-    start: Point
-    end: Point
 
 
 @dataclass
@@ -28,87 +21,37 @@ class SegmentConnections:
 
 
 class Segment(Entity, ABC):
-    __slots__ = ("color", "_edges", "line", "connections", "path_order")
-
-    line: Line
+    __slots__ = ("connections", "visual")
 
     def __init__(
         self,
         color: Color,
         id: EntityId,
-        *,
-        path_order: int,
     ) -> None:
         super().__init__(id)
-        self.color: Final = color
-        self._edges: SegmentEdges | None = None
-        self.path_order: Final = path_order
         self.connections: Final = SegmentConnections()
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, Segment) and (self._edges == other._edges)
-
-    def draw(self, surface: pygame.surface.Surface) -> None:
-        self.line.draw(surface)
+        self.visual: Final = VisualSegment(color)
 
     @abstractmethod
-    def set_edges(self, value: SegmentEdges) -> None:
-        assert not self._edges
-        self._edges = value
+    def __eq__(self, other: object) -> bool:
+        raise NotImplementedError
+
+    def draw(self, surface: pygame.surface.Surface) -> None:
+        self.visual.draw(surface)
+
+    def includes(self, position: Point) -> bool:
+        return self.visual.includes(position)
 
     @property
     def start(self) -> Point:
-        assert self._edges
-        return self._edges.start
+        return self.visual.start
 
     @property
     def end(self) -> Point:
-        assert self._edges
-        return self._edges.end
-
-    def includes(self, position: Point) -> bool:
-        dist = distance_point_segment(
-            self.start.left,
-            self.start.top,
-            self.end.left,
-            self.end.top,
-            position.left,
-            position.top,
-        )
-        return dist is not None and dist < Config.path_width
+        return self.visual.end
 
     def repr(self) -> str:
-        return f"{type(self).__name__}(id={self.num_id}, start={self.start}, end={self.end})"
-
-
-def distance_point_segment(
-    Ax: float, Ay: float, Bx: float, By: float, Cx: float, Cy: float
-) -> float | None:
-    # Vector AB
-    ABx = Bx - Ax
-    ABy = By - Ay
-
-    # Vector AC
-    ACx = Cx - Ax
-    ACy = Cy - Ay
-
-    # Length of AB squared
-    AB_length_sq = ABx**2 + ABy**2
-
-    # Scalar projection of AC onto AB
-    proj = (ACx * ABx + ACy * ABy) / AB_length_sq
-
-    if proj <= 0:
-        # C is closer to A
-        return None
-    elif proj >= 1:
-        # C is closer to B
-        return None
-    else:
-        # The projection falls within the segment
-        proj_x = Ax + proj * ABx
-        proj_y = Ay + proj * ABy
-        return math.sqrt((Cx - proj_x) ** 2 + (Cy - proj_y) ** 2)
+        return f"{type(self).__name__}(id={self.num_id})"
 
 
 T = TypeVar("T", bound=Segment)

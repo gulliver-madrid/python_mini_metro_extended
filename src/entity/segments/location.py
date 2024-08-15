@@ -5,12 +5,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Final
 
 from src.config import path_order_shift
+from src.entity.segments.visual_segment import SegmentEdges
 from src.entity.station import Station
 from src.geometry.point import Point
 from src.geometry.types import create_degrees
 from src.geometry.utils import get_direction
-
-from .segment import SegmentEdges
 
 if TYPE_CHECKING:
     from src.entity.segments.padding_segment import GroupOfThreeStations
