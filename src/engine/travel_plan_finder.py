@@ -35,7 +35,12 @@ class TravelPlanFinder:
             self._components.stations, self._components.paths
         )
         for station in self._components.stations:
+            # if station is not in any path
             if not self._station_is_connected(station):
+                # passengers shouldn't have a travel plan
+                for passenger in station.passengers:
+                    if passenger.travel_plan:
+                        passenger.travel_plan = None
                 continue
             for passenger in station.passengers:
                 if _passenger_has_travel_plan_with_next_path(
@@ -102,6 +107,9 @@ class TravelPlanFinder:
 def _passenger_has_travel_plan_with_next_path(
     passenger: Passenger, paths: Sequence[Path]
 ) -> bool:
+    if not passenger.travel_plan:
+        return False
     return (
-        passenger.travel_plan is not None and passenger.travel_plan.next_path in paths
+        passenger.travel_plan.next_path in paths
+        or passenger.travel_plan.next_station is not None
     )
