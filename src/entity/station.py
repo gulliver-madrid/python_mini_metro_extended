@@ -25,7 +25,7 @@ class Station(Holder):
             capacity=station_capacity,
             id=create_new_station_id(shape.type),
             passengers_per_row=station_passengers_per_row,
-            mediator=passengers_mediator,  # pyright: ignore [reportArgumentType]
+            mediator=passengers_mediator,
         )
         self.position = position
 
