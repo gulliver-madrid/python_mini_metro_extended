@@ -10,19 +10,25 @@ from src.ui.ui import UI
 
 from .passenger_spawner import TravelPlansMapping
 
+LINE_HEIGHT = 30
+DEFAULT_SIZE = (300, 300)
+
 
 class DebugRenderer:
-    __slots__ = ("_debug_surf", "_position")
+    __slots__ = ("_debug_surf", "_size")
 
     fg_color: Final = (255, 255, 255)
     bg_color: Final = (0, 0, 0)
-    size: Final = (300, 300)
 
     def __init__(self) -> None:
-        self._debug_surf = pygame.Surface(self.size)
-        self._position: Final = Point(
-            Config.screen_width - self.size[0],
-            Config.screen_height - self.size[1],
+        self._size = DEFAULT_SIZE
+
+    @property
+    def _position(self) -> Point:
+        w, h = self._size
+        return Point(
+            Config.screen_width - w,
+            Config.screen_height - h,
         )
 
     def draw_debug(
@@ -38,8 +44,6 @@ class DebugRenderer:
         font = ui.small_font
         mouse_pos = ui.last_pos
         fps = ui.clock.get_fps() if ui.clock else None
-        self._debug_surf.set_alpha(180)
-        self._debug_surf.fill(self.bg_color)
 
         debug_texts = self._define_debug_texts(
             mouse_pos,
@@ -50,6 +54,12 @@ class DebugRenderer:
             is_creating_path=is_creating_path,
             game_speed=speed,
         )
+        number_of_lines = len(debug_texts)
+
+        self._size = (self._size[0], (number_of_lines + 1) * LINE_HEIGHT)
+        self._debug_surf = pygame.Surface(self._size)
+        self._debug_surf.set_alpha(180)
+        self._debug_surf.fill(self.bg_color)
 
         self._draw_debug_texts(debug_texts, font, self.fg_color)
 
@@ -73,11 +83,11 @@ class DebugRenderer:
         if mouse_pos:
             debug_texts.append(f"Mouse position: {mouse_pos.to_tuple()}")
         if fps:
-            debug_texts.append(f"FPS: {fps:.2f}")
+            debug_texts.append(f"FPS: {fps:.1f}")
         debug_texts.append(f"Game speed: {game_speed:.2f}")
         debug_texts.append(f"Number of passengers: {len(passengers)}")
         debug_texts.append(f"Number of travel plans: {len(travel_plans)}")
-        debug_texts.append(f"Until next spawning: { ( ms_until_next_spawn/1000):.2f}")
+        debug_texts.append(f"Until next spawning: { ( ms_until_next_spawn/1000):.1f}")
         debug_texts.append(f"Is creating path: { ( is_creating_path)}")
         return debug_texts
 
@@ -89,4 +99,4 @@ class DebugRenderer:
     ) -> None:
         for i, text in enumerate(debug_texts):
             debug_label = font.render(text, True, fg_color)
-            self._debug_surf.blit(debug_label, (10, 10 + i * 30))
+            self._debug_surf.blit(debug_label, (10, 10 + i * LINE_HEIGHT))
