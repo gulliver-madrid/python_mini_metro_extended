@@ -5,7 +5,6 @@ import pygame
 from src.config import Config
 from src.engine.debug_renderer import DebugRenderer
 from src.entity import Passenger, Path
-from src.ui.ui import UI
 
 from .game_components import GameComponents
 from .passenger_spawner import TravelPlansMapping
@@ -27,9 +26,7 @@ class GameRenderer:
         main_surface_height: float,
         paths: Sequence[Path],
         editing_intermediate_stations: EditingIntermediateStations | None,
-        max_num_paths: int,
         travel_plans: TravelPlansMapping,
-        ui: UI,
         is_creating_path: bool,
         ms_until_next_spawn: float,
         showing_debug: bool,
@@ -46,12 +43,11 @@ class GameRenderer:
             station.draw(screen)
         for metro in self._components.metros:
             metro.draw(screen)
-        ui.render(screen, self._components.status.score)
+        self._components.ui.render(screen, self._components.status.score)
         passengers: Sequence[Passenger] = self._components.passengers
         if showing_debug:
             self.debug_renderer.draw_debug(
                 screen,
-                ui,
                 is_creating_path,
                 passengers,
                 travel_plans,

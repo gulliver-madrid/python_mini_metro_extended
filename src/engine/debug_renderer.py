@@ -7,7 +7,6 @@ from src.config import Config
 from src.engine.game_components import GameComponents
 from src.entity import Passenger
 from src.geometry.point import Point
-from src.ui.ui import UI
 
 from .passenger_spawner import TravelPlansMapping
 
@@ -40,13 +39,13 @@ class DebugRenderer:
     def draw_debug(
         self,
         screen: pygame.surface.Surface,
-        ui: UI,
         is_creating_path: bool,
         passengers: Sequence[Passenger],
         travel_plans: TravelPlansMapping,
         ms_until_next_spawn: float,
         speed: float,
     ) -> None:
+        ui = self._components.ui
         font = ui.small_font
         mouse_pos = ui.last_pos
         fps = ui.clock.get_fps() if ui.clock else None
