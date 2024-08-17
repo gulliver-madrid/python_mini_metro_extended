@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Final, Sequence
 
-from src.config import max_num_metros, max_num_paths
+from src.config import Config, max_num_metros, max_num_paths
 from src.entity import Metro, Path, Station
 from src.entity.segments import PathSegment, Segment
 from src.geometry.point import Point
@@ -162,6 +162,10 @@ class PathManager:
             metro.move_passenger(passenger, passenger.last_station)
         assert not metro.passengers
         self._components.metros.remove(metro)
+        if Config.debug_path_and_metros:
+            print(
+                f"Removed item from metros. Total metros: {len(self._components.metros)}"
+            )
 
     def _find_travel_plan_for_passengers(self) -> None:
         self._travel_plan_finder.find_travel_plan_for_passengers()

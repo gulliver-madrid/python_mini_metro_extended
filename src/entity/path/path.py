@@ -56,6 +56,10 @@ class Path(Entity):
         self.temp_point_is_from_end = True
         self._path_order = path_order
 
+    def __del__(self) -> None:
+        if Config.debug_path_and_metros:
+            print("Deleting path")
+
     ########################
     ### public interface ###
     ########################

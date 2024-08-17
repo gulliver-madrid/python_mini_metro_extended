@@ -1,6 +1,6 @@
 from typing_extensions import override
 
-from src.config import max_num_metros
+from src.config import Config, max_num_metros
 from src.engine.game_components import GameComponents
 from src.entity.metro import Metro
 from src.entity.path import Path
@@ -75,6 +75,8 @@ class CreatingPath(CreatingOrExpandingPathBase):
         metro = Metro(self._components.passengers_mediator)
         self.path.add_metro(metro)
         self._components.metros.append(metro)
+        if Config.debug_path_and_metros:
+            print(f"Added item to metros. Total metros: {len(self._components.metros)}")
 
     def _finish_path_creation(self) -> None:
         assert self.is_active

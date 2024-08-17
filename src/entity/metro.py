@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Final
 
 from src.config import (
+    Config,
     metro_capacity,
     metro_color,
     metro_passengers_per_row,
@@ -39,11 +40,12 @@ class Metro(Holder):
             mediator=passengers_mediator,
         )
         self._current_station: Station | None = None
-        # self.current_segment: Segment | None = None
-        # self.current_segment_idx = 0
-        # self.is_forward = True
         self.travel_step: TravelStep | None = None
         self.path_id: EntityId | None = None
+
+    def __del__(self) -> None:
+        if Config.debug_path_and_metros:
+            print(f"Removing metro.")
 
     ######################
     ### public methods ###
