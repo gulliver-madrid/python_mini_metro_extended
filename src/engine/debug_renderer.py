@@ -88,7 +88,7 @@ class DebugRenderer:
         debug_texts: list[str] = []
         if mouse_pos:
             debug_texts.append(f"Mouse position: {mouse_pos.to_tuple()}")
-        debug_texts.append(f"Frame: {self._components.status.frame}")
+        debug_texts.append(f"Game time: {self._components.status.game_time}")
         if fps:
             debug_texts.append(f"FPS: {fps:.1f}")
         debug_texts.append(f"Game speed: {game_speed:.2f}")

@@ -88,10 +88,10 @@ class Engine:
         return self._components.ui.get_containing_button(position) or None
 
     def increment_time(self, dt_ms: int) -> None:
-        self._components.status.frame += 1
         if self._components.status.is_paused:
             return
 
+        self._components.status.game_time += 1
         dt_ms *= self.game_speed
         self._passenger_spawner.increment_time(dt_ms)
 
