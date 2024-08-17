@@ -1,5 +1,5 @@
-from collections.abc import Sequence
 import random
+from collections.abc import Sequence
 from typing import Final, Mapping
 
 from src.entity import Passenger, Station
@@ -35,12 +35,12 @@ class TravelPlanFinder:
             self._components.stations, self._components.paths
         )
         for station in self._components.stations:
+            if not self._station_is_connected(station):
+                continue
             for passenger in station.passengers:
                 if _passenger_has_travel_plan_with_next_path(
                     passenger, self._components.paths
                 ):
-                    continue
-                if not self._station_is_connected(station):
                     continue
                 if DEBUG:
                     print(f"Looking for a travel plan for passenger {passenger}")
