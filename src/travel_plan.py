@@ -8,6 +8,13 @@ from src.graph.node import Node
 
 
 class TravelPlan:
+    __slots__ = (
+        "next_path",
+        "next_station",
+        "node_path",
+        "next_station_idx",
+    )
+
     def __init__(self, node_path: Sequence[Node]) -> None:
         self.next_path: Path | None = None
         self.next_station: Station | None = None
