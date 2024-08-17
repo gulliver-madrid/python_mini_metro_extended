@@ -6,7 +6,6 @@ from src.geometry.type import ShapeType
 screen_color = (255, 255, 255)
 
 # station
-num_stations = 10
 station_size = 60
 station_capacity = 12
 station_color = (0, 0, 0)
@@ -75,6 +74,7 @@ class Config:
     passenger_spawning = _PassengerSpawningConfig
     # stations
     min_distance = station_size * 3
+    num_stations = 10
     # path
     path_width = _path_width
     # rules

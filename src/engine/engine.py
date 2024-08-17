@@ -4,7 +4,7 @@ from typing import Final, NoReturn
 
 import pygame
 
-from src.config import Config, num_stations
+from src.config import Config
 from src.entity import Station, get_random_stations
 from src.geometry.point import Point
 from src.passengers_mediator import PassengersMediator
@@ -45,7 +45,7 @@ class Engine:
         # components
         self._components: Final = GameComponents(
             paths=[],
-            stations=get_random_stations(num_stations, passengers_mediator),
+            stations=get_random_stations(Config.num_stations, passengers_mediator),
             metros=[],
             status=MediatorStatus(),
             passengers_mediator=passengers_mediator,
