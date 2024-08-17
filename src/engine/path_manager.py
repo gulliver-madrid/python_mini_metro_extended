@@ -79,12 +79,12 @@ class PathManager:
         return gen_wrapper_creating_or_expanding(self._creating_or_expanding_path)
 
     def remove_path(self, path: Path) -> None:
-        self._components.ui.path_to_button[path].remove_path()
+        self._components.gui.path_to_button[path].remove_path()
         for metro in path.metros:
             self._remove_metro(metro)
         self._components.path_color_manager.release_color_for_path(path)
         self._components.paths.remove(path)
-        self._components.ui.assign_paths_to_buttons(self._components.paths)
+        self._components.gui.assign_paths_to_buttons(self._components.paths)
         self._find_travel_plan_for_passengers()
 
     def try_to_set_temporary_point(self, position: Point) -> None:

@@ -10,7 +10,7 @@ from src.config import (
 )
 from src.entity.path import Path
 from src.geometry.point import Point
-from src.ui.path_button import PathButton, get_path_buttons
+from src.gui.path_button import PathButton, get_path_buttons
 
 _gui_height = Config.screen_height * gui_height_proportion
 _main_surface_height = Config.screen_height - _gui_height
@@ -24,7 +24,7 @@ def get_main_surface_height() -> float:
     return _main_surface_height
 
 
-class UI:
+class GUI:
     __slots__ = (
         "path_buttons",
         "path_to_button",

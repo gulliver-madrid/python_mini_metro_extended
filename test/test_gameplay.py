@@ -154,38 +154,40 @@ class TestGameplay(GameplayBaseTestCase):
             station.draw(self.screen)
         self._connect_stations([0, 1])
         self.reactor.react(
-            MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
+            MouseEvent(
+                MouseEventType.MOUSE_UP, self.engine.gui.path_buttons[0].position
+            )
         )
         self.assertEqual(len(legacy_get_engine_paths(self.engine)), 0)
-        self.assertEqual(len(self.engine.ui.path_to_button.items()), 0)
+        self.assertEqual(len(self.engine.gui.path_to_button.items()), 0)
 
     def test_path_buttons_get_assigned_upon_path_creation(self) -> None:
         self._replace_with_random_stations(5)
         for station in legacy_get_engine_stations(self.engine):
             station.draw(self.screen)
         self._connect_stations([0, 1])
-        self.assertEqual(len(self.engine.ui.path_to_button.items()), 1)
+        self.assertEqual(len(self.engine.gui.path_to_button.items()), 1)
         self.assertIn(
-            legacy_get_engine_paths(self.engine)[0], self.engine.ui.path_to_button
+            legacy_get_engine_paths(self.engine)[0], self.engine.gui.path_to_button
         )
         self._connect_stations([2, 3])
-        self.assertEqual(len(self.engine.ui.path_to_button.items()), 2)
+        self.assertEqual(len(self.engine.gui.path_to_button.items()), 2)
         self.assertIn(
-            legacy_get_engine_paths(self.engine)[0], self.engine.ui.path_to_button
+            legacy_get_engine_paths(self.engine)[0], self.engine.gui.path_to_button
         )
         self.assertIn(
-            legacy_get_engine_paths(self.engine)[1], self.engine.ui.path_to_button
+            legacy_get_engine_paths(self.engine)[1], self.engine.gui.path_to_button
         )
         self._connect_stations([1, 3])
-        self.assertEqual(len(self.engine.ui.path_to_button.items()), 3)
+        self.assertEqual(len(self.engine.gui.path_to_button.items()), 3)
         self.assertIn(
-            legacy_get_engine_paths(self.engine)[0], self.engine.ui.path_to_button
+            legacy_get_engine_paths(self.engine)[0], self.engine.gui.path_to_button
         )
         self.assertIn(
-            legacy_get_engine_paths(self.engine)[1], self.engine.ui.path_to_button
+            legacy_get_engine_paths(self.engine)[1], self.engine.gui.path_to_button
         )
         self.assertIn(
-            legacy_get_engine_paths(self.engine)[2], self.engine.ui.path_to_button
+            legacy_get_engine_paths(self.engine)[2], self.engine.gui.path_to_button
         )
 
     def test_more_paths_can_be_created_after_removing_paths(self) -> None:
@@ -196,7 +198,9 @@ class TestGameplay(GameplayBaseTestCase):
         self._connect_stations([2, 3])
         self._connect_stations([1, 4])
         self.reactor.react(
-            MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
+            MouseEvent(
+                MouseEventType.MOUSE_UP, self.engine.gui.path_buttons[0].position
+            )
         )
         self.assertEqual(len(legacy_get_engine_paths(self.engine)), 2)
         self._connect_stations([1, 3])
@@ -211,26 +215,36 @@ class TestGameplay(GameplayBaseTestCase):
         self._connect_stations([2, 3])
         self._connect_stations([1, 4])
         self.reactor.react(
-            MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
+            MouseEvent(
+                MouseEventType.MOUSE_UP, self.engine.gui.path_buttons[0].position
+            )
         )
         self.assertEqual(len(legacy_get_engine_paths(self.engine)), 2)
         self.reactor.react(
-            MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
+            MouseEvent(
+                MouseEventType.MOUSE_UP, self.engine.gui.path_buttons[0].position
+            )
         )
         self.assertEqual(len(legacy_get_engine_paths(self.engine)), 1)
         self.reactor.react(
-            MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
+            MouseEvent(
+                MouseEventType.MOUSE_UP, self.engine.gui.path_buttons[0].position
+            )
         )
         self.assertEqual(len(legacy_get_engine_paths(self.engine)), 0)
 
     def test_unassigned_path_buttons_do_nothing_on_click(self) -> None:
         self.assertEqual(len(legacy_get_engine_paths(self.engine)), 0)
         self.reactor.react(
-            MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
+            MouseEvent(
+                MouseEventType.MOUSE_UP, self.engine.gui.path_buttons[0].position
+            )
         )
         self.assertEqual(len(legacy_get_engine_paths(self.engine)), 0)
         self.reactor.react(
-            MouseEvent(MouseEventType.MOUSE_UP, self.engine.ui.path_buttons[0].position)
+            MouseEvent(
+                MouseEventType.MOUSE_UP, self.engine.gui.path_buttons[0].position
+            )
         )
         self.assertEqual(len(legacy_get_engine_paths(self.engine)), 0)
 

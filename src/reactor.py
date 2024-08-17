@@ -10,8 +10,8 @@ from src.event.keyboard import KeyboardEvent
 from src.event.mouse import MouseEvent
 from src.event.type import KeyboardEventType, MouseEventType
 from src.geometry.point import Point
-from src.ui.button import Button
-from src.ui.path_button import PathButton
+from src.gui.button import Button
+from src.gui.path_button import PathButton
 
 
 class UI_Reactor:
@@ -97,7 +97,7 @@ class UI_Reactor:
     ) -> None:
         if self._last_clicked:
             self._last_clicked = None
-        self._engine.ui.last_pos = position
+        self._engine.gui.last_pos = position
         if self.is_mouse_down:
             self._on_mouse_motion_with_mouse_down(entity, position)
         else:
@@ -179,7 +179,7 @@ class UI_Reactor:
         if isinstance(entity, Button):
             entity.on_hover()
         else:
-            self._engine.ui.exit_buttons()
+            self._engine.gui.exit_buttons()
 
     def _send_to_wrapper_creating_or_expanding(
         self, command: str, entity: Station | object

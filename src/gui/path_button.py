@@ -15,7 +15,7 @@ from src.geometry.point import Point
 from src.geometry.polygons import Cross
 from src.geometry.shape import Shape
 from src.geometry.types import create_degrees
-from src.ui.button import Button
+from src.gui.button import Button
 
 
 class PathButton(Button):

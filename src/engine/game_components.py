@@ -2,8 +2,8 @@ from dataclasses import dataclass, field
 
 from src.engine.path_color_manager import PathColorManager
 from src.entity import Metro, Passenger, Path, Station
+from src.gui.gui import GUI
 from src.protocols.passenger_mediator import PassengersMediatorProtocol
-from src.ui.ui import UI
 
 from .status import EngineStatus
 
@@ -18,7 +18,7 @@ class GameComponents:
     path_color_manager: PathColorManager = field(
         init=False, default_factory=PathColorManager
     )
-    ui: UI = field(init=False, default_factory=UI)
+    gui: GUI = field(init=False, default_factory=GUI)
 
     @property
     def passengers(self) -> list[Passenger]:

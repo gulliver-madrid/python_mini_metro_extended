@@ -5,8 +5,8 @@ from typing import Iterator
 
 from src.config import Config
 from src.geometry.point import Point
+from src.gui.gui import get_gui_height, get_main_surface_height
 from src.protocols.passenger_mediator import PassengersMediatorProtocol
-from src.ui.ui import get_gui_height, get_main_surface_height
 from src.utils import get_random_position, get_random_station_shape
 
 from .metro import Metro

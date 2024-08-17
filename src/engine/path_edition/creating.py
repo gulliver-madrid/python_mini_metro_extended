@@ -84,7 +84,7 @@ class CreatingPath(CreatingOrExpandingPathBase):
         if self._can_add_metro():
             self._add_new_metro()
         self._stop_creating_or_expanding()
-        self._components.ui.assign_paths_to_buttons(self._components.paths)
+        self._components.gui.assign_paths_to_buttons(self._components.paths)
 
     def _remove_path_from_network(self) -> None:
         self._components.path_color_manager.release_color_for_path(self.path)

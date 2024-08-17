@@ -43,7 +43,7 @@ class GameRenderer:
             station.draw(screen)
         for metro in self._components.metros:
             metro.draw(screen)
-        self._components.ui.render(screen, self._components.status.score)
+        self._components.gui.render(screen, self._components.status.score)
         passengers: Sequence[Passenger] = self._components.passengers
         if showing_debug:
             self.debug_renderer.draw_debug(

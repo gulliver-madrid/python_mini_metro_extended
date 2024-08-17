@@ -45,10 +45,10 @@ class DebugRenderer:
         ms_until_next_spawn: float,
         speed: float,
     ) -> None:
-        ui = self._components.ui
-        font = ui.small_font
-        mouse_pos = ui.last_pos
-        fps = ui.clock.get_fps() if ui.clock else None
+        gui = self._components.gui
+        font = gui.small_font
+        mouse_pos = gui.last_pos
+        fps = gui.clock.get_fps() if gui.clock else None
 
         debug_texts = self._define_debug_texts(
             mouse_pos,

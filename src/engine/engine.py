@@ -7,9 +7,9 @@ import pygame
 from src.config import Config
 from src.entity import Station, get_random_stations
 from src.geometry.point import Point
+from src.gui.gui import GUI, get_gui_height, get_main_surface_height
+from src.gui.path_button import PathButton
 from src.passengers_mediator import PassengersMediator
-from src.ui.path_button import PathButton
-from src.ui.ui import UI, get_gui_height, get_main_surface_height
 
 from .game_components import GameComponents
 from .game_renderer import GameRenderer
@@ -72,20 +72,20 @@ class Engine:
         )
         self._passenger_mover = PassengerMover(self._components)
 
-        self._components.ui.init(self.path_manager.max_num_paths)
+        self._components.gui.init(self.path_manager.max_num_paths)
 
     ######################
     ### public methods ###
     ######################
 
     def set_clock(self, clock: pygame.time.Clock) -> None:
-        self._components.ui.clock = clock
+        self._components.gui.clock = clock
 
     def get_containing_entity(self, position: Point) -> Station | PathButton | None:
         for station in self._components.stations:
             if station.contains(position):
                 return station
-        return self._components.ui.get_containing_button(position) or None
+        return self._components.gui.get_containing_button(position) or None
 
     def increment_time(self, dt_ms: int) -> None:
         if self._components.status.is_paused:
@@ -150,8 +150,8 @@ class Engine:
         }
 
     @property
-    def ui(self) -> UI:
-        return self._components.ui
+    def gui(self) -> GUI:
+        return self._components.gui
 
     @property
     def is_paused(self) -> bool:
