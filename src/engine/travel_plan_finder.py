@@ -1,7 +1,9 @@
+from collections.abc import Sequence
 import random
 from typing import Final, Mapping
 
 from src.entity import Passenger, Station
+from src.entity.path.path import Path
 from src.geometry.type import ShapeType
 from src.graph.graph_algo import bfs, build_station_nodes_dict
 from src.graph.node import Node
@@ -10,6 +12,8 @@ from src.travel_plan import TravelPlan
 
 from .game_components import GameComponents
 from .path_finder import find_next_path_for_passenger_at_station
+
+DEBUG = False
 
 
 class TravelPlanFinder:
@@ -32,13 +36,22 @@ class TravelPlanFinder:
         )
         for station in self._components.stations:
             for passenger in station.passengers:
-                if _passenger_has_travel_plan_with_next_path(passenger):
+                if _passenger_has_travel_plan_with_next_path(
+                    passenger, self._components.paths
+                ):
                     continue
+                if not self._station_is_connected(station):
+                    continue
+                if DEBUG:
+                    print(f"Looking for a travel plan for passenger {passenger}")
                 self._find_travel_plan_for_passenger(station, passenger)
 
     #######################
     ### private methods ###
     #######################
+
+    def _station_is_connected(self, station: Station) -> bool:
+        return any(station in path.stations for path in self._components.paths)
 
     def _find_travel_plan_for_passenger(
         self,
@@ -86,8 +99,9 @@ class TravelPlanFinder:
         )
 
 
-def _passenger_has_travel_plan_with_next_path(passenger: Passenger) -> bool:
+def _passenger_has_travel_plan_with_next_path(
+    passenger: Passenger, paths: Sequence[Path]
+) -> bool:
     return (
-        passenger.travel_plan is not None
-        and passenger.travel_plan.next_path is not None
+        passenger.travel_plan is not None and passenger.travel_plan.next_path in paths
     )
