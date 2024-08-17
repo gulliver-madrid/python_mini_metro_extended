@@ -1,5 +1,5 @@
+import argparse
 import random
-import sys
 import time
 
 import numpy as np
@@ -17,23 +17,38 @@ DEBUG_TIME = False
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Python implementation of the Mini Metro game."
+    )
+
+    parser.add_argument("-s", "--seed", type=int, help="Random seed")
+
+    parser.add_argument("-st", "--stations", type=int, help="Number of stations")
+
+    args = parser.parse_args()
+
+    random_seed = args.seed
+    if random_seed is not None:
+        assert 0 <= random_seed <= 999
+    else:
+        random_seed = random.randint(0, 999)
+
+    if args.stations is not None:
+        assert args.stations >= 0
+        Config.num_stations = args.stations
+
+    print(f"Random seed: {random_seed}")
+    print(f"Number of stations: {Config.num_stations}")
+
+    random.seed(random_seed)
+    np.random.seed(random_seed)
+
     pygame.init()
 
     flags = pygame.SCALED
     screen = pygame.display.set_mode(
         (Config.screen_width, Config.screen_height), flags, vsync=1
     )
-
-    args = sys.argv[1:]
-    if args:
-        assert len(args) == 1
-        seed = int(args[0])
-        assert 0 <= seed <= 999
-    else:
-        seed = random.randint(0, 999)
-    print(f"Random seed: {seed}")
-    random.seed(seed)
-    np.random.seed(seed)
 
     clock = pygame.time.Clock()
     pygame.display.set_caption("Python Minimetro")
