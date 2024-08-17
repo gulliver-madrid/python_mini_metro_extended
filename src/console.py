@@ -22,7 +22,12 @@ class Console:
         return cmd
 
     def _open_console(self, engine: Engine) -> None:
-        variables = {"e": engine, "engine": engine, "exit": self._console_exit}
+        variables = {
+            "e": engine,
+            "engine": engine,
+            "exit": self._console_exit,
+            "passengers": engine._components.passengers,  # pyright: ignore [reportPrivateUsage]
+        }
         console = code.InteractiveConsole(variables)
         print("Debugging console opened. The game is paused.")
         print("Use 'print(variable)' to see values. Example: print(score)")
