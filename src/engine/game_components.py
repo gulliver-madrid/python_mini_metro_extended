@@ -5,7 +5,7 @@ from src.entity import Metro, Passenger, Path, Station
 from src.protocols.passenger_mediator import PassengersMediatorProtocol
 from src.ui.ui import UI
 
-from .status import MediatorStatus
+from .status import EngineStatus
 
 
 @dataclass(frozen=True)
@@ -13,7 +13,7 @@ class GameComponents:
     paths: list[Path]
     stations: list[Station]
     metros: list[Metro]
-    status: MediatorStatus
+    status: EngineStatus
     passengers_mediator: PassengersMediatorProtocol
     path_color_manager: PathColorManager = field(
         init=False, default_factory=PathColorManager

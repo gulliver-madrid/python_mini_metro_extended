@@ -4,6 +4,7 @@ from typing import Final
 import pygame
 
 from src.config import Config
+from src.engine.game_components import GameComponents
 from src.entity import Passenger
 from src.geometry.point import Point
 from src.ui.ui import UI
@@ -15,12 +16,17 @@ DEFAULT_SIZE = (300, 300)
 
 
 class DebugRenderer:
-    __slots__ = ("_debug_surf", "_size")
+    __slots__ = (
+        "_debug_surf",
+        "_size",
+        "_components",
+    )
 
     fg_color: Final = (255, 255, 255)
     bg_color: Final = (0, 0, 0)
 
-    def __init__(self) -> None:
+    def __init__(self, components: GameComponents) -> None:
+        self._components = components
         self._size = DEFAULT_SIZE
 
     @property
@@ -82,6 +88,7 @@ class DebugRenderer:
         debug_texts: list[str] = []
         if mouse_pos:
             debug_texts.append(f"Mouse position: {mouse_pos.to_tuple()}")
+        debug_texts.append(f"Frame: {self._components.status.frame}")
         if fps:
             debug_texts.append(f"FPS: {fps:.1f}")
         debug_texts.append(f"Game speed: {game_speed:.2f}")

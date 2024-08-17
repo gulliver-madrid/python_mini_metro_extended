@@ -17,7 +17,7 @@ class GameRenderer:
 
     def __init__(self, components: GameComponents) -> None:
         self._components = components
-        self.debug_renderer = DebugRenderer()
+        self.debug_renderer = DebugRenderer(self._components)
 
     def render_game(
         self,

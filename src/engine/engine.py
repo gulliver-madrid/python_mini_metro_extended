@@ -16,7 +16,7 @@ from .game_renderer import GameRenderer
 from .passenger_mover import PassengerMover
 from .passenger_spawner import PassengerSpawner, TravelPlansMapping
 from .path_manager import PathManager
-from .status import MediatorStatus
+from .status import EngineStatus
 from .travel_plan_finder import TravelPlanFinder
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -47,7 +47,7 @@ class Engine:
             paths=[],
             stations=get_random_stations(Config.num_stations, passengers_mediator),
             metros=[],
-            status=MediatorStatus(),
+            status=EngineStatus(),
             passengers_mediator=passengers_mediator,
         )
         self._travel_plan_finder = TravelPlanFinder(self._components)
@@ -88,6 +88,7 @@ class Engine:
         return self._components.ui.get_containing_button(position) or None
 
     def increment_time(self, dt_ms: int) -> None:
+        self._components.status.frame += 1
         if self._components.status.is_paused:
             return
 
