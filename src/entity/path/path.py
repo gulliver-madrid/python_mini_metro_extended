@@ -92,6 +92,10 @@ class Path(Entity):
             if self.metros:
                 metro = self.metros[0]
                 assert metro
+                assert metro.travel_step
+                assert metro.travel_step.next
+                # trigger the clearing of references
+                metro.travel_step.next = None
                 metro.travel_step = travel_step
         self._state.segments.clear()
         self._state.segments.extend(segments)
@@ -130,6 +134,7 @@ class Path(Entity):
         self.update_segments()
 
     def add_metro(self, metro: Metro) -> None:
+        assert not metro.travel_step
         metro.shape.color = self.color
         metro.travel_step = build_travel_steps(self._state.segments, self.is_looped)
         assert metro.current_segment

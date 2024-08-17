@@ -44,6 +44,9 @@ class Metro(Holder):
         self.path_id: EntityId | None = None
 
     def __del__(self) -> None:
+        if self.travel_step:
+            # trigger the clearing of references
+            self.travel_step.next = None
         if Config.debug_path_and_metros:
             print(f"Removing metro.")
 
